@@ -1,0 +1,436 @@
+{
+ "M_Wall_Navy": {
+  "hex": "#2f3f72",
+  "roughness": 0.9,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Wall_NavyDeep": {
+  "hex": "#232f5a",
+  "roughness": 0.9,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Wood_Warm": {
+  "hex": "#b8784a",
+  "roughness": 0.55,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Wood_Dark": {
+  "hex": "#6e432d",
+  "roughness": 0.6,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Wood_Light": {
+  "hex": "#d29a66",
+  "roughness": 0.55,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Floor_Plank_A": {
+  "hex": "#a8704a",
+  "roughness": 0.7,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Floor_Plank_B": {
+  "hex": "#9a6643",
+  "roughness": 0.7,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Floor_Plank_C": {
+  "hex": "#b67c51",
+  "roughness": 0.7,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Cream": {
+  "hex": "#f4e7c9",
+  "roughness": 0.6,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Metal_Gold": {
+  "hex": "#e8b84e",
+  "roughness": 0.3,
+  "metallic": 1.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Metal_Steel": {
+  "hex": "#cfd5df",
+  "roughness": 0.3,
+  "metallic": 0.9,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Teal": {
+  "hex": "#3db3ad",
+  "roughness": 0.45,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Teal_Dark": {
+  "hex": "#25807f",
+  "roughness": 0.5,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Pink": {
+  "hex": "#ff86ad",
+  "roughness": 0.6,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Lime": {
+  "hex": "#c7e64c",
+  "roughness": 0.6,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Blue": {
+  "hex": "#4a7be0",
+  "roughness": 0.6,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Navy_Fabric": {
+  "hex": "#1f2a52",
+  "roughness": 0.8,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Rubber_Mat": {
+  "hex": "#2a2f3c",
+  "roughness": 0.9,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Red": {
+  "hex": "#e5484f",
+  "roughness": 0.5,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Orange": {
+  "hex": "#ffa043",
+  "roughness": 0.5,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Yellow": {
+  "hex": "#ffd84a",
+  "roughness": 0.5,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_White": {
+  "hex": "#fbf7ef",
+  "roughness": 0.5,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Leaf": {
+  "hex": "#5cbf6a",
+  "roughness": 0.7,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Leaf_Dark": {
+  "hex": "#3e9a57",
+  "roughness": 0.7,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Terracotta": {
+  "hex": "#de7b4f",
+  "roughness": 0.8,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Paper": {
+  "hex": "#fff6e0",
+  "roughness": 0.9,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Glass_Clear": {
+  "hex": "#e3f6ff",
+  "roughness": 0.05,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 0.3
+ },
+ "M_Glass_Ice": {
+  "hex": "#eafcff",
+  "roughness": 0.05,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 0.65
+ },
+ "M_Emit_WarmBulb": {
+  "hex": "#ffd08a",
+  "roughness": 0.5,
+  "metallic": 0,
+  "emission": 10,
+  "alpha": 1.0
+ },
+ "M_Emit_Lantern": {
+  "hex": "#ffb46b",
+  "roughness": 0.6,
+  "metallic": 0,
+  "emission": 3,
+  "alpha": 1.0
+ },
+ "M_Emit_NeonPink": {
+  "hex": "#ff5fa2",
+  "roughness": 0.4,
+  "metallic": 0,
+  "emission": 12,
+  "alpha": 1.0
+ },
+ "M_Emit_NeonTeal": {
+  "hex": "#4ff0e6",
+  "roughness": 0.4,
+  "metallic": 0,
+  "emission": 10,
+  "alpha": 1.0
+ },
+ "M_Emit_NeonYellow": {
+  "hex": "#ffe066",
+  "roughness": 0.4,
+  "metallic": 0,
+  "emission": 10,
+  "alpha": 1.0
+ },
+ "M_Emit_Sky": {
+  "hex": "#1e2560",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 1.0,
+  "alpha": 1.0
+ },
+ "M_Emit_SkyGlow": {
+  "hex": "#5a4aa0",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 1.0,
+  "alpha": 1.0
+ },
+ "M_Emit_SkyHorizon": {
+  "hex": "#c46fa8",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 1.0,
+  "alpha": 1.0
+ },
+ "M_Emit_Hills": {
+  "hex": "#151a3c",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 1.0,
+  "alpha": 1.0
+ },
+ "M_Emit_Moon": {
+  "hex": "#fff3c8",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 4,
+  "alpha": 1.0
+ },
+ "M_Emit_Star": {
+  "hex": "#fff8dc",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 6,
+  "alpha": 1.0
+ },
+ "M_Emit_HouseWindow": {
+  "hex": "#ffcc66",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 5,
+  "alpha": 1.0
+ },
+ "M_Emit_ShelfGlow": {
+  "hex": "#ffc77a",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 5,
+  "alpha": 1.0
+ },
+ "M_Emit_FridgeGlow": {
+  "hex": "#d8f6ff",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 2.5,
+  "alpha": 1.0
+ },
+ "M_Emit_ServeRing": {
+  "hex": "#ffe7a0",
+  "roughness": 0.4,
+  "metallic": 0,
+  "emission": 3,
+  "alpha": 1.0
+ },
+ "M_Glass_Teal": {
+  "hex": "#47d1c1",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.6
+ },
+ "M_Glass_Amber": {
+  "hex": "#d98a2b",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Glass_Clear2": {
+  "hex": "#e8f4ff",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.35
+ },
+ "M_Glass_Gold": {
+  "hex": "#f2c14e",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.65
+ },
+ "M_Glass_Blue": {
+  "hex": "#3b6cf0",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Glass_Red": {
+  "hex": "#e0344a",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.75
+ },
+ "M_Glass_Orange": {
+  "hex": "#ff8c2e",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Glass_Green": {
+  "hex": "#4fae4f",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Glass_Purple": {
+  "hex": "#9a6be0",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Glass_Pink": {
+  "hex": "#ff7eb0",
+  "roughness": 0.08,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.7
+ },
+ "M_Liquid_Orange": {
+  "hex": "#ffa53a",
+  "roughness": 0.1,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.8
+ },
+ "M_Liquid_Blue": {
+  "hex": "#4fa6ff",
+  "roughness": 0.1,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.75
+ },
+ "M_Liquid_Pink": {
+  "hex": "#ff8fbf",
+  "roughness": 0.1,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.75
+ },
+ "M_Liquid_Lime": {
+  "hex": "#c9ef5a",
+  "roughness": 0.1,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.75
+ },
+ "M_Metal_SteelDark": {
+  "hex": "#8f98a8",
+  "roughness": 0.3,
+  "metallic": 0.9,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Glass_Fridge": {
+  "hex": "#cfefff",
+  "roughness": 0.05,
+  "metallic": 0,
+  "emission": 0,
+  "alpha": 0.35
+ },
+ "M_Emit_FridgeFloor": {
+  "hex": "#d8f6ff",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 1.5,
+  "alpha": 1.0
+ },
+ "M_Chalkboard": {
+  "hex": "#26313a",
+  "roughness": 0.95,
+  "metallic": 0.0,
+  "emission": 0.0,
+  "alpha": 1.0
+ },
+ "M_Emit_MoonCrater": {
+  "hex": "#f1dfa8",
+  "roughness": 1,
+  "metallic": 0,
+  "emission": 3,
+  "alpha": 1.0
+ }
+}

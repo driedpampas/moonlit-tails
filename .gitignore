@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------- Unity: generated, never commit
+Unity/[Ll]ibrary/
+Unity/[Tt]emp/
+Unity/[Oo]bj/
+Unity/[Ll]ogs/
+Unity/[Uu]ser[Ss]ettings/
+Unity/[Bb]uild/
+Unity/[Bb]uilds/
+Unity/[Mm]emoryCaptures/
+Unity/[Rr]ecordings/
+# desk-check renders from Tools > Moonlit Tails > Capture Player Views
+Unity/Captures/
+Unity/Assets/AssetStoreTools*
+
+# IDE / generated project files
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vs/
+.vscode/
+.idea/
+.consulo/
+
+# builds and packages
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+sysinfo.txt
+
+# ---------------------------------------------------------------- Blender
+*.blend1
+*.blend2
+*.blend@
+
+# ---------------------------------------------------------------- OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store

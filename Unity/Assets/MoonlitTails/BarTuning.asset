@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 712d23da5ae6a0444a99feb4a8fc1b4c, type: 3}
+  m_Name: BarTuning
+  m_EditorClassIdentifier: Assembly-CSharp::MoonlitTails.BarTuning
+  environmentScale: 1
+  playerFloorOffset: 0
+  propScale: 1
+  propScaleRules:
+  - nameContains: Glass_
+    scale: 1
+  - nameContains: Bottle_
+    scale: 1
+  - nameContains: Garnish_
+    scale: 1
+  - nameContains: Fridge_
+    scale: 1
+  - nameContains: Shaker
+    scale: 1
+  characters:
+  - id: Kintsu
+    height: 1
+    heightOffset: 0
+    turn: 0
+  - id: Character03
+    height: 1
+    heightOffset: 0
+    turn: 0
+  - id: Character02
+    height: 1
+    heightOffset: 0
+    turn: 0
+  grabWithWholeHand: 1
+  grabCurl: 0.5
+  releaseCurl: 0.35
+  allowPinchGrab: 1
+  pinchDistance: 0.02
+  pinchReleaseDistance: 0.035
+  grabReach: 0.07
+  palmGrabOffset: 0.03
+  allowDistanceGrab: 0
+  throwStrength: 1.1
+  throwSpin: 1
+  throwWindow: 0.12
+  physicsRate: 90
