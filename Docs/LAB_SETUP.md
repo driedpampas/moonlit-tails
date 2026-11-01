@@ -3,7 +3,7 @@
 Scene: `Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`
 
 The scene contains:
-- **The bar.** It comes from the Blender model `D:\MoonlitTailsBar\MoonlitBar`.
+- **The bar.** It comes from the team's Blender model of the bar (not in this repo).
 - **Three customers:**
   - Kintsu stands at the ordering spot in front of you.
   - Character03 sits on the right-hand bar stool.

@@ -2,6 +2,10 @@
 
 A cozy VR bartending game for Quest. Mix drinks with your own hands for animal customers who come back every night with their stories.
 
+[AI conversation log](Docs/AI_Conversation_Log.md)
+
+[Main modules](https://docs.google.com/document/d/1RSFIeXCF41nIRa_LPg4IBjAwsAV0ZEPrtElibrYGyQE/edit?usp=sharing)
+
 [State of the art](https://docs.google.com/document/d/1jW3J8CAuBcPGa2orrIAQPoJuJKJFUZwphDUCLjqxw80/edit?tab=t.0)
 
 ## What's here
