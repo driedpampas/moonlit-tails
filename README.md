@@ -8,6 +8,16 @@ A cozy VR bartending game for Quest. Mix drinks with your own hands for animal c
 
 [State of the art](https://docs.google.com/document/d/1jW3J8CAuBcPGa2orrIAQPoJuJKJFUZwphDUCLjqxw80/edit?tab=t.0)
 
+## Week 1
+- Placeholder environment with interactable assets integrated in Unity
+- Character brainstorming and creation
+
+AI was used for:
+- creating placeholder 3D models
+- help with integration
+- debugging
+- writing the README
+
 ## What's here
 | Folder | What |
 |---|---|
