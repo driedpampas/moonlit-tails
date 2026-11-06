@@ -19,7 +19,7 @@ from mathutils import Vector, Matrix
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = os.path.abspath(argv[0] if argv else os.path.join(os.getcwd(), "BarSplit"))
 
-# replaced in Unity by Stiv's models (Environment/StivModels): leave them out
+# replaced in Unity by the remade models (Environment/RemadeModels): leave them out
 REPLACED = {"ENV_Wainscot_Front", "ENV_Wainscot_Left", "ENV_Wainscot_Right", "ENV_Wainscot_BackL", "ENV_Wainscot_BackR",
             "ENV_DoorFrame_L", "ENV_DoorFrame_R", "ENV_WindowSill_0"}
 GROUPS = {"ENV_Architecture": "Architecture", "ENV_BarCounters": "BarCounters", "ENV_Decor": "Decor",

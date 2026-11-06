@@ -17,7 +17,7 @@ namespace MoonlitTails.EditorTools
     /// 1. Import settings for every piece, with its materials pointed at Environment/Materials (by name).
     /// 2. One prefab per piece in Environment/Bar/Prefabs (colliders, physics and grabbing included).
     /// 3. In the open scene, every piece of the old MoonlitBar is swapped for its prefab at exactly the same place,
-    ///    the bar is grouped (Architecture, BarCounters, Decor, NightSky, Stools, Props, Markers, Lights, StivModels)
+    ///    the bar is grouped (Architecture, BarCounters, Decor, NightSky, Stools, Props, Markers, Lights, RemadeModels)
     ///    and saved as Environment/Bar/MoonlitBar.prefab.
     /// 4. Every piece's world bounds and vertex count are compared before and after; if anything moved, nothing is saved.
     ///
@@ -29,7 +29,7 @@ namespace MoonlitTails.EditorTools
         public const string Dir = MoonlitSetup.Root + "/Environment/Bar";
         const string PrefabDir = Dir + "/Prefabs";
         const string MaterialDir = MoonlitSetup.Root + "/Environment/Materials";
-        static readonly string[] StivPrefixes = { "woodslab", "archdoor", "counterthingy" };
+        static readonly string[] RemadePrefixes = { "woodslab", "archdoor", "counterthingy" };
 
         [Serializable] class SplitFile { public string source; public string[] replaced; public SplitObject[] objects; }
         [Serializable] class SplitObject { public string name, model, group; public float[] shift; public string[] parts; public int verts, tris; }
@@ -57,7 +57,7 @@ namespace MoonlitTails.EditorTools
             if (split == null) return;
             ConfigureImports(split);
             MakePrefabs(split);
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(MoonlitSetup.BarPrefab)) PromoteStivModels();
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(MoonlitSetup.BarPrefab)) PromoteRemadeModels();
             AssetDatabase.SaveAssets();
             Debug.Log("[Moonlit] Bar pieces refreshed.");
         }
@@ -68,21 +68,21 @@ namespace MoonlitTails.EditorTools
             EditorApplication.Exit(0);
         }
 
-        // ------------------------------------------------------------------ Stiv's models
-        const string StivDir = MoonlitSetup.Root + "/Environment/StivModels";
+        // ------------------------------------------------------------------ remade models
+        const string RemadeDir = MoonlitSetup.Root + "/Environment/RemadeModels";
 
         /// <summary>
-        /// Gives every model in Environment/StivModels a prefab (StivModels/Prefabs) with colliders and the materials
+        /// Gives every model in Environment/RemadeModels a prefab (RemadeModels/Prefabs) with colliders and the materials
         /// its copies in the bar use, then swaps copies of the bare model inside MoonlitBar.prefab for copies of that
-        /// prefab, in exactly the same place. New models dropped into StivModels get the same treatment.
+        /// prefab, in exactly the same place. New models dropped into RemadeModels get the same treatment.
         /// </summary>
-        public static void PromoteStivModels()
+        public static void PromoteRemadeModels()
         {
             var bar = PrefabUtility.LoadPrefabContents(MoonlitSetup.BarPrefab);
             try
             {
-                var models = AssetDatabase.FindAssets("t:Model", new[] { StivDir }).Select(AssetDatabase.GUIDToAssetPath)
-                    .Where(p => Path.GetDirectoryName(p).Replace('\\', '/') == StivDir).ToList();
+                var models = AssetDatabase.FindAssets("t:Model", new[] { RemadeDir }).Select(AssetDatabase.GUIDToAssetPath)
+                    .Where(p => Path.GetDirectoryName(p).Replace('\\', '/') == RemadeDir).ToList();
                 int swapped = 0;
                 foreach (var modelPath in models)
                 {
@@ -91,11 +91,11 @@ namespace MoonlitTails.EditorTools
                         .Where(t => PrefabUtility.IsAnyPrefabInstanceRoot(t.gameObject) && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) == model)
                         .ToList();
 
-                    string prefabPath = StivDir + "/Prefabs/" + model.name + ".prefab";
+                    string prefabPath = RemadeDir + "/Prefabs/" + model.name + ".prefab";
                     var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                     if (!prefab)
                     {
-                        EnsureFolder(StivDir + "/Prefabs");
+                        EnsureFolder(RemadeDir + "/Prefabs");
                         var go = (GameObject)PrefabUtility.InstantiatePrefab(model);
                         go.name = model.name;
                         // the materials the copies in the bar use (they all use the same ones)
@@ -131,7 +131,7 @@ namespace MoonlitTails.EditorTools
                     }
                 }
                 PrefabUtility.SaveAsPrefabAsset(bar, MoonlitSetup.BarPrefab);
-                Debug.Log($"[Moonlit] Stiv's models: {models.Count} prefabs, {swapped} copies in the bar swapped to them.");
+                Debug.Log($"[Moonlit] remade models: {models.Count} prefabs, {swapped} copies in the bar swapped to them.");
             }
             finally { PrefabUtility.UnloadPrefabContents(bar); }
         }
@@ -217,14 +217,14 @@ namespace MoonlitTails.EditorTools
                 Object.DestroyImmediate(old.gameObject);
             }
 
-            // ---- markers, lights and Stiv's replacement pieces into their groups
+            // ---- markers, lights and the remade replacement pieces into their groups
             foreach (Transform t in bar.transform.Cast<Transform>().ToList())
             {
                 if (t.name.StartsWith("MK_")) t.SetParent(Group("Markers"), true);
                 else if (t.name.StartsWith("LGT_")) t.SetParent(Group("Lights"), true);
             }
             foreach (var root in scene.GetRootGameObjects())
-                if (StivPrefixes.Any(p => root.name.StartsWith(p))) root.transform.SetParent(Group("StivModels"), true);
+                if (RemadePrefixes.Any(p => root.name.StartsWith(p))) root.transform.SetParent(Group("RemadeModels"), true);
 
             var leftovers = bar.transform.Cast<Transform>().Where(t => !IsGroup(t.name)).Select(t => t.name).ToList();
 
@@ -267,7 +267,7 @@ namespace MoonlitTails.EditorTools
             return true;
         }
 
-        static bool IsGroup(string n) => new[] { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "StivModels" }.Contains(n);
+        static bool IsGroup(string n) => new[] { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "RemadeModels" }.Contains(n);
 
         static (Bounds b, int verts, int tris) Measure(Transform t)
         {

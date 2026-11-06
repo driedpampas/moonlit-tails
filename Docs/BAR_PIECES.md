@@ -14,7 +14,7 @@ The bar used to be one FBX with 248 objects in it. Now every piece is its own fi
 | `Environment/Bar/Prefabs/<Group>/*.prefab` | One prefab per piece, with its colliders. Props also get physics, grabbing and respawn. |
 | `Environment/Bar/MoonlitBar.prefab` | The whole bar, built from the piece prefabs. The scene holds one copy of it. |
 | `Environment/Bar/bar_split.json` | Which object uses which file. The Unity tools read it. |
-| `Environment/StivModels/` | Stiv's remade pieces, each with a prefab in `StivModels/Prefabs` (colliders and materials included). |
+| `Environment/RemadeModels/` | The remade pieces, each with a prefab in `RemadeModels/Prefabs` (colliders and materials included). |
 
 ## Inside `MoonlitBar`
 
@@ -30,7 +30,7 @@ The bar is grouped like the Blender collections:
 | **Props** | Everything you can grab: `Glasses`, `Bottles`, `Fridge`, `Garnish` and `Tools` |
 | **Markers** | `MK_` points where customers stand, props live, and so on |
 | **Lights** | The bar's lights |
-| **StivModels** | `woodslab` (the wall panelling), `archdoor` (the door arches), `counterthingy` (the middle window sill and the back-wall panelling), as prefabs with colliders. They replace 8 pieces of the original bar, which `split_bar.py` leaves out. Put a new model in `Environment/StivModels` and run **7. Refresh Bar Pieces**: it gets a prefab too, and copies of the bare model in the bar are swapped for it. |
+| **RemadeModels** | `woodslab` (the wall panelling), `archdoor` (the door arches), `counterthingy` (the middle window sill and the back-wall panelling), as prefabs with colliders. They replace 8 pieces of the original bar, which `split_bar.py` leaves out. Put a new model in `Environment/RemadeModels` and run **7. Refresh Bar Pieces**: it gets a prefab too, and copies of the bare model in the bar are swapped for it. |
 
 **Pieces made of parts.** Architecture and counter pieces are split into their parts, so you can move one slab, door or shelf on its own. For example, `ENV_BarCounter` has 20 children: the counter bodies, the top slabs, cabinet doors, fluting and trim.
 - Up to 8 parts of one material stay separate.

@@ -29,7 +29,7 @@ namespace MoonlitTails.EditorTools
             EditorApplication.Exit(problems == 0 ? 0 : 1);
         }
 
-        static readonly string[] Groups = { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "StivModels" };
+        static readonly string[] Groups = { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "RemadeModels" };
         static readonly string[] FixedProps = { "PROP_TapHandle", "PROP_DispenserLever", "PROP_OrderTicket" };
         static readonly string[] NoCollider = { "StringLights", "Neon", "Pendant", "Lantern", "WallStars", "Sconces", "Noren", "IceCubes", "Picture", "Medallion", "Straw", "SKY_" };
 
@@ -46,7 +46,7 @@ namespace MoonlitTails.EditorTools
 
             // ---- what's directly in each group
             var pieces = new List<GameObject>();
-            int markers = 0, lights = 0, stiv = 0;
+            int markers = 0, lights = 0, remade = 0;
             var pieceAssets = new HashSet<string>();
             foreach (Transform child in bar.transform)
             {
@@ -68,12 +68,12 @@ namespace MoonlitTails.EditorTools
                     }
                     if (!PrefabUtility.IsAnyPrefabInstanceRoot(go)) { issues.Add($"{child.name}/{go.name} is not a prefab instance"); continue; }
                     string asset = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
-                    if (child.name == "StivModels") stiv++; else pieces.Add(go);
+                    if (child.name == "RemadeModels") remade++; else pieces.Add(go);
                     pieceAssets.Add(asset);
                     if (!asset.EndsWith(".prefab")) issues.Add($"{go.name} is an instance of a model ({asset}), not of a piece prefab");
                 }
             }
-            sb.AppendLine($"Pieces: {pieces.Count} (from {pieceAssets.Count} prefab files), Stiv's models: {stiv}, markers: {markers}, lights: {lights}");
+            sb.AppendLine($"Pieces: {pieces.Count} (from {pieceAssets.Count} prefab files), remade models: {remade}, markers: {markers}, lights: {lights}");
 
             // ---- every renderer in the bar must belong to a prefab instance, with real materials
             var shared = new HashSet<Material>(AssetDatabase.FindAssets("t:Material", new[] { MoonlitSetup.Root + "/Environment/Materials" })
@@ -88,8 +88,8 @@ namespace MoonlitTails.EditorTools
                 foreach (var m in r.sharedMaterials)
                 {
                     if (!m) { issues.Add($"missing material on {Path(r.transform, bar.transform)}"); continue; }
-                    bool stivMat = Path(r.transform, bar.transform).StartsWith("StivModels/");
-                    if (!stivMat && !shared.Contains(m)) issues.Add($"{Path(r.transform, bar.transform)} uses '{m.name}' ({AssetDatabase.GetAssetPath(m)}), not a shared bar material");
+                    bool remadeMat = Path(r.transform, bar.transform).StartsWith("RemadeModels/");
+                    if (!remadeMat && !shared.Contains(m)) issues.Add($"{Path(r.transform, bar.transform)} uses '{m.name}' ({AssetDatabase.GetAssetPath(m)}), not a shared bar material");
                 }
             }
 

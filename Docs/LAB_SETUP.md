@@ -26,6 +26,8 @@ Link lets you change sizes in the Inspector while someone is wearing the headset
    - Put the controllers down. The hands show up as soon as the headset sees them.
 4. **Recenter:** stand where you want to be behind the bar, and long-press the Meta button to recenter.
 
+**Linux (no headset):** OpenXR can't start in the Linux editor, so on Linux Play skips XR startup and the scene's XR Interaction Simulator drives the rig with mouse and keyboard. The XR setting comes back when you stop Play and is never saved, so the Quest build doesn't change. To turn this off (for example to try a Linux OpenXR runtime), use **Tools > Moonlit Tails > Linux: Skip OpenXR in Play Mode**.
+
 **Hands:**
 - **Hold something:** close your hand around it, like a real glass. Your palm must be within about 7 cm of it. It stays in your palm exactly where you touched it, and opening your hand lets go.
 - **Small things** (cherries, garnish, mint): pinch them between thumb and index, and they're held at your fingertips.
