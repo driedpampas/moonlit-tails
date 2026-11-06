@@ -81,7 +81,7 @@ Run these from **Tools > Moonlit Tails**:
    - Your sizes in `BarTuning.asset` are kept.
 3. **Capture Player Views**: a desk check without a headset. It renders what a standing player sees in every direction, throws a glass and resets it. Output goes to `Captures/` with a `report.txt`.
 4. **Check Drink Setup** and 5. **Play Smoke Test**: see [DRINK_GAME.md](DRINK_GAME.md).
-6. **Assemble Split Bar** and 7. **Refresh Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
+6. **Assemble Split Bar**, 7. **Refresh Bar Pieces** and 8. **Check Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
 
 ## Building an APK instead of Link
 

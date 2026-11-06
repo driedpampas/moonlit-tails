@@ -57,9 +57,86 @@ namespace MoonlitTails.EditorTools
             if (split == null) return;
             ConfigureImports(split);
             MakePrefabs(split);
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(MoonlitSetup.BarPrefab)) PromoteStivModels();
             AssetDatabase.SaveAssets();
             Debug.Log("[Moonlit] Bar pieces refreshed.");
         }
+
+        public static void RefreshPiecesBatch()
+        {
+            RefreshPieces();
+            EditorApplication.Exit(0);
+        }
+
+        // ------------------------------------------------------------------ Stiv's models
+        const string StivDir = MoonlitSetup.Root + "/Environment/StivModels";
+
+        /// <summary>
+        /// Gives every model in Environment/StivModels a prefab (StivModels/Prefabs) with colliders and the materials
+        /// its copies in the bar use, then swaps copies of the bare model inside MoonlitBar.prefab for copies of that
+        /// prefab, in exactly the same place. New models dropped into StivModels get the same treatment.
+        /// </summary>
+        public static void PromoteStivModels()
+        {
+            var bar = PrefabUtility.LoadPrefabContents(MoonlitSetup.BarPrefab);
+            try
+            {
+                var models = AssetDatabase.FindAssets("t:Model", new[] { StivDir }).Select(AssetDatabase.GUIDToAssetPath)
+                    .Where(p => Path.GetDirectoryName(p).Replace('\\', '/') == StivDir).ToList();
+                int swapped = 0;
+                foreach (var modelPath in models)
+                {
+                    var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+                    var copies = bar.GetComponentsInChildren<Transform>(true)
+                        .Where(t => PrefabUtility.IsAnyPrefabInstanceRoot(t.gameObject) && PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) == model)
+                        .ToList();
+
+                    string prefabPath = StivDir + "/Prefabs/" + model.name + ".prefab";
+                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                    if (!prefab)
+                    {
+                        EnsureFolder(StivDir + "/Prefabs");
+                        var go = (GameObject)PrefabUtility.InstantiatePrefab(model);
+                        go.name = model.name;
+                        // the materials the copies in the bar use (they all use the same ones)
+                        var sample = copies.FirstOrDefault();
+                        if (sample)
+                        {
+                            var from = sample.GetComponentsInChildren<Renderer>(true);
+                            var to = go.GetComponentsInChildren<Renderer>(true);
+                            for (int i = 0; i < Mathf.Min(from.Length, to.Length); i++) to[i].sharedMaterials = from[i].sharedMaterials;
+                        }
+                        MoonlitSetup.AddEnvironmentComponents(go, "ENV_" + model.name);
+                        prefab = PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
+                        Object.DestroyImmediate(go);
+                        Debug.Log("[Moonlit] Made " + prefabPath);
+                    }
+
+                    // swap copies of the bare model, parents before children so nested copies come along
+                    foreach (var old in copies.OrderBy(t => Depth(t)))
+                    {
+                        if (!old) continue;
+                        var piece = (GameObject)PrefabUtility.InstantiatePrefab(prefab, old.parent);
+                        piece.name = old.name;
+                        piece.transform.SetSiblingIndex(old.GetSiblingIndex());
+                        piece.transform.localPosition = old.localPosition;
+                        piece.transform.localRotation = old.localRotation;
+                        piece.transform.localScale = old.localScale;
+                        piece.SetActive(old.gameObject.activeSelf);
+                        // anything that was attached under the old copy (e.g. another slab) moves to the new one
+                        foreach (var child in old.Cast<Transform>().Where(c => !PrefabUtility.IsPartOfPrefabAsset(c) && PrefabUtility.IsAddedGameObjectOverride(c.gameObject)).ToList())
+                            child.SetParent(piece.transform, false);
+                        Object.DestroyImmediate(old.gameObject);
+                        swapped++;
+                    }
+                }
+                PrefabUtility.SaveAsPrefabAsset(bar, MoonlitSetup.BarPrefab);
+                Debug.Log($"[Moonlit] Stiv's models: {models.Count} prefabs, {swapped} copies in the bar swapped to them.");
+            }
+            finally { PrefabUtility.UnloadPrefabContents(bar); }
+        }
+
+        static int Depth(Transform t) { int d = 0; while (t.parent) { d++; t = t.parent; } return d; }
 
         static SplitFile Load()
         {
