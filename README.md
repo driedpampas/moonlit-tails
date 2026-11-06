@@ -18,6 +18,17 @@ AI was used for:
 - debugging
 - writing the README
 
+## Drink game and bar pieces (6 Nov 2026)
+- Drink rules from the team's crafting guide: stir/shake mixing, layering, glass sizes, stat adjustments and orders, with tests. See [DRINK_GAME.md](Docs/DRINK_GAME.md).
+- Making drinks in VR: pour from bottles, stir or shake, mixed or layered glasses, ice, garnish, a serve station, customer tickets and reactions.
+- The bar split from one FBX into one prefab per piece, with its Blender source in `Art/Bar`. See [BAR_PIECES.md](Docs/BAR_PIECES.md).
+
+AI was used for:
+- analysing the drink rules and finding gaps in them
+- writing the drink rules, the VR drink interactions and their tests
+- splitting the bar into pieces and checking nothing moved
+- writing the docs
+
 ## What's here
 | Folder | What |
 |---|---|
