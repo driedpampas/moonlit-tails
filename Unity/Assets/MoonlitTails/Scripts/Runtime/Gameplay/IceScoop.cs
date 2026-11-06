@@ -5,7 +5,7 @@ namespace MoonlitTails.Gameplay
     /// <summary>Dip the scoop in the ice well to fill it, then bring it to a glass's rim: the drink becomes Cold.</summary>
     public class IceScoop : MonoBehaviour
     {
-        public Renderer iceWell;
+        public Transform iceWell;
         public float reach = 0.08f;
 
         Renderer self;
@@ -13,7 +13,7 @@ namespace MoonlitTails.Gameplay
         GameObject cubes;
         FloatingLabel label;
 
-        public void Init(Renderer well)
+        public void Init(Transform well)
         {
             iceWell = well;
             self = GetComponent<Renderer>();
@@ -28,7 +28,7 @@ namespace MoonlitTails.Gameplay
             Vector3 p = self.bounds.center;
             if (!loaded && iceWell)
             {
-                var b = iceWell.bounds;
+                var b = GameVisuals.WorldBounds(iceWell);
                 b.Expand(new Vector3(0.02f, 0.06f, 0.02f));
                 if (b.Contains(p)) { SetLoaded(true); label.Flash("Got ice", GameVisuals.Good, 1.5f); }
             }

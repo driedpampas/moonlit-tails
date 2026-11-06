@@ -1,0 +1,2342 @@
+{
+ "source": "Art/Bar/MoonlitBar.blend",
+ "replaced": [
+  "ENV_DoorFrame_L",
+  "ENV_DoorFrame_R",
+  "ENV_Wainscot_BackL",
+  "ENV_Wainscot_BackR",
+  "ENV_Wainscot_Front",
+  "ENV_Wainscot_Left",
+  "ENV_Wainscot_Right",
+  "ENV_WindowSill_0"
+ ],
+ "objects": [
+  {
+   "name": "DECO_Chair_L1",
+   "model": "Decor/DECO_Chair_L1.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 318,
+   "tris": 604
+  },
+  {
+   "name": "DECO_Chair_L2",
+   "model": "Decor/DECO_Chair_L2.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 318,
+   "tris": 604
+  },
+  {
+   "name": "DECO_Chair_R1",
+   "model": "Decor/DECO_Chair_R1.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 318,
+   "tris": 604
+  },
+  {
+   "name": "DECO_Chair_R2",
+   "model": "Decor/DECO_Chair_R2.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 318,
+   "tris": 604
+  },
+  {
+   "name": "DECO_Coaster_Side_1",
+   "model": "Decor/DECO_Coaster_Side.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 284
+  },
+  {
+   "name": "DECO_Coaster_Side_2",
+   "model": "Decor/DECO_Coaster_Side.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 284
+  },
+  {
+   "name": "DECO_IceCubes",
+   "model": "Decor/DECO_IceCubes.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 624,
+   "tris": 1144
+  },
+  {
+   "name": "DECO_Jukebox",
+   "model": "Decor/DECO_Jukebox.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 940,
+   "tris": 1792
+  },
+  {
+   "name": "DECO_Lantern_L",
+   "model": "Decor/DECO_Lantern_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 434,
+   "tris": 852
+  },
+  {
+   "name": "DECO_Lantern_R",
+   "model": "Decor/DECO_Lantern_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 434,
+   "tris": 852
+  },
+  {
+   "name": "DECO_Medallion",
+   "model": "Decor/DECO_Medallion.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 240,
+   "tris": 476
+  },
+  {
+   "name": "DECO_MenuBoard",
+   "model": "Decor/DECO_MenuBoard.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 304,
+   "tris": 560
+  },
+  {
+   "name": "DECO_Neon_Cocktail",
+   "model": "Decor/DECO_Neon_Cocktail.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 128
+  },
+  {
+   "name": "DECO_Neon_Glass_Back",
+   "model": "Decor/DECO_Neon_Glass_Back.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 128
+  },
+  {
+   "name": "DECO_Neon_Moon",
+   "model": "Decor/DECO_Neon_Moon.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 320,
+   "tris": 640
+  },
+  {
+   "name": "DECO_Neon_Olive",
+   "model": "Decor/DECO_Neon_Olive.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 96,
+   "tris": 192
+  },
+  {
+   "name": "DECO_Neon_Sign_Back",
+   "model": "Decor/DECO_Neon_Sign_Back.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 6808,
+   "tris": 6764
+  },
+  {
+   "name": "DECO_Noren_L",
+   "model": "Decor/DECO_Noren_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 134,
+   "tris": 244
+  },
+  {
+   "name": "DECO_Noren_R",
+   "model": "Decor/DECO_Noren_R.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 134,
+   "tris": 244
+  },
+  {
+   "name": "DECO_OrderRug",
+   "model": "Decor/DECO_OrderRug.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 214,
+   "tris": 420
+  },
+  {
+   "name": "DECO_Pendant_1",
+   "model": "Decor/DECO_Pendant_1.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 267,
+   "tris": 500
+  },
+  {
+   "name": "DECO_Pendant_2",
+   "model": "Decor/DECO_Pendant_2.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 267,
+   "tris": 500
+  },
+  {
+   "name": "DECO_Pendant_3",
+   "model": "Decor/DECO_Pendant_3.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 267,
+   "tris": 500
+  },
+  {
+   "name": "DECO_Picture_L1",
+   "model": "Decor/DECO_Picture_L1.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 174,
+   "tris": 332
+  },
+  {
+   "name": "DECO_Picture_L2",
+   "model": "Decor/DECO_Picture_L2.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 174,
+   "tris": 332
+  },
+  {
+   "name": "DECO_Picture_R1",
+   "model": "Decor/DECO_Picture_R1.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 174,
+   "tris": 332
+  },
+  {
+   "name": "DECO_Picture_R2",
+   "model": "Decor/DECO_Picture_R2.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 174,
+   "tris": 332
+  },
+  {
+   "name": "DECO_Plant_BackR",
+   "model": "Decor/DECO_Plant_BackR.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 416,
+   "tris": 784
+  },
+  {
+   "name": "DECO_Plant_CounterL",
+   "model": "Decor/DECO_Plant_CounterL.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 302,
+   "tris": 572
+  },
+  {
+   "name": "DECO_Plant_FrontR",
+   "model": "Decor/DECO_Plant_FrontR.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 416,
+   "tris": 784
+  },
+  {
+   "name": "DECO_Plant_SideL",
+   "model": "Decor/DECO_Plant_SideL.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 416,
+   "tris": 784
+  },
+  {
+   "name": "DECO_Plant_SideR",
+   "model": "Decor/DECO_Plant_SideR.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 416,
+   "tris": 784
+  },
+  {
+   "name": "DECO_Plant_SillL",
+   "model": "Decor/DECO_Plant_SillL.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 302,
+   "tris": 572
+  },
+  {
+   "name": "DECO_Plant_SillR",
+   "model": "Decor/DECO_Plant_SillR.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 302,
+   "tris": 572
+  },
+  {
+   "name": "DECO_Rug_L",
+   "model": "Decor/DECO_Rug_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 320,
+   "tris": 632
+  },
+  {
+   "name": "DECO_Rug_R",
+   "model": "Decor/DECO_Rug_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 320,
+   "tris": 632
+  },
+  {
+   "name": "DECO_Sconces_L",
+   "model": "Decor/DECO_Sconces_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 284,
+   "tris": 552
+  },
+  {
+   "name": "DECO_Sconces_R",
+   "model": "Decor/DECO_Sconces_R.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 284,
+   "tris": 552
+  },
+  {
+   "name": "DECO_ServeCoaster",
+   "model": "Decor/DECO_ServeCoaster.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 192,
+   "tris": 380
+  },
+  {
+   "name": "DECO_ShelfBottles_L1",
+   "model": "Decor/DECO_ShelfBottles_L1.fbx",
+   "group": "Decor",
+   "shift": [
+    -1.190184,
+    -1.28,
+    1.5
+   ],
+   "parts": [],
+   "verts": 400,
+   "tris": 720
+  },
+  {
+   "name": "DECO_ShelfBottles_L2",
+   "model": "Decor/DECO_ShelfBottles_L2.fbx",
+   "group": "Decor",
+   "shift": [
+    -1.190157,
+    -1.28,
+    1.88
+   ],
+   "parts": [],
+   "verts": 412,
+   "tris": 744
+  },
+  {
+   "name": "DECO_ShelfBottles_L3",
+   "model": "Decor/DECO_ShelfBottles_L3.fbx",
+   "group": "Decor",
+   "shift": [
+    -1.194844,
+    -1.28,
+    2.26
+   ],
+   "parts": [],
+   "verts": 472,
+   "tris": 864
+  },
+  {
+   "name": "DECO_ShelfBottles_R1",
+   "model": "Decor/DECO_ShelfBottles_R1.fbx",
+   "group": "Decor",
+   "shift": [
+    1.137238,
+    -1.28,
+    1.5
+   ],
+   "parts": [],
+   "verts": 412,
+   "tris": 744
+  },
+  {
+   "name": "DECO_ShelfBottles_R2",
+   "model": "Decor/DECO_ShelfBottles_R2.fbx",
+   "group": "Decor",
+   "shift": [
+    1.139771,
+    -1.28,
+    1.88
+   ],
+   "parts": [],
+   "verts": 436,
+   "tris": 792
+  },
+  {
+   "name": "DECO_ShelfBottles_R3",
+   "model": "Decor/DECO_ShelfBottles_R3.fbx",
+   "group": "Decor",
+   "shift": [
+    1.151678,
+    -1.28,
+    2.26
+   ],
+   "parts": [],
+   "verts": 376,
+   "tris": 672
+  },
+  {
+   "name": "DECO_StrawCup",
+   "model": "Decor/DECO_StrawCup.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 174,
+   "tris": 308
+  },
+  {
+   "name": "DECO_StringLights_Front",
+   "model": "Decor/DECO_StringLights_Front.fbx",
+   "group": "Decor",
+   "shift": [
+    -0.013832,
+    4.92,
+    2.8336
+   ],
+   "parts": [],
+   "verts": 960,
+   "tris": 1680
+  },
+  {
+   "name": "DECO_StringLights_Left",
+   "model": "Decor/DECO_StringLights_Left.fbx",
+   "group": "Decor",
+   "shift": [
+    -4.52,
+    1.786186,
+    2.8836
+   ],
+   "parts": [],
+   "verts": 576,
+   "tris": 1008
+  },
+  {
+   "name": "DECO_StringLights_Right",
+   "model": "Decor/DECO_StringLights_Right.fbx",
+   "group": "Decor",
+   "shift": [
+    4.52,
+    1.786186,
+    2.8836
+   ],
+   "parts": [],
+   "verts": 576,
+   "tris": 1008
+  },
+  {
+   "name": "DECO_Table_L",
+   "model": "Decor/DECO_Table_L.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 972,
+   "tris": 1908
+  },
+  {
+   "name": "DECO_Table_R",
+   "model": "Decor/DECO_Table_R.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 972,
+   "tris": 1908
+  },
+  {
+   "name": "DECO_TipJar",
+   "model": "Decor/DECO_TipJar.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 310,
+   "tris": 576
+  },
+  {
+   "name": "DECO_WallStars",
+   "model": "Decor/DECO_WallStars.fbx",
+   "group": "Decor",
+   "shift": [
+    0.0,
+    1.983185,
+    1.604762
+   ],
+   "parts": [],
+   "verts": 462,
+   "tris": 840
+  },
+  {
+   "name": "ENV_BackBar_Wall",
+   "model": "BarCounters/ENV_BackBar_Wall.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    -1.28,
+    0.97
+   ],
+   "parts": [
+    "BackBar_Wall_Cream",
+    "BackBar_Wall_Emit_ShelfGlow_01",
+    "BackBar_Wall_Emit_ShelfGlow_02",
+    "BackBar_Wall_Emit_ShelfGlow_03",
+    "BackBar_Wall_Emit_ShelfGlow_04",
+    "BackBar_Wall_Emit_ShelfGlow_05",
+    "BackBar_Wall_Emit_ShelfGlow_06",
+    "BackBar_Wall_Metal_Gold",
+    "BackBar_Wall_Teal",
+    "BackBar_Wall_Teal_Dark",
+    "BackBar_Wall_Wood_Light_01",
+    "BackBar_Wall_Wood_Light_02",
+    "BackBar_Wall_Wood_Light_03",
+    "BackBar_Wall_Wood_Light_04",
+    "BackBar_Wall_Wood_Light_05",
+    "BackBar_Wall_Wood_Light_06"
+   ],
+   "verts": 2184,
+   "tris": 3988
+  },
+  {
+   "name": "ENV_BarCounter",
+   "model": "BarCounters/ENV_BarCounter.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    -0.14,
+    0.0
+   ],
+   "parts": [
+    "BarCounter_Cream_01",
+    "BarCounter_Cream_02",
+    "BarCounter_Cream_03",
+    "BarCounter_Cream_04",
+    "BarCounter_Cream_05",
+    "BarCounter_Cream_06",
+    "BarCounter_Cream_07",
+    "BarCounter_Cream_08",
+    "BarCounter_Metal_Gold",
+    "BarCounter_Rubber_Mat",
+    "BarCounter_Teal",
+    "BarCounter_Teal_Dark",
+    "BarCounter_Wood_Dark_01",
+    "BarCounter_Wood_Dark_02",
+    "BarCounter_Wood_Dark_03",
+    "BarCounter_Wood_Dark_04",
+    "BarCounter_Wood_Warm_01",
+    "BarCounter_Wood_Warm_02",
+    "BarCounter_Wood_Warm_03",
+    "BarCounter_Wood_Warm_04"
+   ],
+   "verts": 1816,
+   "tris": 3364
+  },
+  {
+   "name": "ENV_BarMat",
+   "model": "BarCounters/ENV_BarMat.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.225,
+    0.615,
+    1.02
+   ],
+   "parts": [],
+   "verts": 8,
+   "tris": 12
+  },
+  {
+   "name": "ENV_Blender_Base",
+   "model": "BarCounters/ENV_Blender_Base.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Blender_Base_Pink",
+    "Blender_Base_Teal",
+    "Blender_Base_White"
+   ],
+   "verts": 60,
+   "tris": 108
+  },
+  {
+   "name": "ENV_BottleRiser",
+   "model": "BarCounters/ENV_BottleRiser.fbx",
+   "group": "BarCounters",
+   "shift": [
+    1.47,
+    -0.5,
+    1.02
+   ],
+   "parts": [
+    "BottleRiser_Rubber_Mat",
+    "BottleRiser_Wood_Light"
+   ],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "ENV_Ceiling",
+   "model": "Architecture/ENV_Ceiling.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    1.8,
+    3.36
+   ],
+   "parts": [
+    "Ceiling_Wood_Dark",
+    "Ceiling_Wood_Warm_01",
+    "Ceiling_Wood_Warm_02",
+    "Ceiling_Wood_Warm_03",
+    "Ceiling_Wood_Warm_04",
+    "Ceiling_Wood_Warm_05"
+   ],
+   "verts": 128,
+   "tris": 232
+  },
+  {
+   "name": "ENV_Dispenser_Blue",
+   "model": "BarCounters/ENV_Dispenser_Blue.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Dispenser_Blue_Blue",
+    "Dispenser_Blue_Glass_Clear",
+    "Dispenser_Blue_Liquid_Blue",
+    "Dispenser_Blue_Metal_Steel_01",
+    "Dispenser_Blue_Metal_Steel_02",
+    "Dispenser_Blue_Wood_Light"
+   ],
+   "verts": 406,
+   "tris": 788
+  },
+  {
+   "name": "ENV_Dispenser_Orange",
+   "model": "BarCounters/ENV_Dispenser_Orange.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Dispenser_Orange_Glass_Clear",
+    "Dispenser_Orange_Liquid_Orange",
+    "Dispenser_Orange_Metal_Steel_01",
+    "Dispenser_Orange_Metal_Steel_02",
+    "Dispenser_Orange_Orange",
+    "Dispenser_Orange_Wood_Light"
+   ],
+   "verts": 406,
+   "tris": 788
+  },
+  {
+   "name": "ENV_Dispenser_Pink",
+   "model": "BarCounters/ENV_Dispenser_Pink.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Dispenser_Pink_Glass_Clear",
+    "Dispenser_Pink_Liquid_Pink",
+    "Dispenser_Pink_Metal_Steel_01",
+    "Dispenser_Pink_Metal_Steel_02",
+    "Dispenser_Pink_Pink",
+    "Dispenser_Pink_Wood_Light"
+   ],
+   "verts": 406,
+   "tris": 788
+  },
+  {
+   "name": "ENV_Floor_Lounge",
+   "model": "Architecture/ENV_Floor_Lounge.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    3.035,
+    0.46
+   ],
+   "parts": [
+    "Floor_Lounge_Floor_Plank_A",
+    "Floor_Lounge_Floor_Plank_B",
+    "Floor_Lounge_Floor_Plank_C"
+   ],
+   "verts": 416,
+   "tris": 624
+  },
+  {
+   "name": "ENV_Floor_Pit",
+   "model": "Architecture/ENV_Floor_Pit.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    -0.165,
+    -0.04
+   ],
+   "parts": [
+    "Floor_Pit_Floor_Plank_A",
+    "Floor_Pit_Floor_Plank_B",
+    "Floor_Pit_Floor_Plank_C"
+   ],
+   "verts": 160,
+   "tris": 240
+  },
+  {
+   "name": "ENV_Floor_SideL",
+   "model": "Architecture/ENV_Floor_SideL.fbx",
+   "group": "Architecture",
+   "shift": [
+    -3.2,
+    -0.165,
+    0.46
+   ],
+   "parts": [
+    "Floor_SideL_Floor_Plank_A",
+    "Floor_SideL_Floor_Plank_B",
+    "Floor_SideL_Floor_Plank_C"
+   ],
+   "verts": 128,
+   "tris": 192
+  },
+  {
+   "name": "ENV_Floor_SideR",
+   "model": "Architecture/ENV_Floor_SideR.fbx",
+   "group": "Architecture",
+   "shift": [
+    3.2,
+    -0.165,
+    0.46
+   ],
+   "parts": [
+    "Floor_SideR_Floor_Plank_A",
+    "Floor_SideR_Floor_Plank_B",
+    "Floor_SideR_Floor_Plank_C"
+   ],
+   "verts": 128,
+   "tris": 192
+  },
+  {
+   "name": "ENV_FootRail",
+   "model": "BarCounters/ENV_FootRail.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.0,
+    1.22,
+    0.5
+   ],
+   "parts": [],
+   "verts": 152,
+   "tris": 268
+  },
+  {
+   "name": "ENV_Fridge",
+   "model": "BarCounters/ENV_Fridge.fbx",
+   "group": "BarCounters",
+   "shift": [
+    1.35,
+    -1.185,
+    0.08
+   ],
+   "parts": [
+    "Fridge_Emit_FridgeFloor",
+    "Fridge_Emit_FridgeGlow",
+    "Fridge_Glass_Fridge",
+    "Fridge_Metal_Gold",
+    "Fridge_Metal_Steel_01",
+    "Fridge_Metal_Steel_02",
+    "Fridge_Metal_Steel_03",
+    "Fridge_Metal_Steel_04",
+    "Fridge_Metal_Steel_05"
+   ],
+   "verts": 136,
+   "tris": 236
+  },
+  {
+   "name": "ENV_GarnishTray",
+   "model": "BarCounters/ENV_GarnishTray.fbx",
+   "group": "BarCounters",
+   "shift": [
+    0.89,
+    0.65,
+    1.02
+   ],
+   "parts": [
+    "GarnishTray_Wood_Light_01",
+    "GarnishTray_Wood_Light_02",
+    "GarnishTray_Wood_Light_03",
+    "GarnishTray_Wood_Light_04",
+    "GarnishTray_Wood_Light_05",
+    "GarnishTray_Wood_Light_06",
+    "GarnishTray_Wood_Light_07",
+    "GarnishTray_Wood_Light_08"
+   ],
+   "verts": 192,
+   "tris": 352
+  },
+  {
+   "name": "ENV_GlassRiser",
+   "model": "BarCounters/ENV_GlassRiser.fbx",
+   "group": "BarCounters",
+   "shift": [
+    -1.47,
+    -0.315,
+    1.02
+   ],
+   "parts": [
+    "GlassRiser_Rubber_Mat",
+    "GlassRiser_Wood_Light"
+   ],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "ENV_IceWell",
+   "model": "BarCounters/ENV_IceWell.fbx",
+   "group": "BarCounters",
+   "shift": [
+    -0.5,
+    0.65,
+    1.02
+   ],
+   "parts": [
+    "IceWell_Metal_Steel",
+    "IceWell_Metal_SteelDark"
+   ],
+   "verts": 32,
+   "tris": 56
+  },
+  {
+   "name": "ENV_Pit_Mat",
+   "model": "Architecture/ENV_Pit_Mat.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    -0.25,
+    0.0
+   ],
+   "parts": [],
+   "verts": 24,
+   "tris": 44
+  },
+  {
+   "name": "ENV_Platform",
+   "model": "Architecture/ENV_Platform.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    1.8,
+    0.0
+   ],
+   "parts": [
+    "Platform_Wood_Dark_01",
+    "Platform_Wood_Dark_02",
+    "Platform_Wood_Dark_03"
+   ],
+   "verts": 24,
+   "tris": 36
+  },
+  {
+   "name": "ENV_Sink",
+   "model": "BarCounters/ENV_Sink.fbx",
+   "group": "BarCounters",
+   "shift": [
+    -1.2,
+    -1.19,
+    0.948
+   ],
+   "parts": [
+    "Sink_Blue",
+    "Sink_Metal_Steel_01",
+    "Sink_Metal_Steel_02",
+    "Sink_Metal_Steel_03",
+    "Sink_Metal_Steel_04",
+    "Sink_Metal_SteelDark",
+    "Sink_Red"
+   ],
+   "verts": 132,
+   "tris": 236
+  },
+  {
+   "name": "ENV_Stool_L",
+   "model": "Stools/ENV_Stool_L.fbx",
+   "group": "Stools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 1056,
+   "tris": 2096
+  },
+  {
+   "name": "ENV_Stool_R",
+   "model": "Stools/ENV_Stool_R.fbx",
+   "group": "Stools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 1056,
+   "tris": 2096
+  },
+  {
+   "name": "ENV_TapTower",
+   "model": "BarCounters/ENV_TapTower.fbx",
+   "group": "BarCounters",
+   "shift": [
+    1.45,
+    0.18,
+    1.02
+   ],
+   "parts": [
+    "TapTower_Metal_Gold_01",
+    "TapTower_Metal_Gold_02",
+    "TapTower_Metal_Gold_03",
+    "TapTower_Metal_Steel_01",
+    "TapTower_Metal_Steel_02",
+    "TapTower_Metal_Steel_03",
+    "TapTower_Metal_Steel_04",
+    "TapTower_Metal_Steel_05",
+    "TapTower_Metal_Steel_06",
+    "TapTower_Metal_Steel_07",
+    "TapTower_Rubber_Mat"
+   ],
+   "verts": 266,
+   "tris": 488
+  },
+  {
+   "name": "ENV_TicketRail",
+   "model": "BarCounters/ENV_TicketRail.fbx",
+   "group": "BarCounters",
+   "shift": [
+    -1.42,
+    -0.25,
+    1.7625
+   ],
+   "parts": [
+    "TicketRail_Metal_Gold_01",
+    "TicketRail_Metal_Gold_02",
+    "TicketRail_Metal_Gold_03"
+   ],
+   "verts": 56,
+   "tris": 100
+  },
+  {
+   "name": "ENV_Vestibule_L",
+   "model": "Architecture/ENV_Vestibule_L.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Vestibule_L_Wall_NavyDeep_01",
+    "Vestibule_L_Wall_NavyDeep_02",
+    "Vestibule_L_Wall_NavyDeep_03",
+    "Vestibule_L_Wall_NavyDeep_04",
+    "Vestibule_L_Wood_Dark"
+   ],
+   "verts": 40,
+   "tris": 60
+  },
+  {
+   "name": "ENV_Vestibule_R",
+   "model": "Architecture/ENV_Vestibule_R.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Vestibule_R_Wall_NavyDeep_01",
+    "Vestibule_R_Wall_NavyDeep_02",
+    "Vestibule_R_Wall_NavyDeep_03",
+    "Vestibule_R_Wall_NavyDeep_04",
+    "Vestibule_R_Wood_Dark"
+   ],
+   "verts": 40,
+   "tris": 60
+  },
+  {
+   "name": "ENV_Wall_Back",
+   "model": "Architecture/ENV_Wall_Back.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    -1.5,
+    0.0
+   ],
+   "parts": [],
+   "verts": 8,
+   "tris": 12
+  },
+  {
+   "name": "ENV_Wall_Front",
+   "model": "Architecture/ENV_Wall_Front.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    5.1,
+    0.0
+   ],
+   "parts": [],
+   "verts": 180,
+   "tris": 368
+  },
+  {
+   "name": "ENV_Wall_Left",
+   "model": "Architecture/ENV_Wall_Left.fbx",
+   "group": "Architecture",
+   "shift": [
+    -4.7,
+    1.8,
+    0.0
+   ],
+   "parts": [],
+   "verts": 46,
+   "tris": 92
+  },
+  {
+   "name": "ENV_Wall_Right",
+   "model": "Architecture/ENV_Wall_Left.fbx",
+   "group": "Architecture",
+   "shift": [
+    4.7,
+    1.8,
+    0.0
+   ],
+   "parts": [],
+   "verts": 46,
+   "tris": 92
+  },
+  {
+   "name": "ENV_WindowFrame_0",
+   "model": "Architecture/ENV_WindowFrame_0.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "WindowFrame_0_Cream_01",
+    "WindowFrame_0_Cream_02",
+    "WindowFrame_0_Cream_03",
+    "WindowFrame_0_Metal_Gold"
+   ],
+   "verts": 272,
+   "tris": 536
+  },
+  {
+   "name": "ENV_WindowFrame_1",
+   "model": "Architecture/ENV_WindowFrame_1.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "WindowFrame_1_Cream_01",
+    "WindowFrame_1_Cream_02",
+    "WindowFrame_1_Cream_03",
+    "WindowFrame_1_Metal_Gold"
+   ],
+   "verts": 272,
+   "tris": 536
+  },
+  {
+   "name": "ENV_WindowFrame_2",
+   "model": "Architecture/ENV_WindowFrame_1.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "WindowFrame_1_Cream_01",
+    "WindowFrame_1_Cream_02",
+    "WindowFrame_1_Cream_03",
+    "WindowFrame_1_Metal_Gold"
+   ],
+   "verts": 272,
+   "tris": 536
+  },
+  {
+   "name": "ENV_WindowSill_1",
+   "model": "Architecture/ENV_WindowSill.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 56,
+   "tris": 108
+  },
+  {
+   "name": "ENV_WindowSill_2",
+   "model": "Architecture/ENV_WindowSill.fbx",
+   "group": "Architecture",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 56,
+   "tris": 108
+  },
+  {
+   "name": "PROP_BarSpoon",
+   "model": "Props/Tools/PROP_BarSpoon.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 106,
+   "tris": 200
+  },
+  {
+   "name": "PROP_Blender_Jar",
+   "model": "Props/Tools/PROP_Blender_Jar.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 168,
+   "tris": 324
+  },
+  {
+   "name": "PROP_Bottle_BlueCuracao",
+   "model": "Props/Bottles/PROP_Bottle_BlueCuracao.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_Bottle_Gin",
+   "model": "Props/Bottles/PROP_Bottle_Gin.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 80,
+   "tris": 144
+  },
+  {
+   "name": "PROP_Bottle_Grenadine",
+   "model": "Props/Bottles/PROP_Bottle_Grenadine.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_Bottle_MelonLiqueur",
+   "model": "Props/Bottles/PROP_Bottle_MelonLiqueur.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 100,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Bottle_PeachSyrup",
+   "model": "Props/Bottles/PROP_Bottle_PeachSyrup.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_Bottle_Rum",
+   "model": "Props/Bottles/PROP_Bottle_Rum.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_Bottle_Tequila",
+   "model": "Props/Bottles/PROP_Bottle_Tequila.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 100,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Bottle_TripleSec",
+   "model": "Props/Bottles/PROP_Bottle_TripleSec.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 80,
+   "tris": 144
+  },
+  {
+   "name": "PROP_Bottle_Violet",
+   "model": "Props/Bottles/PROP_Bottle_Violet.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_Bottle_Vodka",
+   "model": "Props/Bottles/PROP_Bottle_Vodka.fbx",
+   "group": "Props/Bottles",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 160,
+   "tris": 304
+  },
+  {
+   "name": "PROP_DispenserLever_Blue",
+   "model": "Props/Tools/PROP_DispenserLever_Blue.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 40,
+   "tris": 72
+  },
+  {
+   "name": "PROP_DispenserLever_Orange",
+   "model": "Props/Tools/PROP_DispenserLever_Orange.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 40,
+   "tris": 72
+  },
+  {
+   "name": "PROP_DispenserLever_Pink",
+   "model": "Props/Tools/PROP_DispenserLever_Pink.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 40,
+   "tris": 72
+  },
+  {
+   "name": "PROP_Fridge_Cola_1",
+   "model": "Props/Fridge/PROP_Fridge_Cola.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Cola_2",
+   "model": "Props/Fridge/PROP_Fridge_Cola.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Juice_1",
+   "model": "Props/Fridge/PROP_Fridge_Juice.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Juice_2",
+   "model": "Props/Fridge/PROP_Fridge_Juice.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Milk_1",
+   "model": "Props/Fridge/PROP_Fridge_Milk.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Milk_2",
+   "model": "Props/Fridge/PROP_Fridge_Milk.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Soda_1",
+   "model": "Props/Fridge/PROP_Fridge_Soda.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Soda_2",
+   "model": "Props/Fridge/PROP_Fridge_Soda.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Tonic_1",
+   "model": "Props/Fridge/PROP_Fridge_Tonic.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Fridge_Tonic_2",
+   "model": "Props/Fridge/PROP_Fridge_Tonic.fbx",
+   "group": "Props/Fridge",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 276
+  },
+  {
+   "name": "PROP_Garnish_Blueberry_01",
+   "model": "Props/Garnish/PROP_Garnish_Blueberry_01.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 260,
+   "tris": 500
+  },
+  {
+   "name": "PROP_Garnish_Blueberry_02",
+   "model": "Props/Garnish/PROP_Garnish_Blueberry_02.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 260,
+   "tris": 500
+  },
+  {
+   "name": "PROP_Garnish_Blueberry_03",
+   "model": "Props/Garnish/PROP_Garnish_Blueberry_03.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 260,
+   "tris": 500
+  },
+  {
+   "name": "PROP_Garnish_Cherry_01",
+   "model": "Props/Garnish/PROP_Garnish_Cherry_01.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 96,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Garnish_Cherry_02",
+   "model": "Props/Garnish/PROP_Garnish_Cherry_02.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 96,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Garnish_Cherry_03",
+   "model": "Props/Garnish/PROP_Garnish_Cherry_03.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 96,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Garnish_Lemon_01",
+   "model": "Props/Garnish/PROP_Garnish_Lemon.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Lemon_02",
+   "model": "Props/Garnish/PROP_Garnish_Lemon.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Lemon_03",
+   "model": "Props/Garnish/PROP_Garnish_Lemon.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Lime_01",
+   "model": "Props/Garnish/PROP_Garnish_Lime.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Lime_02",
+   "model": "Props/Garnish/PROP_Garnish_Lime.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Lime_03",
+   "model": "Props/Garnish/PROP_Garnish_Lime.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Mint_01",
+   "model": "Props/Garnish/PROP_Garnish_Mint_01.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 218,
+   "tris": 416
+  },
+  {
+   "name": "PROP_Garnish_Mint_02",
+   "model": "Props/Garnish/PROP_Garnish_Mint_02.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 218,
+   "tris": 416
+  },
+  {
+   "name": "PROP_Garnish_Mint_03",
+   "model": "Props/Garnish/PROP_Garnish_Mint_03.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 218,
+   "tris": 416
+  },
+  {
+   "name": "PROP_Garnish_Orange_01",
+   "model": "Props/Garnish/PROP_Garnish_Orange.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Orange_02",
+   "model": "Props/Garnish/PROP_Garnish_Orange.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Garnish_Orange_03",
+   "model": "Props/Garnish/PROP_Garnish_Orange.fbx",
+   "group": "Props/Garnish",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 64,
+   "tris": 120
+  },
+  {
+   "name": "PROP_Glass_Coupe_01",
+   "model": "Props/Glasses/PROP_Glass_Coupe.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 142,
+   "tris": 280
+  },
+  {
+   "name": "PROP_Glass_Coupe_02",
+   "model": "Props/Glasses/PROP_Glass_Coupe.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 142,
+   "tris": 280
+  },
+  {
+   "name": "PROP_Glass_Highball_01",
+   "model": "Props/Glasses/PROP_Glass_Highball.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Highball_02",
+   "model": "Props/Glasses/PROP_Glass_Highball.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Martini_01",
+   "model": "Props/Glasses/PROP_Glass_Martini.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 100,
+   "tris": 196
+  },
+  {
+   "name": "PROP_Glass_Martini_02",
+   "model": "Props/Glasses/PROP_Glass_Martini.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 100,
+   "tris": 196
+  },
+  {
+   "name": "PROP_Glass_Mug_01",
+   "model": "Props/Glasses/PROP_Glass_Mug.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 140,
+   "tris": 268
+  },
+  {
+   "name": "PROP_Glass_Mug_02",
+   "model": "Props/Glasses/PROP_Glass_Mug.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 140,
+   "tris": 268
+  },
+  {
+   "name": "PROP_Glass_Rocks_01",
+   "model": "Props/Glasses/PROP_Glass_Rocks.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Rocks_02",
+   "model": "Props/Glasses/PROP_Glass_Rocks.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Shot_01",
+   "model": "Props/Glasses/PROP_Glass_Shot.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Shot_02",
+   "model": "Props/Glasses/PROP_Glass_Shot.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Shot_03",
+   "model": "Props/Glasses/PROP_Glass_Shot.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 72,
+   "tris": 140
+  },
+  {
+   "name": "PROP_Glass_Wine_01",
+   "model": "Props/Glasses/PROP_Glass_Wine.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 142,
+   "tris": 280
+  },
+  {
+   "name": "PROP_Glass_Wine_02",
+   "model": "Props/Glasses/PROP_Glass_Wine.fbx",
+   "group": "Props/Glasses",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 142,
+   "tris": 280
+  },
+  {
+   "name": "PROP_IceScoop",
+   "model": "Props/Tools/PROP_IceScoop.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 82,
+   "tris": 156
+  },
+  {
+   "name": "PROP_Jigger",
+   "model": "Props/Tools/PROP_Jigger.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 114,
+   "tris": 224
+  },
+  {
+   "name": "PROP_Muddler",
+   "model": "Props/Tools/PROP_Muddler.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 48,
+   "tris": 88
+  },
+  {
+   "name": "PROP_OrderTicket_01",
+   "model": "Props/Tools/PROP_OrderTicket_01.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 56,
+   "tris": 92
+  },
+  {
+   "name": "PROP_OrderTicket_02",
+   "model": "Props/Tools/PROP_OrderTicket_02.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 56,
+   "tris": 92
+  },
+  {
+   "name": "PROP_OrderTicket_03",
+   "model": "Props/Tools/PROP_OrderTicket_03.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 56,
+   "tris": 92
+  },
+  {
+   "name": "PROP_ServiceBell",
+   "model": "Props/Tools/PROP_ServiceBell.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 98,
+   "tris": 184
+  },
+  {
+   "name": "PROP_Shaker_Cap",
+   "model": "Props/Tools/PROP_Shaker_Cap.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 102,
+   "tris": 200
+  },
+  {
+   "name": "PROP_Shaker_Tin",
+   "model": "Props/Tools/PROP_Shaker_Tin.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 102,
+   "tris": 200
+  },
+  {
+   "name": "PROP_Strainer",
+   "model": "Props/Tools/PROP_Strainer.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 144,
+   "tris": 280
+  },
+  {
+   "name": "PROP_TapHandle_1",
+   "model": "Props/Tools/PROP_TapHandle_1.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 156,
+   "tris": 304
+  },
+  {
+   "name": "PROP_TapHandle_2",
+   "model": "Props/Tools/PROP_TapHandle_2.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 156,
+   "tris": 304
+  },
+  {
+   "name": "PROP_TapHandle_3",
+   "model": "Props/Tools/PROP_TapHandle_3.fbx",
+   "group": "Props/Tools",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 156,
+   "tris": 304
+  },
+  {
+   "name": "SKY_Backdrop",
+   "model": "NightSky/SKY_Backdrop.fbx",
+   "group": "NightSky",
+   "shift": [
+    0.0,
+    9.5,
+    -4.0
+   ],
+   "parts": [],
+   "verts": 8,
+   "tris": 12
+  },
+  {
+   "name": "SKY_Hills",
+   "model": "NightSky/SKY_Hills.fbx",
+   "group": "NightSky",
+   "shift": [
+    0.500001,
+    8.404071,
+    -2.4
+   ],
+   "parts": [],
+   "verts": 1064,
+   "tris": 2112
+  },
+  {
+   "name": "SKY_HorizonGlow",
+   "model": "NightSky/SKY_HorizonGlow.fbx",
+   "group": "NightSky",
+   "shift": [
+    0.0,
+    9.375,
+    0.1
+   ],
+   "parts": [],
+   "verts": 16,
+   "tris": 24
+  },
+  {
+   "name": "SKY_Moon",
+   "model": "NightSky/SKY_Moon.fbx",
+   "group": "NightSky",
+   "shift": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "parts": [],
+   "verts": 176,
+   "tris": 336
+  },
+  {
+   "name": "SKY_Stars",
+   "model": "NightSky/SKY_Stars.fbx",
+   "group": "NightSky",
+   "shift": [
+    0.086366,
+    9.291,
+    1.846768
+   ],
+   "parts": [],
+   "verts": 900,
+   "tris": 1600
+  },
+  {
+   "name": "SKY_Village",
+   "model": "NightSky/SKY_Village.fbx",
+   "group": "NightSky",
+   "shift": [
+    -0.777372,
+    7.8,
+    0.675
+   ],
+   "parts": [],
+   "verts": 180,
+   "tris": 264
+  }
+ ]
+}

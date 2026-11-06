@@ -8,13 +8,13 @@ using UnityEngine;
 namespace MoonlitTails.EditorTools
 {
     /// <summary>
-    /// Tools > Moonlit Tails > 3. Check Drink Setup: lists which bar props the drink game will use and for what,
+    /// Tools > Moonlit Tails > 4. Check Drink Setup: lists which bar props the drink game will use and for what,
     /// and warns about anything it can't find. Changes nothing.
     /// From the command line: Unity -batchmode -quit -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkSetupCheck.RunBatch
     /// </summary>
     public static class DrinkSetupCheck
     {
-        [MenuItem("Tools/Moonlit Tails/3. Check Drink Setup")]
+        [MenuItem("Tools/Moonlit Tails/4. Check Drink Setup")]
         public static void Run() => Check(out _);
 
         public static void RunBatch()

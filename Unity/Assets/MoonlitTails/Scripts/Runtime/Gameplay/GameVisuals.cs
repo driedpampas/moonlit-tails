@@ -88,6 +88,16 @@ namespace MoonlitTails.Gameplay
             return new Vector3(0, 0, Mathf.Sign(up.z));
         }
 
+        /// <summary>World bounds of every renderer in an object and its children (pieces can be made of parts).</summary>
+        public static Bounds WorldBounds(Transform t)
+        {
+            var rs = t.GetComponentsInChildren<Renderer>();
+            if (rs.Length == 0) return new Bounds(t.position, Vector3.zero);
+            var b = rs[0].bounds;
+            foreach (var r in rs) b.Encapsulate(r.bounds);
+            return b;
+        }
+
         public static Bounds LocalBounds(GameObject go)
         {
             var mf = go.GetComponent<MeshFilter>();

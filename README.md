@@ -22,8 +22,9 @@ AI was used for:
 | Folder | What |
 |---|---|
 | `Unity/` | The Unity project (Unity **6000.3.25f1**, URP, OpenXR hand tracking). Open this folder in Unity Hub. |
-| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. |
+| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. `BAR_PIECES.md`: how the bar is split into pieces and how to change them. |
 | `Tests/` | Tests for the drink rules (`dotnet run` in `Tests/DrinkRules.Tests`). |
+| `Art/` | Blender sources. `Art/Bar/` has the bar `.blend`, the scripts that built it, and `split_bar.py`, which exports it as separate pieces. See `Docs/BAR_PIECES.md`. |
 
 The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with three customers and grabbable, throwable props, for testing scale and hand grabbing in VR. All sizes live in `Unity/Assets/MoonlitTails/BarTuning.asset`.
 
@@ -44,7 +45,7 @@ The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It'
 ## Working together
 - **Pull before opening Unity**, and close Unity before switching branches that change scenes.
 - **Always commit `.meta` files together with their assets.** Move or rename assets *inside Unity*, never in Explorer, or references break.
-- **One person edits `MoonlitBar_VR.unity` at a time.** Scene merges are painful. Size tweaks go in `BarTuning.asset` instead, a small text file that merges fine.
+- **One person edits `MoonlitBar_VR.unity` at a time.** Scene merges are painful. Size tweaks go in `BarTuning.asset` instead, a small text file that merges fine. Changes to the bar itself go in its prefabs (`Environment/Bar`), so they don't touch the scene.
 - The scene can be regenerated with **Tools > Moonlit Tails > 2. Rebuild VR Scene**. Agree who runs it, because it replaces manual scene edits.
 - **Before editing a `.blend` file, lock it** so nobody edits it at the same time: `git lfs lock path/to/file.blend`. Unlock it when you're done: `git lfs unlock path/to/file.blend`.
 - Work on a branch and open a pull request into `main`.

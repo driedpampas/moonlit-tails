@@ -12,7 +12,7 @@ namespace MoonlitTails.Gameplay
     /// "MoonlitBar" object, so the scene file doesn't need editing (no scene merges).
     ///
     /// Which prop is which ingredient, glass size, etc. is all in the tables below. Change them freely: the props
-    /// are found by name, and Tools > Moonlit Tails > 3. Check Drink Setup lists what matched.
+    /// are found by name, and Tools > Moonlit Tails > 4. Check Drink Setup lists what matched.
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {
@@ -88,7 +88,7 @@ namespace MoonlitTails.Gameplay
             if (plan.shaker) plan.shaker.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.ShakeMixer, "Shake Mixer", GlassLength.Long);
             foreach (var (t, color) in plan.garnishes) t.gameObject.AddComponent<Garnish>().Init(color);
             if (plan.spoon) plan.spoon.gameObject.AddComponent<StirTool>().Init();
-            if (plan.scoop && plan.iceWell) plan.scoop.gameObject.AddComponent<IceScoop>().Init(plan.iceWell.GetComponent<Renderer>());
+            if (plan.scoop && plan.iceWell) plan.scoop.gameObject.AddComponent<IceScoop>().Init(plan.iceWell);
 
             var glassTypes = plan.glasses.Select(g => g.type).Distinct().Select(n => new GlassVariant(n, GlassLengths[n])).ToList();
             var colors = plan.garnishes.Select(g => g.color).Distinct().ToList();
@@ -167,8 +167,7 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ how-to-play on the menu board
         static void WriteMenuBoard(Transform board, Transform player)
         {
-            var r = board.GetComponent<Renderer>();
-            Vector3 center = r ? r.bounds.center : board.position;
+            Vector3 center = GameVisuals.WorldBounds(board).center;
             Vector3 toPlayer = player.position - center; toPlayer.y = 0;
             if (toPlayer.sqrMagnitude < 1e-4f) return;
             toPlayer.Normalize();

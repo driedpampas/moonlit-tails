@@ -12,7 +12,7 @@ namespace MoonlitTails.EditorTools
     /// <summary>
     /// Plays the bar scene and makes drinks by moving the real props around (no headset needed): pours, a wrong and a
     /// right mix, stirring with the spoon, a mixed and a layered glass, ice, garnish, adjustments and serving.
-    /// Tools > Moonlit Tails > 4. Play Smoke Test, or from the command line:
+    /// Tools > Moonlit Tails > 5. Play Smoke Test, or from the command line:
     /// Unity -batchmode -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkPlaySmokeTest.RunBatch
     /// (exit code 0 = everything passed). It never saves the scene.
     /// </summary>
@@ -27,7 +27,7 @@ namespace MoonlitTails.EditorTools
             if (SessionState.GetBool(Key, false)) EditorApplication.update += Tick;
         }
 
-        [MenuItem("Tools/Moonlit Tails/4. Play Smoke Test")]
+        [MenuItem("Tools/Moonlit Tails/5. Play Smoke Test")]
         public static void Run() => Start(false);
 
         public static void RunBatch() => Start(true);
@@ -202,7 +202,7 @@ namespace MoonlitTails.EditorTools
                 (0.2f, "fill ice scoop", () =>
                 {
                     var scoop = UnityEngine.Object.FindFirstObjectByType<IceScoop>();
-                    var well = Find(DrinkGame.IceWell).GetComponent<Renderer>().bounds.center;
+                    var well = GameVisuals.WorldBounds(Find(DrinkGame.IceWell)).center;
                     Hold(scoop);
                     scoop.transform.position += well - scoop.GetComponent<Renderer>().bounds.center;
                 }),

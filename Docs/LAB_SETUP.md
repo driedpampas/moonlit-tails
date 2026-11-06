@@ -3,7 +3,7 @@
 Scene: `Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`
 
 The scene contains:
-- **The bar.** It comes from the team's Blender model of the bar (not in this repo).
+- **The bar.** `Environment/Bar/MoonlitBar.prefab`, built from one prefab per piece. The Blender source is in `Art/Bar/`. See [BAR_PIECES.md](BAR_PIECES.md).
 - **Three customers:**
   - Kintsu stands at the ordering spot in front of you.
   - Character03 sits on the right-hand bar stool.
@@ -65,7 +65,7 @@ Because it's an asset, changes you make while playing in the headset are **kept 
 Seated customers measure their own hip height from the sitting animation, so they stay on the seat at any height you give them.
 
 **Moving things:**
-- **A customer:** move their marker inside `MoonlitBar` (`MK_CustomerSpot_C`, `MK_StoolSeat_R`, `MK_ChairSeat_L1`). The character follows.
+- **A customer:** move their marker in `MoonlitBar/Markers` (`MK_CustomerSpot_C`, `MK_StoolSeat_R`, `MK_ChairSeat_L1`). The character follows.
 - **Swapping who sits where:** change the **Spot** of each entry on the `BarLayout` object.
 - **The player:** move `MK_PlayerStart`.
 
@@ -76,10 +76,12 @@ Props' "home" positions are stored relative to the bar, so a rescaled bar still 
 Run these from **Tools > Moonlit Tails**:
 
 1. **Configure Project**: URP, OpenXR + hand tracking (PC and Android), XR Interaction Toolkit samples, and the character prefabs. Safe to run again.
-2. **Rebuild VR Scene**: rebuilds the scene from the FBX files.
-   - Run it after re-exporting the bar from Blender (`build_bar.py`). The bar's colours come from `MoonlitBar_materials.json`, which that script writes next to the FBX.
+2. **Rebuild VR Scene**: builds the scene from scratch: the bar prefab, the XR rig and the customers.
+   - It replaces manual scene edits, so agree who runs it. You rarely need it: bar changes go into the piece prefabs (see [BAR_PIECES.md](BAR_PIECES.md)).
    - Your sizes in `BarTuning.asset` are kept.
 3. **Capture Player Views**: a desk check without a headset. It renders what a standing player sees in every direction, throws a glass and resets it. Output goes to `Captures/` with a `report.txt`.
+4. **Check Drink Setup** and 5. **Play Smoke Test**: see [DRINK_GAME.md](DRINK_GAME.md).
+6. **Assemble Split Bar** and 7. **Refresh Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
 
 ## Building an APK instead of Link
 

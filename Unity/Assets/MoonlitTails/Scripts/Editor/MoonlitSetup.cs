@@ -35,6 +35,7 @@ namespace MoonlitTails.EditorTools
         public const string ScenePath = Root + "/Scenes/MoonlitBar_VR.unity";
         const string TuningPath = Root + "/BarTuning.asset";
         const string BarFbx = Root + "/Environment/MoonlitBar.fbx";
+        public const string BarPrefab = Root + "/Environment/Bar/MoonlitBar.prefab";
         const string SitFbx = Root + "/Animations/Sitting Idle.fbx";
         static readonly string[] CharacterIds = { "Kintsu", "Character02", "Character03" };
 
@@ -156,7 +157,8 @@ namespace MoonlitTails.EditorTools
 
         static void ConfigureBarImport()
         {
-            var imp = (ModelImporter)AssetImporter.GetAtPath(BarFbx);
+            var imp = AssetImporter.GetAtPath(BarFbx) as ModelImporter;
+            if (imp == null) return;   // the bar is split into pieces now (Environment/Bar)
             imp.importLights = true;                 // light positions come from Blender, intensities are set in BuildLights
             imp.importCameras = false;
             imp.importAnimation = false;
@@ -225,8 +227,18 @@ namespace MoonlitTails.EditorTools
             var tuning = AssetDatabase.LoadAssetAtPath<BarTuning>(TuningPath);
             if (tuning == null) { tuning = ScriptableObject.CreateInstance<BarTuning>(); AssetDatabase.CreateAsset(tuning, TuningPath); }
 
-            var bar = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(BarFbx));
-            PrefabUtility.UnpackPrefabInstance(bar, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            // the split bar (one prefab per piece, see Docs/BAR_PIECES.md); the old single FBX only as a fallback
+            var barPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BarPrefab);
+            GameObject bar;
+            if (barPrefab)
+                bar = (GameObject)PrefabUtility.InstantiatePrefab(barPrefab);
+            else
+            {
+                var fbx = AssetDatabase.LoadAssetAtPath<GameObject>(BarFbx);
+                if (!fbx) { Debug.LogError("[Moonlit] No " + BarPrefab + " (see Docs/BAR_PIECES.md)."); return; }
+                bar = (GameObject)PrefabUtility.InstantiatePrefab(fbx);
+                PrefabUtility.UnpackPrefabInstance(bar, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            }
             bar.name = "MoonlitBar";
             bar.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             bar.transform.localScale = Vector3.one;
@@ -236,9 +248,18 @@ namespace MoonlitTails.EditorTools
             layout.environment = bar.transform;
             Transform Marker(string n) => bar.GetComponentsInChildren<Transform>(true).First(t => t.name == n);
 
-            ApplyBarMaterials(bar);
-            SetupBarObjects(bar, layout, tuning);
-            BuildLights(bar, Marker("MK_PlayerStart"), Marker("MK_ServeSpot"), Marker("MK_CustomerSpot_C"));
+            if (barPrefab)
+            {
+                // materials, colliders, grabbing and lights are already set up in the prefabs
+                foreach (var home in bar.GetComponentsInChildren<PropRespawn>(true))
+                    layout.props.Add(new BarLayout.PropRecord { prop = home.transform, baseScale = home.transform.localScale });
+            }
+            else
+            {
+                ApplyBarMaterials(bar);
+                SetupBarObjects(bar, layout, tuning);
+                BuildLights(bar, Marker("MK_PlayerStart"), Marker("MK_ServeSpot"), Marker("MK_CustomerSpot_C"));
+            }
 
             layout.playerSpot = Marker("MK_PlayerStart");
             layout.playerFacing = Marker("MK_ServeSpot");
@@ -342,28 +363,54 @@ namespace MoonlitTails.EditorTools
                 bool hasMesh = go.TryGetComponent<MeshFilter>(out _);
                 if (n.StartsWith("PROP_") && hasMesh)
                 {
-                    if (FixedProps.Any(n.StartsWith)) { go.AddComponent<MeshCollider>().convex = true; continue; }
-                    var col = go.AddComponent<MeshCollider>(); col.convex = true;
-                    var rb = go.AddComponent<Rigidbody>();
-                    rb.mass = n.Contains("Bottle_") ? 0.8f : n.Contains("Fridge_") ? 0.45f : n.Contains("Glass_") ? 0.25f
-                            : n.Contains("Garnish_") ? 0.02f : n.Contains("Blender") ? 0.6f : n.Contains("Shaker") ? 0.35f : 0.2f;
-                    rb.interpolation = RigidbodyInterpolation.Interpolate;
-                    rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;   // thrown things shouldn't tunnel through walls
-                    var grab = go.AddComponent<XRGrabInteractable>();
-                    grab.movementType = XRBaseInteractable.MovementType.VelocityTracking;  // collides with counters while held
-                    grab.throwOnDetach = true;
-                    grab.useDynamicAttach = true;                                          // held where your hand touched it
-                    grab.throwVelocityScale = tuning.throwStrength;
-                    var home = go.AddComponent<PropRespawn>(); home.space = bar.transform; home.RememberHome();
+                    if (!AddPropComponents(go, tuning)) continue;
+                    var home = go.GetComponent<PropRespawn>(); home.space = bar.transform; home.RememberHome();
                     layout.props.Add(new BarLayout.PropRecord { prop = t, baseScale = t.localScale });
                 }
                 else if (n.StartsWith("ENV_") || n.StartsWith("DECO_") || n.StartsWith("SKY_"))
-                {
-                    // no Batching Static yet: BarLayout rescales the bar live while we tune sizes
-                    GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic | StaticEditorFlags.ReflectionProbeStatic);
-                    if (n.StartsWith("SKY_")) { if (go.TryGetComponent<MeshRenderer>(out var r)) r.shadowCastingMode = ShadowCastingMode.Off; continue; }
-                    if (hasMesh && !NoCollider.Any(n.Contains)) go.AddComponent<MeshCollider>();
-                }
+                    AddEnvironmentComponents(go, n);
+            }
+        }
+
+        /// <summary>
+        /// Physics and grabbing for a prop (collider, rigidbody, grab, respawn). Props that are part of a machine or
+        /// pinned only get a collider; returns false for those.
+        /// </summary>
+        public static bool AddPropComponents(GameObject go, BarTuning tuning)
+        {
+            string n = go.name;
+            if (FixedProps.Any(n.StartsWith)) { go.AddComponent<MeshCollider>().convex = true; return false; }
+            var col = go.AddComponent<MeshCollider>(); col.convex = true;
+            var rb = go.AddComponent<Rigidbody>();
+            rb.mass = n.Contains("Bottle_") ? 0.8f : n.Contains("Fridge_") ? 0.45f : n.Contains("Glass_") ? 0.25f
+                    : n.Contains("Garnish_") ? 0.02f : n.Contains("Blender") ? 0.6f : n.Contains("Shaker") ? 0.35f : 0.2f;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;   // thrown things shouldn't tunnel through walls
+            var grab = go.AddComponent<XRGrabInteractable>();
+            grab.movementType = XRBaseInteractable.MovementType.VelocityTracking;  // collides with counters while held
+            grab.throwOnDetach = true;
+            grab.useDynamicAttach = true;                                          // held where your hand touched it
+            grab.throwVelocityScale = tuning ? tuning.throwStrength : 1f;
+            go.AddComponent<PropRespawn>();
+            return true;
+        }
+
+        /// <summary>Static flags and mesh colliders for room pieces and decor (every mesh in the piece, including its parts).</summary>
+        public static void AddEnvironmentComponents(GameObject go, string objectName)
+        {
+            bool sky = objectName.StartsWith("SKY_");
+            bool collide = !sky && !NoCollider.Any(objectName.Contains);
+            foreach (var t in go.GetComponentsInChildren<Transform>(true))
+            {
+                // no Batching Static yet: BarLayout rescales the bar live while we tune sizes
+                GameObjectUtility.SetStaticEditorFlags(t.gameObject, StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic | StaticEditorFlags.ReflectionProbeStatic);
+                if (!t.TryGetComponent<MeshFilter>(out _)) continue;
+                var r = t.GetComponent<MeshRenderer>();
+                if (sky && r) r.shadowCastingMode = ShadowCastingMode.Off;
+                // liquid parts (dispensers) draw after the glass around them, as they did when both were one mesh
+                // (URP sorts transparent objects by sorting order, not by renderer priority)
+                if (r && r.sharedMaterials.Any(m => m && m.name.StartsWith("M_Liquid"))) { r.rendererPriority = 0; r.sortingOrder = 1; }
+                if (collide && !t.TryGetComponent<MeshCollider>(out _)) t.gameObject.AddComponent<MeshCollider>();
             }
         }
 
