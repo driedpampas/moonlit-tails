@@ -22,7 +22,8 @@ AI was used for:
 | Folder | What |
 |---|---|
 | `Unity/` | The Unity project (Unity **6000.3.25f1**, URP, OpenXR hand tracking). Open this folder in Unity Hub. |
-| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. |
+| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. |
+| `Tests/` | Tests for the drink rules (`dotnet run` in `Tests/DrinkRules.Tests`). |
 
 The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with three customers and grabbable, throwable props, for testing scale and hand grabbing in VR. All sizes live in `Unity/Assets/MoonlitTails/BarTuning.asset`.
 
