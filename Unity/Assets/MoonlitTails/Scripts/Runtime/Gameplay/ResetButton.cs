@@ -13,7 +13,9 @@ namespace MoonlitTails.Gameplay
 
         // where it sits, measured from the player spot in the bar model: on the front counter, at the left corner
         // next to the glass rack, out of the way of the ice well and the work mat
-        const float ModelPlayerToServe = 1.18f, Forward = 0.67f, Left = 1.05f;
+        /// <summary>Player spot to serve spot in the bar model (m), to scale things placed by hand with the bar.</summary>
+        public const float ModelPlayerToServe = 1.18f;
+        const float Forward = 0.67f, Left = 1.05f;
 
         public static PokeButton Create(Transform parent, Transform player, Transform serveSpot)
         {

@@ -61,6 +61,12 @@ namespace MoonlitTails
         [Tooltip("Physics steps per second. Match the headset refresh rate (72/90/120) so held props move smoothly.")]
         [Range(50, 120)] public int physicsRate = 90;
 
+        [Header("Dev options")]
+        [Tooltip("Off (default): props pass through the player's body (the capsule on the XR Origin), so leaning or " +
+                 "moving into the counter doesn't knock glasses over. Turn it on if walking or teleporting comes back " +
+                 "and the body should bump into things again. Hands and held props still push other props either way.")]
+        public bool playerBodyPushesProps = false;
+
         /// <summary>Bumped on every inspector change so BarLayout knows to re-apply while playing.</summary>
         public int Version { get; private set; }
         void OnValidate()

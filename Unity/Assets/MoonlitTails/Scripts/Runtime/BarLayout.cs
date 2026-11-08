@@ -118,7 +118,11 @@ namespace MoonlitTails
             foreach (var p in props)
                 if (p.prop && p.prop.TryGetComponent<XRGrabInteractable>(out var g)) g.throwVelocityScale = tuning.throwStrength;
             if (xrOrigin)
+            {
                 foreach (var i in xrOrigin.GetComponentsInChildren<NearFarInteractor>(true)) i.enableFarCasting = tuning.allowDistanceGrab;
+                // dev option: the body capsule is still there for locomotion, it just doesn't shove props
+                foreach (var body in xrOrigin.GetComponentsInChildren<CharacterController>(true)) body.detectCollisions = tuning.playerBodyPushesProps;
+            }
         }
 
         // only write when the value really changes, so edit mode doesn't keep dirtying the scene
