@@ -26,6 +26,7 @@ AI was used for:
 - Quest build setup, and the XR Interaction Simulator for testing without a headset
 - The drink game: pouring, stirring, shaking, layering, orders and customer reactions ([how it works](Docs/DRINK_GAME.md))
 - The bar split into one prefab per piece ([details](Docs/BAR_PIECES.md))
+- [Ingredients, recipes and characters](Docs/MENU_AND_CHARACTERS.md): everything the game has so far
 - Playtest fixes: the serve coaster, a reset button, and rules you can read from behind the bar
 
 AI was used for:
@@ -39,7 +40,7 @@ AI was used for:
 | Folder | What |
 |---|---|
 | `Unity/` | The Unity project (Unity **6000.3.25f1**, URP, OpenXR hand tracking). Open this folder in Unity Hub. |
-| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. `BAR_PIECES.md`: how the bar is split into pieces and how to change them. |
+| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. `BAR_PIECES.md`: how the bar is split into pieces and how to change them. `MENU_AND_CHARACTERS.md`: all ingredients, recipes and characters. |
 | `Tests/` | Tests for the drink rules (`dotnet run` in `Tests/DrinkRules.Tests`). |
 | `Art/` | Blender sources. `Art/Bar/` has the bar `.blend`, the scripts that built it, and `split_bar.py`, which exports it as separate pieces. See `Docs/BAR_PIECES.md`. |
 
