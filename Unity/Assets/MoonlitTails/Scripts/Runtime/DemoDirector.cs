@@ -503,7 +503,7 @@ namespace MoonlitTails.EditorTools
             Debug.Log($"[Moonlit] Demo layout: serve {serve} player {player} fwd {fwd} right {right}\n" + string.Join("\n",
                 new Component[] { shaker, cup, highball, rocks, whiskey, cola, tonic, scoop, lime }.Select(c => $"  {c.name}: {c.transform.position} bounds {MeshBounds(c.transform)}")));
             yield return Wait(3.5f);
-            Caption("The bar is now one prefab per piece, and Stiv's models are prefabs with colliders");
+            Caption("The bar is now one prefab per piece, and all models are prefabs with colliders");
             yield return Wait(4.5f);
 
             // ---- 2. customers and tickets
