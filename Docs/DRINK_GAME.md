@@ -24,13 +24,13 @@ Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so
 5. **Finish the glass.**
    - Dip the ice scoop in the ice well, then bring it to the glass: the drink becomes **Cold**.
    - Let go of a fruit slice near the rim: it sticks there and gives the drink its **colour**.
-6. **Serve.** Put the glass on the serve coaster.
+6. **Serve.** Put the glass on the serve coaster. Let go of it close to or just above the coaster and it snaps on, upright and in the middle, and stays there until you pick it up.
    - The panel next to it shows the final taste and has **+ / −** buttons for the end-of-drink adjustment: 1 point for a mixed drink, 2 for a layered one.
    - Ring the bell (touch or grab it), or press **Serve**.
    - A right drink: the customer says the next line of their story.
    - A wrong drink: they say what's off, and their ticket shows a tip.
 
-To empty anything, tip it out over nothing. **R** puts every prop back where it started.
+To empty anything, tip it out over nothing. The big red **DO NOT PUSH** button on the front counter (left corner, next to the glass rack) puts every prop back where it started, even one in your hand or behind the bar. What's in the glasses and cups stays. **R** on the keyboard does the same.
 
 Labels float over the bottles, cups and glasses when you're close. Buttons work with a fingertip, or with a mouse click when you use the XR Device Simulator.
 
@@ -92,7 +92,7 @@ The label over each prop shows the ingredient's name. Swap the models later, or 
 
 - **Rules:** `cd Tests/DrinkRules.Tests && dotnet run`. If the .NET workload resolver is broken on your machine, run `MSBuildEnableWorkloadResolver=false dotnet run` instead.
 - **Tools > Moonlit Tails > 4. Check Drink Setup:** lists which prop got which role, and warns about anything missing.
-- **Tools > Moonlit Tails > 5. Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, a mixed and a layered glass, ice, garnish, adjustments and serving.
+- **Tools > Moonlit Tails > 5. Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button.
 - **Headless:** run the smoke test from a terminal. Exit code 0 means it passed.
   ```
   Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkPlaySmokeTest.RunBatch -logFile -

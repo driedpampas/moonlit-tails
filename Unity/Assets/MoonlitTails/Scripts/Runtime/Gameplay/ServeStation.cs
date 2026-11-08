@@ -14,6 +14,7 @@ namespace MoonlitTails.Gameplay
     {
         public Transform spot;
         public float radius = 0.15f;
+        public CoasterSnap Snap { get; private set; }
 
         OrderBook orders;
         DrinkContainer glass;
@@ -25,6 +26,8 @@ namespace MoonlitTails.Gameplay
         {
             spot = serveSpot;
             orders = book;
+            Snap = gameObject.AddComponent<CoasterSnap>();
+            Snap.Init(serveSpot);
 
             // panel beside the serve spot, facing the player
             Vector3 toPlayer = player.position - serveSpot.position; toPlayer.y = 0;

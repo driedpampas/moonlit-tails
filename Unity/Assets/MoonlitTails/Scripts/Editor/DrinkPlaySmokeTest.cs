@@ -283,6 +283,34 @@ namespace MoonlitTails.EditorTools
                 (1.6f, "check dump", () => Expect(rocks.IsEmpty, "tipping a glass out over nothing empties it")),
                 (0.1f, "raw into glass", () => { Place(rocks, work - right * 2f); TipOver(tonic, rocks); }),
                 (0.9f, "check raw", () => Expect(rocks.IsEmpty, "raw ingredients can't go straight into a glass")),
+                (0.1f, "coaster snap", () =>
+                {
+                    var snap = station.Snap;
+                    Hold(rocks);
+                    rocks.transform.rotation = Quaternion.AngleAxis(35f, Vector3.forward) * upright[rocks.transform];
+                    rocks.transform.position = serve + new Vector3(0.07f, 0.12f, -0.04f);
+                    Physics.SyncTransforms();
+                    Expect(snap.InReach(rocks), "a tilted glass let go just above the coaster is close enough to snap");
+                    Expect(snap.Snap(rocks), "it snaps onto the coaster");
+                    Vector3 off = rocks.CenterWorld - serve; float lift = rocks.BottomWorld.y - serve.y; off.y = 0;
+                    Expect(Vector3.Angle(rocks.UpWorld, Vector3.up) < 1f, "the snapped glass stands upright");
+                    Expect(off.magnitude < 0.005f && Mathf.Abs(lift) < 0.005f, "the snapped glass stands in the middle of the coaster");
+                    Expect(!snap.Snap(highball), "a second glass doesn't snap onto a taken coaster");
+                    Place(highball, serve + new Vector3(0.5f, 0.12f, 0f));
+                    Expect(!snap.InReach(highball), "a glass let go farther away doesn't snap");
+                }),
+                (0.2f, "reset button", () =>
+                {
+                    var button = UnityEngine.Object.FindObjectsByType<PokeButton>(FindObjectsSortMode.None)
+                        .FirstOrDefault(b => b.transform.parent && b.transform.parent.name == ResetButton.Name);
+                    Expect(button != null, "the reset button is on the counter");
+                    Place(whiskey, away);
+                    Place(cup, away + right);
+                    button?.Press();
+                    bool AtHome(Component c) { var h = c.GetComponent<PropRespawn>(); return h && Vector3.Distance(c.transform.position, h.HomePosition) < 0.001f; }
+                    Expect(AtHome(whiskey) && AtHome(cup) && AtHome(rocks) && AtHome(highball), "pressing it puts the props back where they started");
+                }),
+                (0.2f, "check reset", () => Expect(station.Snap.Glass == null, "a glass sent home leaves the coaster")),
             }).ToList();
         }
 

@@ -29,6 +29,16 @@ AI was used for:
 - splitting the bar into pieces and checking nothing moved
 - writing the docs
 
+## Playtest fixes (7 Nov 2026)
+From a teammate's playtest with the XR Interaction Simulator:
+- A glass let go near the serve coaster snaps onto it, upright, and stays there.
+- A big red DO NOT PUSH button on the counter puts every prop back where it started (R does the same).
+- The how-to-play text fits on the menu board and is easier to read.
+
+AI was used for:
+- working out the causes from the playtest feedback
+- writing the fixes and their smoke tests
+
 ## What's here
 | Folder | What |
 |---|---|

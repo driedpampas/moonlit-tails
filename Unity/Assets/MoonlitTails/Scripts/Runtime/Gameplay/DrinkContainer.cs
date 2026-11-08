@@ -92,6 +92,9 @@ namespace MoonlitTails.Gameplay
         float HalfHeight => GameVisuals.Extent(bounds, upAxis);
         public Vector3 OpeningWorld => transform.TransformPoint(bounds.center + upAxis * HalfHeight);
         public Vector3 BottomWorld => transform.TransformPoint(bounds.center - upAxis * HalfHeight);
+        public Vector3 CenterWorld => transform.TransformPoint(bounds.center);
+        /// <summary>The direction the glass's opening points, in world space.</summary>
+        public Vector3 UpWorld => transform.TransformDirection(upAxis);
         public float OpeningRadiusWorld => GameVisuals.Radius(bounds, upAxis) * transform.lossyScale.x;
         bool Upright => Vector3.Angle(transform.TransformDirection(upAxis), Vector3.up) < 45f;
 

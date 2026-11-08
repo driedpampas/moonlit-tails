@@ -57,11 +57,13 @@ namespace MoonlitTails.Gameplay
         Color normal;
         TextMeshPro text;
 
-        public static PokeButton Create(Transform parent, string caption, Vector3 localPos, float size, Color color)
+        /// <summary>A flat square button facing the panel's front (Cube), or a dome sitting on a surface (Sphere).</summary>
+        public static PokeButton Create(Transform parent, string caption, Vector3 localPos, float size, Color color,
+                                        PrimitiveType shape = PrimitiveType.Cube)
         {
-            var go = GameVisuals.Primitive(PrimitiveType.Cube, parent, "Button " + caption, color);
+            var go = GameVisuals.Primitive(shape, parent, "Button " + caption, color);
             go.transform.localPosition = localPos;
-            go.transform.localScale = new Vector3(size, size, size * 0.4f);
+            go.transform.localScale = shape == PrimitiveType.Sphere ? new Vector3(size, size * 0.45f, size) : new Vector3(size, size, size * 0.4f);
             var col = go.AddComponent<BoxCollider>();
             col.isTrigger = true;
             var b = go.AddComponent<PokeButton>();
@@ -75,6 +77,9 @@ namespace MoonlitTails.Gameplay
         }
 
         public void SetCaption(string caption) { if (text) text.text = caption; }
+
+        /// <summary>Press it from code (tests).</summary>
+        public void Press() => Fire();
 
         void Update()
         {

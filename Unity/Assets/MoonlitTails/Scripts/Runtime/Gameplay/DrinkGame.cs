@@ -100,6 +100,7 @@ namespace MoonlitTails.Gameplay
             Orders.Init(people, plan.tickets, glassTypes, colors);
             if (plan.serveSpot && plan.player)
                 gameObject.AddComponent<ServeStation>().Init(plan.serveSpot, plan.player, plan.bell, Orders);
+            if (plan.serveSpot && plan.player) ResetButton.Create(transform, plan.player, plan.serveSpot);
             if (plan.menuBoard && plan.player) WriteMenuBoard(plan.menuBoard, plan.player);
 
             Debug.Log($"[Moonlit] DrinkGame ready: {plan.sources.Count} ingredient props, {plan.glasses.Count} glasses, " +
@@ -165,27 +166,59 @@ namespace MoonlitTails.Gameplay
         }
 
         // ------------------------------------------------------------------ how-to-play on the menu board
+        /// <summary>
+        /// Writes the rules on the chalkboard: flat on its face, inside the wooden frame, as big as fits. A dark panel
+        /// goes under the text to hide the painted menu lines.
+        /// </summary>
         static void WriteMenuBoard(Transform board, Transform player)
         {
-            Vector3 center = GameVisuals.WorldBounds(board).center;
-            Vector3 toPlayer = player.position - center; toPlayer.y = 0;
-            if (toPlayer.sqrMagnitude < 1e-4f) return;
-            toPlayer.Normalize();
-            var text = GameVisuals.Text(null, "How To Play", 0.45f, TextAlignmentOptions.TopLeft);
-            text.rectTransform.sizeDelta = new Vector2(0.9f, 0.9f);
+            // the board's own box (its mesh bounds, turned with it); world bounds if the mesh was batched into another
+            var mf = board.GetComponent<MeshFilter>();
+            bool own = mf && mf.sharedMesh && !mf.sharedMesh.name.StartsWith("Combined Mesh");
+            Bounds box = own ? mf.sharedMesh.bounds : GameVisuals.WorldBounds(board);
+            Vector3 Side(Vector3 axis) => own ? board.TransformVector(Vector3.Scale(axis, box.extents)) : Vector3.Scale(axis, box.extents);
+            Vector3 center = own ? board.TransformPoint(box.center) : box.center;
+
+            // the board is a flat box: its thinnest side is the face normal, the side closest to vertical is its height
+            Vector3[] axes = { Vector3.right, Vector3.up, Vector3.forward };
+            var sides = axes.Select(a => (dir: Side(a), a)).ToArray();
+            var thin = sides.OrderBy(x => x.dir.magnitude).First();
+            var rest = sides.Where(x => x.a != thin.a).OrderByDescending(x => Mathf.Abs(Vector3.Dot(x.dir.normalized, Vector3.up))).ToArray();
+            float halfThick = thin.dir.magnitude, height = rest[0].dir.magnitude * 2f, width = rest[1].dir.magnitude * 2f;
+            if (halfThick < 1e-4f || width < 0.1f) return;
+
+            Vector3 normal = thin.dir.normalized;
+            if (Vector3.Dot(normal, player.position - center) < 0) normal = -normal;   // the side facing the room
+            Vector3 up = Vector3.ProjectOnPlane(rest[0].dir, normal).normalized;
+            if (Vector3.Dot(up, Vector3.up) < 0) up = -up;
+
+            var root = new GameObject("How To Play").transform;
+            root.SetPositionAndRotation(center, Quaternion.LookRotation(-normal, up));   // text and quads face local -Z
+
+            // the chalk area inside the frame (1.1 x 0.75 board, 0.98 x 0.63 chalk in the model)
+            float w = width * 0.89f, h = height * 0.84f;
+            var slate = GameVisuals.Primitive(PrimitiveType.Quad, root, "Slate", new Color(0.13f, 0.17f, 0.2f));
+            slate.transform.localPosition = new Vector3(0, 0, -(halfThick + 0.003f));
+            slate.transform.localScale = new Vector3(w, h, 1f);
+
+            var text = GameVisuals.Text(root, "Rules", 0.6f, TextAlignmentOptions.TopLeft);
+            text.transform.localPosition = new Vector3(0, 0, -(halfThick + 0.006f));
+            text.rectTransform.sizeDelta = new Vector2(w - 0.06f, h - 0.05f);
             text.textWrappingMode = TextWrappingModes.Normal;
-            text.transform.position = center + toPlayer * 0.03f;
-            text.transform.rotation = Quaternion.LookRotation(-toPlayer, Vector3.up);
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 0.15f;
+            text.fontSizeMax = 1f;
+            text.lineSpacing = -10f;
             text.text =
-                "<b>How to make a drink</b>\n" +
-                "<size=80%>1. Read a ticket: taste, method, glass, extras.\n" +
-                "2. Tip bottles over the <b>Stir Cup</b> or <b>Shake Mixer</b>: one tip = 1 unit.\n" +
-                "3. Two things in? Same density: <b>stir</b> with the spoon. Different: <b>shake</b> it.\n" +
-                "4. <b>Mixed</b>: pour the Shake Mixer into the glass.\n" +
-                "   <b>Layered</b>: pour from the Stir Cup, one layer per tip.\n" +
-                "5. Ice scoop for Cold, fruit on the rim for colour.\n" +
-                "6. Glass on the coaster, adjust, ring the bell.\n" +
-                "Tip anything out over the floor to empty it. R resets props.</size>";
+                "<b>HOW TO MAKE A DRINK</b>\n" +
+                "1. Read a ticket\n" +
+                "2. Pour into <b>Stir Cup</b> or <b>Shake Mixer</b>\n" +
+                "3. Same density: <b>stir</b>. Different: <b>shake</b>\n" +
+                "4. <b>Mixed</b>: Shake Mixer into the glass\n" +
+                "    <b>Layered</b>: Stir Cup, one tip per layer\n" +
+                "5. Ice for Cold, fruit on the rim for colour\n" +
+                "6. Glass on the coaster, ring the bell\n" +
+                "<color=#ff7a7a>Red button: everything back in place</color>";
         }
     }
 }
