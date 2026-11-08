@@ -63,6 +63,7 @@ Because it's an asset, changes you make while playing in the headset are **kept 
 | Throw Strength | 1 = a released prop flies exactly as fast as your hand was moving. Raise it if throws feel weak. |
 | Throw Spin / Throw Window | How much of the hand's spin the prop keeps, and how far back (s) to look for the throwing speed. |
 | Physics Rate | Physics steps per second. Match the headset refresh (72/90/120) so held props move smoothly. |
+| Player Body Pushes Props *(dev option)* | Off (default): props pass through the player's body, the capsule on the XR Origin that follows your head, so leaning over the counter doesn't knock glasses away. Turn it on if walking or teleporting comes back and the body should bump into things again. |
 
 Seated customers measure their own hip height from the sitting animation, so they stay on the seat at any height you give them.
 

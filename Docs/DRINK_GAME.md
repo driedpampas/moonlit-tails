@@ -32,6 +32,8 @@ Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so
 
 To empty anything, tip it out over nothing. The big red **DO NOT PUSH** button on the front counter (left corner, next to the glass rack) puts every prop back where it started, even one in your hand or behind the bar. What's in the glasses and cups stays. **R** on the keyboard does the same.
 
+The rules are on a sign on the back wall right behind you, where the round cocktail logo was, so you can read them from behind the bar. The logo is only hidden while playing: it's still in the bar prefab. The chalkboard on the far wall shows the same rules.
+
 Labels float over the bottles, cups and glasses when you're close. Buttons work with a fingertip, or with a mouse click when you use the XR Device Simulator.
 
 ## Rules
