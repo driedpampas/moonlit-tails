@@ -18,26 +18,22 @@ AI was used for:
 - debugging
 - writing the README
 
-## Drink game and bar pieces (6 Nov 2026)
-- Drink rules from the team's crafting guide: stir/shake mixing, layering, glass sizes, stat adjustments and orders, with tests. See [DRINK_GAME.md](Docs/DRINK_GAME.md).
-- Making drinks in VR: pour from bottles, stir or shake, mixed or layered glasses, ice, garnish, a serve station, customer tickets and reactions.
-- The bar split from one FBX into one prefab per piece, with its Blender source in `Art/Bar`. See [BAR_PIECES.md](Docs/BAR_PIECES.md).
+## Week 2
+<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Week 2 demo video"></a>
+
+[Watch the Week 2 demo](https://driedpampas.github.io/moonlit-tails/) (2 min, plays in the browser)
+
+- Quest build setup, and the XR Interaction Simulator for testing without a headset
+- The drink game: pouring, stirring, shaking, layering, orders and customer reactions ([how it works](Docs/DRINK_GAME.md))
+- The bar split into one prefab per piece ([details](Docs/BAR_PIECES.md))
+- Playtest fixes: the serve coaster, a reset button, and rules you can read from behind the bar
 
 AI was used for:
-- analysing the drink rules and finding gaps in them
-- writing the drink rules, the VR drink interactions and their tests
-- splitting the bar into pieces and checking nothing moved
+- writing the drink rules, the VR interactions and their tests
+- splitting the bar into pieces
+- the playtest fixes
+- recording the demo video
 - writing the docs
-
-## Playtest fixes (7 Nov 2026)
-From a teammate's playtest with the XR Interaction Simulator:
-- A glass let go near the serve coaster snaps onto it, upright, and stays there.
-- A big red DO NOT PUSH button on the counter puts every prop back where it started (R does the same).
-- The how-to-play text fits on the menu board and is easier to read.
-
-AI was used for:
-- working out the causes from the playtest feedback
-- writing the fixes and their smoke tests
 
 ## What's here
 | Folder | What |
