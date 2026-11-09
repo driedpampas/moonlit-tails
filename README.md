@@ -9,8 +9,8 @@ A cozy VR bartending game for Quest. Mix drinks with your own hands for animal c
 [State of the art](https://docs.google.com/document/d/1jW3J8CAuBcPGa2orrIAQPoJuJKJFUZwphDUCLjqxw80/edit?tab=t.0)
 
 ## Contact (Discord)
-- @syulze
 - @bianca_alexandru_
+- @syulze
 - @stiv69
 - @broko25
 
