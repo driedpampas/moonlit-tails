@@ -12,7 +12,7 @@ namespace MoonlitTails.Gameplay
     /// "MoonlitBar" object, so the scene file doesn't need editing (no scene merges).
     ///
     /// Which prop is which ingredient, glass size, etc. is all in the tables below. Change them freely: the props
-    /// are found by name, and Tools > Moonlit Tails > 4. Check Drink Setup lists what matched.
+    /// are found by name, and Tools > Moonlit Tails > Automation > Check Scene lists what matched.
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {

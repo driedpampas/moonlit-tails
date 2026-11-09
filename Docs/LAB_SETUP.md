@@ -74,18 +74,22 @@ Seated customers measure their own hip height from the sitting animation, so the
 
 Props' "home" positions are stored relative to the bar, so a rescaled bar still resets props onto the right counter.
 
-## Rebuilding
+## Project settings (already set; check them by hand if something breaks)
 
-Run these from **Tools > Moonlit Tails**:
+The scene and these settings are edited by hand in the Editor. No script rebuilds them.
 
-1. **Configure Project**: URP, OpenXR + hand tracking (PC and Android), XR Interaction Toolkit samples, and the character prefabs. Safe to run again.
-2. **Rebuild VR Scene**: builds the scene from scratch: the bar prefab, the XR rig and the customers.
-   - It replaces manual scene edits, so it asks first. You rarely need it: bar changes go into the piece prefabs (see [BAR_PIECES.md](BAR_PIECES.md)).
-   - Your sizes in `BarTuning.asset` are kept.
-4. **Check Drink Setup**: see [DRINK_GAME.md](DRINK_GAME.md). It changes nothing.
-6. **Assemble Split Bar**, 7. **Refresh Bar Pieces** and 8. **Check Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
+- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, HDR, shadow distance 12 m), set as the default pipeline and on every quality level. Colour space: Linear.
+- **XR Plug-in Management:** OpenXR for PC and Android, *Initialize XR on Startup* on.
+- **OpenXR features (PC and Android):** Hand Tracking Subsystem, Meta Hand Tracking Aim, Hand Interaction Profile, Oculus Touch and Meta Quest Touch Plus controller profiles. On Android also **Meta Quest Support**.
+- **Player:** *Run In Background* on (Play keeps running when the headset takes focus). Android: IL2CPP, ARM64, minimum API level 29.
+- **Samples** (Package Manager): XR Interaction Toolkit *Starter Assets*, *Hands Interaction Demo* and *XR Interaction Simulator*; XR Hands *HandVisualizer*.
+- **Sitting animation** (`Animations/Sitting Idle.fbx`): Rig = Humanoid, create the avatar from this model; clip renamed `Sitting_Idle`, Loop Time + Loop Pose, root rotation, height and XZ baked into the pose.
 
-**Automation** (Capture Player Views, Play Smoke Test, Record Demo Video) runs the game without a headset for desk checks, tests and the demo video. You don't need it to work on the game, and it never saves the scene. It lives in `Assets/MoonlitTails/DevTools` (see the README there).
+## Checking the scene
+
+**Tools > Moonlit Tails > Automation > Check Scene** checks the bar pieces (see [BAR_PIECES.md](BAR_PIECES.md)) and lists which props the drink game uses (see [DRINK_GAME.md](DRINK_GAME.md)). It changes nothing.
+
+**Automation** (Check Scene, Capture Player Views, Play Smoke Test, Record Demo Video) runs the game without a headset for desk checks, tests and the demo video. You don't need it to work on the game, and it never saves the scene. It lives in `Assets/MoonlitTails/DevTools` (see the README there).
 
 ## Building an APK instead of Link
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MoonlitTails.Gameplay;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,31 +10,42 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MoonlitTails.EditorTools
 {
     /// <summary>
-    /// Tools > Moonlit Tails > 8. Check Bar Pieces: checks that every object in the bar is where it belongs and set up
-    /// right. Changes nothing.
+    /// Tools > Moonlit Tails > Automation > Check Scene: checks the open bar scene. Changes nothing, saves nothing.
+    /// Bar pieces:
     /// - every mesh in the bar belongs to a piece prefab (no loose meshes)
     /// - every material is one of the shared bar materials (no missing or default ones)
     /// - room pieces have colliders, props have collider + rigidbody + grab + respawn
     /// - no missing scripts, no duplicate names
-    /// Command line: Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.BarPieceCheck.RunBatch
+    /// Drink setup: which props the drink game will use and for what, and anything it can't find.
+    /// Command line (exit code 0 = no problems):
+    /// Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.SceneCheck.RunBatch
     /// </summary>
-    public static class BarPieceCheck
+    public static class SceneCheck
     {
-        [MenuItem("Tools/Moonlit Tails/8. Check Bar Pieces")]
+        [MenuItem("Tools/Moonlit Tails/Automation/Check Scene")]
         public static void Run() => Check(out _);
 
         public static void RunBatch()
         {
-            EditorSceneManager.OpenScene(MoonlitSetup.ScenePath);
+            if (!GameObject.Find("MoonlitBar")) EditorSceneManager.OpenScene(HeadlessRun.ScenePath);
             Check(out int problems);
             EditorApplication.Exit(problems == 0 ? 0 : 1);
+        }
+
+        /// <summary>Both sections. <paramref name="problems"/> counts bar problems plus drink-setup warnings.</summary>
+        public static bool Check(out int problems)
+        {
+            bool barOk = CheckBar(out int barProblems);
+            CheckDrinkSetup(out int drinkWarnings);
+            problems = barProblems + drinkWarnings;
+            return barOk && drinkWarnings == 0;
         }
 
         static readonly string[] Groups = { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "RemadeModels" };
         static readonly string[] FixedProps = { "PROP_TapHandle", "PROP_DispenserLever", "PROP_OrderTicket" };
         static readonly string[] NoCollider = { "StringLights", "Neon", "Pendant", "Lantern", "WallStars", "Sconces", "Noren", "IceCubes", "Picture", "Medallion", "Straw", "SKY_" };
 
-        public static bool Check(out int problems)
+        static bool CheckBar(out int problems)
         {
             var bar = GameObject.Find("MoonlitBar");
             var issues = new List<string>();
@@ -76,7 +88,7 @@ namespace MoonlitTails.EditorTools
             sb.AppendLine($"Pieces: {pieces.Count} (from {pieceAssets.Count} prefab files), remade models: {remade}, markers: {markers}, lights: {lights}");
 
             // ---- every renderer in the bar must belong to a prefab instance, with real materials
-            var shared = new HashSet<Material>(AssetDatabase.FindAssets("t:Material", new[] { MoonlitSetup.Root + "/Environment/Materials" })
+            var shared = new HashSet<Material>(AssetDatabase.FindAssets("t:Material", new[] { HeadlessRun.Root + "/Environment/Materials" })
                 .Select(g => AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(g))));
             int renderers = 0;
             foreach (var r in bar.GetComponentsInChildren<Renderer>(true))
@@ -155,6 +167,36 @@ namespace MoonlitTails.EditorTools
             return problems == 0;
         }
 
+        // ------------------------------------------------------------------ drink setup
+        /// <summary>Which bar props the drink game will use and for what; warnings for anything it can't find.</summary>
+        static bool CheckDrinkSetup(out int warnings)
+        {
+            warnings = 0;
+            var bar = GameObject.Find("MoonlitBar");
+            if (!bar) { Debug.LogError("[Moonlit] Open MoonlitBar_VR.unity first (no MoonlitBar object)."); warnings = 1; return false; }
+            var plan = DrinkGame.Plan(bar.transform);
+            var sb = new StringBuilder("[Moonlit] Drink setup\n");
+            sb.AppendLine($"Ingredients ({plan.sources.Count}):");
+            foreach (var g in plan.sources.GroupBy(s => s.ingredient.DisplayName))
+                sb.AppendLine($"  {g.Key,-16} <- {string.Join(", ", g.Select(s => s.t.name))}");
+            sb.AppendLine($"Glasses ({plan.glasses.Count}):");
+            foreach (var g in plan.glasses.GroupBy(s => s.type))
+                sb.AppendLine($"  {g.Key,-9} {DrinkGame.GlassLengths[g.Key],-6} x{g.Count()}");
+            sb.AppendLine($"Garnishes ({plan.garnishes.Count}): {string.Join(", ", plan.garnishes.Select(g => g.color).Distinct())}");
+            sb.AppendLine($"Stir Cup: {Name(plan.stirCup)}   Shake Mixer: {Name(plan.shaker)}   Spoon: {Name(plan.spoon)}");
+            sb.AppendLine($"Ice: {Name(plan.scoop)} + {Name(plan.iceWell)}   Bell: {Name(plan.bell)}   Serve: {Name(plan.serveSpot)}");
+            sb.AppendLine($"Tickets: {plan.tickets.Count}   Menu board: {Name(plan.menuBoard)}");
+            var layout = Object.FindFirstObjectByType<BarLayout>();
+            sb.AppendLine($"Customers: {(layout ? string.Join(", ", layout.characters.Select(c => c.id)) : "none (no BarLayout)")}");
+            foreach (var w in plan.warnings) sb.AppendLine("  WARNING: " + w);
+            warnings = plan.warnings.Count;
+            Debug.Log(sb.ToString());
+            return warnings == 0;
+        }
+
+        static string Name(Transform t) => t ? t.name : "MISSING";
+
+        // ------------------------------------------------------------------ helpers
         /// <summary>The objects in a group: direct children, and the children of sub-groups (Props/Glasses).</summary>
         static IEnumerable<Transform> Members(Transform group)
         {

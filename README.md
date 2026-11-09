@@ -64,7 +64,6 @@ The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It'
 - **Pull before opening Unity**, and close Unity before switching branches that change scenes.
 - **Always commit `.meta` files together with their assets.** Move or rename assets *inside Unity*, never in Explorer, or references break.
 - **One person edits `MoonlitBar_VR.unity` at a time.** Scene merges are painful. Size tweaks go in `BarTuning.asset` instead, a small text file that merges fine. Changes to the bar itself go in its prefabs (`Environment/Bar`), so they don't touch the scene.
-- The scene can be regenerated with **Tools > Moonlit Tails > 2. Rebuild VR Scene**. It replaces manual scene edits, so it asks first; you rarely need it.
 - **Tools > Moonlit Tails > Automation** and `Assets/MoonlitTails/DevTools` are the headless desk checks, smoke test and demo recorder. You can ignore them: they never save the scene or change project settings.
 - **Before editing a `.blend` file, lock it** so nobody edits it at the same time: `git lfs lock path/to/file.blend`. Unlock it when you're done: `git lfs unlock path/to/file.blend`.
 - Work on a branch and open a pull request into `main`.

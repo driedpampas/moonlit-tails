@@ -17,7 +17,7 @@ namespace MoonlitTails
     {
         public BarTuning tuning;
 
-        [Header("Scene references (filled by Tools > Moonlit Tails > Rebuild VR Scene)")]
+        [Header("Scene references")]
         public Transform environment;
         public Transform xrOrigin;
         [Tooltip("Where the player's feet go (MK_PlayerStart).")] public Transform playerSpot;

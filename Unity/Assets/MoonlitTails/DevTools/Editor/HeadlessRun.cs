@@ -11,6 +11,9 @@ namespace MoonlitTails.EditorTools
     /// </summary>
     public static class HeadlessRun
     {
+        public const string Root = "Assets/MoonlitTails";
+        public const string ScenePath = Root + "/Scenes/MoonlitBar_VR.unity";
+
         /// <summary>
         /// Makes sure the bar scene is the open scene. If another scene has unsaved changes, asks to save them first.
         /// Returns false if the person cancels, so the caller should stop.
@@ -19,7 +22,7 @@ namespace MoonlitTails.EditorTools
         {
             if (GameObject.Find("MoonlitBar") != null) return true;   // already open: play it as it is, unsaved edits included
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return false;
-            EditorSceneManager.OpenScene(MoonlitSetup.ScenePath);
+            EditorSceneManager.OpenScene(ScenePath);
             return true;
         }
 

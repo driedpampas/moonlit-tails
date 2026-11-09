@@ -30,7 +30,7 @@ The bar is grouped like the Blender collections:
 | **Props** | Everything you can grab: `Glasses`, `Bottles`, `Fridge`, `Garnish` and `Tools` |
 | **Markers** | `MK_` points where customers stand, props live, and so on |
 | **Lights** | The bar's lights |
-| **RemadeModels** | `woodslab` (the wall panelling), `archdoor` (the door arches), `counterthingy` (the middle window sill and the back-wall panelling), as prefabs with colliders. They replace 8 pieces of the original bar, which `split_bar.py` leaves out. Put a new model in `Environment/RemadeModels` and run **7. Refresh Bar Pieces**: it gets a prefab too, and copies of the bare model in the bar are swapped for it. |
+| **RemadeModels** | `woodslab` (the wall panelling), `archdoor` (the door arches), `counterthingy` (the middle window sill and the back-wall panelling), as prefabs with colliders. They replace 8 pieces of the original bar, which `split_bar.py` leaves out. To add one: put the model in `Environment/RemadeModels`, make its prefab with colliders by hand, and swap the bar's copies for it with **Prefab → Replace** (see *Add a new piece* below). |
 
 **Pieces made of parts.** Architecture and counter pieces are split into their parts, so you can move one slab, door or shelf on its own. For example, `ENV_BarCounter` has 20 children: the counter bodies, the top slabs, cabinet doors, fluting and trim.
 - Up to 8 parts of one material stay separate.
@@ -50,15 +50,22 @@ Each part's pivot is at its bottom centre, and so is each piece's.
    ```
    blender -b --factory-startup --disable-autoexec Art/Bar/MoonlitBar.blend --python Art/Bar/split_bar.py -- Unity/Assets/MoonlitTails/Environment/Bar
    ```
-3. In Unity, run **Tools > Moonlit Tails > 7. Refresh Bar Pieces**. It updates the imports and prefabs in place, keeping the same files and links, so the scene keeps working.
+3. Switch back to Unity. It reimports the changed FBX files in place (same files, same GUIDs), so the piece prefabs, their mesh colliders and the scene follow on their own. Nothing to run.
 
 Or edit one piece's FBX directly in Blender and export it again under the same name.
 
-**Add a new piece:** model it, export it into the right `Environment/Bar/<Group>` folder, make a prefab, and drag it into `MoonlitBar.prefab`. Use `M_*` names for materials that already exist in `Environment/Materials`, so it matches the bar.
+**Add a new piece:** model it and export it into the right `Environment/Bar/<Group>` folder. Then, by hand:
+1. Drag the FBX into the scene, add a **Mesh Collider** to each mesh, and drag it into `Environment/Bar/Prefabs/<Group>` to make its prefab.
+2. For a prop you can pick up, copy the components of an existing prop prefab of the same kind (the component menu's *Copy Component* / *Paste Component As New*): a convex **Mesh Collider**, **Rigidbody**, **XR Grab Interactable** and **Prop Respawn**.
+3. Drag the prefab into `MoonlitBar.prefab`, in its group.
+
+Use `M_*` names for materials that already exist in `Environment/Materials`, so it matches the bar.
+
+**Replace copies of a model with a remade one** (as with `RemadeModels`): select the instances, right-click → **Prefab → Replace**, and pick the new prefab.
 
 ## Checking the bar
 
-**Tools > Moonlit Tails > 8. Check Bar Pieces** (changes nothing) checks that:
+**Tools > Moonlit Tails > Automation > Check Scene** (changes nothing) checks that:
 - every object in the bar is a piece prefab, a marker or a light, with no loose meshes;
 - every material is one of the shared bar materials;
 - room pieces have colliders, and props have a collider, physics, grabbing and respawn;
@@ -69,7 +76,7 @@ Run it after editing the bar.
 
 ## How the split was checked
 
-**6. Assemble Split Bar** swapped every piece for its prefab in the scene. Before saving, it compared each piece before and after:
+A one-time tool (since removed) swapped every piece for its prefab in the scene. Before saving, it compared each piece before and after:
 - all 168 pieces are at the same position and size (0.0 mm difference);
 - all have the same triangle count;
 - 17 pieces have a slightly different vertex count, because Blender 5.2 splits vertices at sharp edges a little differently from 4.4. The triangles are the same.

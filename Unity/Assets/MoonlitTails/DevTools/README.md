@@ -8,7 +8,8 @@ These scripts run the game without a headset: for desk checks, the drink smoke t
 | `Editor/MoonlitCapture.cs` | Capture Player Views | Plays the scene, saves screenshots from the player's eye and a physics report to `Unity/Captures/`. |
 | `Editor/DrinkPlaySmokeTest.cs` | Play Smoke Test | Plays the scene and makes drinks by moving the props. Exit code 0 = passed. See `Docs/DRINK_GAME.md`. |
 | `Editor/DemoVideoRecorder.cs` + `DemoDirector.cs` | Record Demo Video | Films the weekly progress video into `Unity/Captures/Demo/` (needs ffmpeg). |
-| `Editor/HeadlessRun.cs` | | What the three share: opening the scene, batch-mode workarounds, exiting. |
+| `Editor/SceneCheck.cs` | Check Scene | Checks the bar pieces (prefabs, materials, colliders, grabbing) and lists which props the drink game uses. Changes nothing. Exit code 0 = no problems. |
+| `Editor/HeadlessRun.cs` | | What they share: opening the scene, batch-mode workarounds, exiting. |
 
 What they promise:
 - **They never save a scene or an asset.** Everything they move happens in Play mode and goes back when Play stops.

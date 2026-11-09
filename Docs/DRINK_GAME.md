@@ -95,7 +95,7 @@ The label over each prop shows the ingredient's name. Swap the models later, or 
 ## Testing
 
 - **Rules:** `cd Tests/DrinkRules.Tests && dotnet run`. If the .NET workload resolver is broken on your machine, run `MSBuildEnableWorkloadResolver=false dotnet run` instead.
-- **Tools > Moonlit Tails > 4. Check Drink Setup:** lists which prop got which role, and warns about anything missing.
+- **Tools > Moonlit Tails > Automation > Check Scene:** lists which prop got which role, warns about anything missing, and checks the bar pieces.
 - **Tools > Moonlit Tails > Automation > Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button.
 - **Headless:** run the smoke test from a terminal. Exit code 0 means it passed.
   ```
