@@ -2,7 +2,7 @@
 
 [← All conversations](README.md)
 
-*Claude Code, Opus 5.5. Times are local (EET).*
+*Claude Code, Opus 5.5, Fable 5.2. Times are local (EET).*
 
 
 ### User  ·  2026-11-09 14:44
@@ -1696,6 +1696,7 @@ Phase 7 remaining: GameVisuals.Flat from a Resources material + 1/32 quantize + 
 
 *[The conversation got too long here and was summarized; it continues below.]*
 
+*Claude Opus 5.5 High switched to Claude Fable 5.2 Medium*
 
 ### User  ·  2026-11-09 22:34
 
