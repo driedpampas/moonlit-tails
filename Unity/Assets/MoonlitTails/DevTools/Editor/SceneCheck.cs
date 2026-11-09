@@ -244,7 +244,7 @@ namespace MoonlitTails.EditorTools
             }
             if (seats.arraySize == 0) issues.Add("Drink Game has no customer seats");
 
-            foreach (var field in new[] { "serve", "playerSpot", "iceScoop", "resetButton", "rulesSign", "menuBoardText" })
+            foreach (var field in new[] { "serve", "playerSpot", "iceScoop", "resetButton", "menuBoardText" })
                 if (!so.FindProperty(field).objectReferenceValue) issues.Add($"Drink Game: {field} isn't set");
 
             if (so.FindProperty("serve").objectReferenceValue is ServeStation station)

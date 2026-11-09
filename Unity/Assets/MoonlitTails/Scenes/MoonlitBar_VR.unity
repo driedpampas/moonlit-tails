@@ -962,7 +962,6 @@ MonoBehaviour:
   playerSpot: {fileID: 1172200625035237998}
   iceScoop: {fileID: 363945437933981323}
   resetButton: {fileID: 1646573868}
-  rulesSign: {fileID: 4190725687814370401}
   menuBoardText: {fileID: 784582895}
   keyboardReset: 1
 --- !u!4 &166716476

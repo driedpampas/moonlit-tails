@@ -55,8 +55,6 @@ namespace MoonlitTails.Gameplay
         [SerializeField] IceScoop iceScoop;
         [Tooltip("Pressing it puts every prop back where it started.")]
         [SerializeField] XRBaseInteractable resetButton;
-        [Tooltip("The rules sign on the back wall.")]
-        [SerializeField] Transform rulesSign;
         [Tooltip("The rules written on the chalkboard.")]
         [SerializeField] Transform menuBoardText;
         [Tooltip("Editor/dev shortcut: R on the keyboard resets the props too.")]
@@ -67,7 +65,6 @@ namespace MoonlitTails.Gameplay
         public ServeStation Station => serve;
         public Transform PlayerSpot => playerSpot;
         public IceScoop IceScoop => iceScoop;
-        public Transform RulesSign => rulesSign;
         public Transform MenuBoardText => menuBoardText;
         public Transform ResetButtonObject => resetButton ? resetButton.transform : null;
 

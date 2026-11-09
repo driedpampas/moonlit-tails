@@ -66,7 +66,7 @@ Two choices aren't in the guide yet. Check them with the designers:
 |---|---|
 | `Unity/Assets/MoonlitTails/Scripts/Drinks/` | The rules as plain C# with no Unity dependency: ingredients, mixing, layering, glasses, adjustments, order checking and the order generator. |
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
-| `Gameplay/DrinkGame.cs` | The night at the bar: customers, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customer seats, the serve panel, the reset button and the rules signs are set. |
+| `Gameplay/DrinkGame.cs` | The night at the bar: customers, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customer seats, the serve panel, the reset button and the chalkboard text are set. The rules sign on the back wall is just a prefab in the scene; no script uses it. |
 | `Gameplay/ServeStation.cs` | The serve coaster and its panel (`Prefabs/UI/ServePanel.prefab`): the coaster snap, the taste readout, the adjustment buttons, Serve and the bell. |
 | `Prefabs/UI/` | The serve panel and the rules sign, and their flat-colour materials. The reset button and the chalkboard text are plain objects under `Drink Game` in the scene. |
 | The prop prefabs (`Environment/Bar/Prefabs/Props`) | **What each prop is**: the ingredient on each bottle's *Ingredient Source*, the kind, name and length on each glass's *Drink Container*, the colour on each *Garnish*. |
