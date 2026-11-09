@@ -33,6 +33,8 @@ namespace MoonlitTails.EditorTools
         RenderTexture rt;
         Texture2D frame;
         Process ffmpeg;
+        readonly System.Text.StringBuilder ffmpegErrors = new System.Text.StringBuilder();
+        byte[] frameBytes;
         Stream pipe;
         int frames;
         string dir, rawPath, finalPath;
@@ -122,6 +124,9 @@ namespace MoonlitTails.EditorTools
                 UseShellExecute = false, RedirectStandardInput = true, RedirectStandardError = true, CreateNoWindow = true,
             };
             ffmpeg = Process.Start(info);
+            // read stderr as it comes, so a chatty ffmpeg can't fill the pipe and block both sides
+            ffmpeg.ErrorDataReceived += (_, e) => { if (e.Data != null) lock (ffmpegErrors) ffmpegErrors.AppendLine(e.Data); };
+            ffmpeg.BeginErrorReadLine();
             pipe = ffmpeg.StandardInput.BaseStream;
         }
 
@@ -149,7 +154,9 @@ namespace MoonlitTails.EditorTools
             frame.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             RenderTexture.active = prev;
             var bytes = frame.GetRawTextureData<byte>();
-            try { pipe.Write(bytes.ToArray(), 0, bytes.Length); }
+            if (frameBytes == null || frameBytes.Length != bytes.Length) frameBytes = new byte[bytes.Length];
+            bytes.CopyTo(frameBytes);
+            try { pipe.Write(frameBytes, 0, frameBytes.Length); }
             catch (Exception e) { Debug.LogError("[Moonlit] Demo: ffmpeg stopped taking frames: " + e.Message); failed = true; Finish(); return; }
             frames++;
         }
@@ -161,8 +168,11 @@ namespace MoonlitTails.EditorTools
             try { pipe.Close(); } catch { }
             pipe = null;
             ffmpeg.WaitForExit();
-            string err = ffmpeg.StandardError.ReadToEnd();
+            string err;
+            lock (ffmpegErrors) err = ffmpegErrors.ToString();
             if (ffmpeg.ExitCode != 0) { Debug.LogError("[Moonlit] Demo: ffmpeg failed: " + err); failed = true; }
+            ffmpeg.Dispose();
+            ffmpeg = null;
             Time.captureDeltaTime = 0;
 
             if (!failed)
@@ -171,7 +181,7 @@ namespace MoonlitTails.EditorTools
                 File.WriteAllText(srt, Srt());
                 // burn the captions in: a soft box along the bottom
                 string style = "FontName=DejaVu Sans,FontSize=15,PrimaryColour=&H00F5F8FF,OutlineColour=&H90140E10,BorderStyle=3,Outline=7,Shadow=0,MarginV=22";
-                var burn = Process.Start(new ProcessStartInfo("ffmpeg",
+                using var burn = Process.Start(new ProcessStartInfo("ffmpeg",
                     $"-y -loglevel error -i \"{rawPath}\" -vf \"subtitles=captions.srt:force_style='{style}'\" " +
                     $"-c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -movflags +faststart \"{finalPath}\"")
                 { UseShellExecute = false, RedirectStandardError = true, WorkingDirectory = dir, CreateNoWindow = true });
@@ -185,7 +195,10 @@ namespace MoonlitTails.EditorTools
 
         void OnDestroy()
         {
-            if (rt) rt.Release();
+            if (cam) cam.targetTexture = null;
+            if (rt) { rt.Release(); Destroy(rt); }
+            if (frame) Destroy(frame);
+            if (ffmpeg != null) { try { if (!ffmpeg.HasExited) ffmpeg.Kill(); } catch { } ffmpeg.Dispose(); ffmpeg = null; }
             Time.captureDeltaTime = 0;
         }
 
