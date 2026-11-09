@@ -39,28 +39,15 @@ If grabbing feels off, tune it on the XR rig in the scene, not in code:
 - **Physics rate:** Project Settings > Time > Fixed Timestep is 0.0111111 (90 Hz). Match the headset refresh rate (72/90/120 Hz) so held props move smoothly.
 - **Props pass through your body:** the XR Origin's CharacterController is disabled (walking and teleporting are off), so leaning over the counter doesn't knock glasses away. Enable it again if locomotion comes back.
 
-## Changing sizes (nothing is hardcoded)
+## Moving and resizing things
 
-All sizes live in one asset: **`Assets/MoonlitTails/BarTuning.asset`**. Select it and drag the sliders. The scene updates immediately, in Play mode too.
+Everything is placed by hand in the scene, like any Unity object. No script moves anything when you open the scene or press Play.
 
-Because it's an asset, changes you make while playing in the headset are **kept when you stop Play**. That's different from normal Inspector changes on scene objects, which Unity throws away.
-
-| Setting | What it does |
-|---|---|
-| Environment Scale | Scales the whole bar uniformly: room, counters, furniture, props, and the spots where characters stand and sit. |
-| Player Floor Offset | Raises or lowers the floor you stand on. Use it to make the counter feel lower or higher without rescaling the room. |
-| Prop Scale | Scales every grabbable prop, on top of the room scale. |
-| Prop Scale Rules | Extra scale for props whose name contains some text (`Glass_`, `Bottle_`, `Garnish_`...). Add rules for anything else, e.g. `Jigger`. |
-| Characters > Height | Each customer's standing height in metres. They are all modelled 1.0 m tall. |
-| Characters > Height Offset | Moves a customer up or down, e.g. to sit deeper in a seat. |
-| Characters > Turn | Turns a customer left or right from facing their target. |
-
-Seated customers measure their own hip height from the sitting animation, so they stay on the seat at any height you give them.
-
-**Moving things:**
-- **A customer:** move their marker in `MoonlitBar/Markers` (`MK_CustomerSpot_C`, `MK_StoolSeat_R`, `MK_ChairSeat_L1`). The character follows.
-- **Swapping who sits where:** change the **Spot** of each entry on the `BarLayout` object.
-- **The player:** move `MK_PlayerStart`.
+- **A customer:** select the character (`Kintsu`, `Character03`, `Character02`) and move, turn or scale it. Seated customers are posed on their seats as saved; if you change a seat's height, lower or raise the character to match.
+- **Who sits where, and whose ticket is whose:** the **Seats** list on the `Drink Game` object. Each seat has a customer profile, the character model and their ticket on the rail.
+- **What a customer says:** their profile asset in `Assets/MoonlitTails/Data/Customers` (placeholder writing for now).
+- **The player:** move the `XR Origin Hands (XR Rig)` object. It starts behind the bar at `MK_PlayerStart`, facing the serve spot.
+- **The bar or a prop:** edit its prefab in `Environment/Bar` (see [BAR_PIECES.md](BAR_PIECES.md)), so the change doesn't touch the scene.
 
 Props' "home" positions are stored relative to the bar, so a rescaled bar still resets props onto the right counter.
 

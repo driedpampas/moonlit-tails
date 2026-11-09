@@ -15,9 +15,11 @@ namespace MoonlitTails.Gameplay
     /// bubble over each customer, the check when a drink is served), the reset button, and putting props back when
     /// they leave the bar. A correct drink tells the next line of that customer's story.
     ///
-    /// Transition: until the scene has its own Drink Game object, it adds itself to any scene with a "MoonlitBar"
-    /// object and finds the serve spot, player spot, bell and tickets by name (see <see cref="Plan"/>). The props
-    /// already carry their own gameplay components, set in their prefabs.
+    /// It lives on the "Drink Game" object in the scene; the customers, their tickets and the player spot are set
+    /// on it in the Inspector. The props carry their own gameplay components, set in their prefabs.
+    ///
+    /// Transition: until the scene has its own serve panel, reset button and rules signs, the game builds them when
+    /// Play starts, finding the serve spot, bell and menu board by name (see <see cref="Plan"/>).
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {
@@ -86,22 +88,11 @@ namespace MoonlitTails.Gameplay
         public const string ServeSpotName = "MK_ServeSpot";
         public const string PlayerSpotName = "MK_PlayerStart";
         public const string MenuBoardName = "DECO_MenuBoard";
-        public static readonly string[] TicketNames = { "PROP_OrderTicket_01", "PROP_OrderTicket_02", "PROP_OrderTicket_03" };
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Boot()
-        {
-            if (FindFirstObjectByType<DrinkGame>() != null) return;
-            if (GameObject.Find("MoonlitBar") == null) return;
-            new GameObject("Drink Game").AddComponent<DrinkGame>().bootstrapped = true;
-        }
-
-        bool bootstrapped;
 
         // ------------------------------------------------------------------ start
         void Start()
         {
-            if (bootstrapped) BuildFromNames();
+            if (!serve) BuildFromNames();
             rng = new System.Random();
             glasses = FindObjectsByType<DrinkContainer>(FindObjectsSortMode.None).Where(c => c.IsGlass && !string.IsNullOrEmpty(c.variant))
                 .GroupBy(c => c.variant).Select(g => new GlassVariant(g.Key, g.First().length)).OrderBy(g => g.Name).ToList();
@@ -285,28 +276,15 @@ namespace MoonlitTails.Gameplay
         string Pick(string[] lines) => lines == null || lines.Length == 0 ? "" : lines[rng.Next(lines.Length)];
 
         // ------------------------------------------------------------------ transition: finding props by name
-        /// <summary>Transition: turns the bar's props into the game when the scene has no Drink Game object of its own.</summary>
+        /// <summary>Transition: builds the serve panel, reset button and rules signs, which aren't in the scene yet.</summary>
         void BuildFromNames()
         {
             var bar = GameObject.Find("MoonlitBar");
             if (!bar) { Debug.LogWarning("[Moonlit] DrinkGame: no MoonlitBar in the scene"); return; }
             var plan = Plan(bar.transform);
             foreach (var w in plan.warnings) Debug.LogWarning("[Moonlit] DrinkGame: " + w);
-
-            // the props carry their own gameplay components (set up in their prefabs)
-            iceScoop = bar.GetComponentInChildren<IceScoop>(true);
-            playerSpot = plan.player;
-
-            var layout = FindFirstObjectByType<BarLayout>();
-            if (layout)
-                for (int i = 0; i < layout.characters.Count; i++)
-                {
-                    var c = layout.characters[i];
-                    if (!c.character) continue;
-                    var profile = CustomerProfile.FromScript(CustomerScripts.For(c.id));
-                    runtimeProfiles.Add(profile);
-                    seats.Add(new Seat { profile = profile, body = c.character, ticketSpot = i < plan.tickets.Count ? plan.tickets[i] : null });
-                }
+            if (!playerSpot) playerSpot = plan.player;
+            if (!iceScoop) iceScoop = bar.GetComponentInChildren<IceScoop>(true);
 
             if (plan.serveSpot && plan.player)
             {
@@ -321,12 +299,11 @@ namespace MoonlitTails.Gameplay
 
         public class SetupPlan
         {
-            public readonly List<Transform> tickets = new List<Transform>();
             public Transform bell, serveSpot, player, menuBoard;
             public readonly List<string> warnings = new List<string>();
         }
 
-        /// <summary>Transition: finds the serve spot, player spot, bell, tickets and menu board by name.</summary>
+        /// <summary>Transition: finds the serve spot, player spot, bell and menu board by name.</summary>
         public static SetupPlan Plan(Transform bar)
         {
             var plan = new SetupPlan();
@@ -342,7 +319,6 @@ namespace MoonlitTails.Gameplay
             plan.serveSpot = Need(ServeSpotName);
             plan.player = Need(PlayerSpotName);
             plan.menuBoard = Named(MenuBoardName);
-            foreach (var n in TicketNames) { var t = Named(n); if (t) plan.tickets.Add(t); else plan.warnings.Add($"missing {n}"); }
             return plan;
         }
 

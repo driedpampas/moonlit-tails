@@ -4,7 +4,7 @@ How drinks are made in Moonlit Tails, the rules as the team agreed them, and whe
 
 ## Playing it
 
-Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so the scene file doesn't need to change.
+Press Play in `MoonlitBar_VR.unity`. The game runs from the `Drink Game` object in the scene.
 
 1. **Read a ticket** on the ticket rail. Each ticket belongs to one customer and shows:
    - the three taste bars to hit;
@@ -66,9 +66,9 @@ Two choices aren't in the guide yet. Check them with the designers:
 |---|---|
 | `Unity/Assets/MoonlitTails/Scripts/Drinks/` | The rules as plain C# with no Unity dependency: ingredients, mixing, layering, glasses, adjustments, order checking and the order generator. |
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
-| `Gameplay/DrinkGame.cs` | The night at the bar: customers, orders, tickets, serving, and the reset. |
+| `Gameplay/DrinkGame.cs` | The night at the bar: customers, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customer seats are set. |
 | The prop prefabs (`Environment/Bar/Prefabs/Props`) | **What each prop is**: the ingredient on each bottle's *Ingredient Source*, the kind, name and length on each glass's *Drink Container*, the colour on each *Garnish*. |
-| `Gameplay/CustomerScripts.cs` | What each customer says. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
+| `Data/Customers/` | What each customer says, one *Customer Profile* asset each. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
 | `Tests/DrinkRules.Tests/` | Rules tests, including the characters' usual drinks: `dotnet run`. |
 
 **Ingredients and props.** The bar has cocktail bottles, so for now each ingredient is assigned to an existing prop:

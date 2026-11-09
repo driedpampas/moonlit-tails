@@ -114,7 +114,7 @@ namespace MoonlitTails.EditorTools
             switch (phase)
             {
                 case Phase.Settle:
-                    // labels exist and seated characters are re-seated (BarLayout does it on Play frame 3)
+                    // the labels and the runtime-built objects exist by now
                     if (Time.time < 3f || UnityEngine.Object.FindFirstObjectByType<DrinkGame>() == null)
                     {
                         if (EditorApplication.timeSinceStartup > SessionState.GetFloat(DeadlineKey, float.MaxValue))

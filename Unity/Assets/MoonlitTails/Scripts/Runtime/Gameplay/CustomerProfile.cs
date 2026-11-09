@@ -26,19 +26,5 @@ namespace MoonlitTails.Gameplay
             p.displayName = string.IsNullOrEmpty(displayName) ? "Customer" : displayName;
             return p;
         }
-
-        /// <summary>Transition only: a runtime copy of the text still in CustomerScripts. Destroy it when done.</summary>
-        public static CustomerProfile FromScript(CustomerScripts.Profile s)
-        {
-            var p = CreateInstance<CustomerProfile>();
-            p.name = s.DisplayName;
-            p.displayName = s.DisplayName;
-            p.greetings = s.Greetings;
-            p.story = s.Story;
-            p.thanks = s.Thanks;
-            p.wrong = s.Wrong;
-            p.storyDone = s.StoryDone;
-            return p;
-        }
     }
 }

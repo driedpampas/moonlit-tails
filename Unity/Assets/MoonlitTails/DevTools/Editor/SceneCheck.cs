@@ -140,16 +140,7 @@ namespace MoonlitTails.EditorTools
             }
             sb.AppendLine($"Grabbable props: {props}, fixed props (taps, levers, tickets): {fixedProps}, renderers: {renderers}");
 
-            // ---- BarLayout knows every prop, missing scripts, names
-            var layout = Object.FindFirstObjectByType<BarLayout>();
-            if (layout)
-            {
-                var listed = new HashSet<Transform>(layout.props.Where(r => r.prop).Select(r => r.prop));
-                foreach (var p in pieces.Where(p => p.GetComponent<PropRespawn>()))
-                    if (!listed.Contains(p.transform)) issues.Add($"{p.name}: not in BarLayout's prop list (won't scale)");
-                if (layout.props.Any(r => !r.prop)) issues.Add("BarLayout has empty prop entries");
-                if (layout.environment != bar.transform) issues.Add("BarLayout.environment isn't the bar");
-            }
+            // ---- missing scripts, names
             foreach (var t in bar.GetComponentsInChildren<Transform>(true))
                 if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject) > 0) issues.Add($"missing script on {Path(t, bar.transform)}");
             foreach (var g in pieces.GroupBy(p => p.name).Where(g => g.Count() > 1))
@@ -219,8 +210,7 @@ namespace MoonlitTails.EditorTools
                 if (n.StartsWith("PROP_Garnish_") && !t.GetComponent<Garnish>()) issues.Add($"{n}: a garnish with no Garnish");
             }
 
-            var game = Object.FindFirstObjectByType<DrinkGame>();
-            sb.AppendLine(game ? $"Drink Game: {game.name}" : "Drink Game: none in the scene (transition: it adds itself when Play starts)");
+            CheckDrinkGame(sb, issues);
 
             foreach (var w in issues) sb.AppendLine("  WARNING: " + w);
             warnings = issues.Count;
@@ -229,6 +219,37 @@ namespace MoonlitTails.EditorTools
         }
 
         static string Name(Transform t) => t ? t.name : "MISSING";
+
+        /// <summary>The Drink Game object: its customer seats and scene references.</summary>
+        static void CheckDrinkGame(StringBuilder sb, List<string> issues)
+        {
+            var games = Object.FindObjectsByType<DrinkGame>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            if (games.Length == 0) { issues.Add("no Drink Game object in the scene"); return; }
+            if (games.Length > 1) issues.Add($"{games.Length} Drink Game objects in the scene (want 1)");
+            var game = games[0];
+            var so = new SerializedObject(game);
+
+            var seats = so.FindProperty("seats");
+            sb.AppendLine($"Drink Game: {game.name}, {seats.arraySize} customers:");
+            for (int i = 0; i < seats.arraySize; i++)
+            {
+                var seat = seats.GetArrayElementAtIndex(i);
+                var profile = seat.FindPropertyRelative("profile").objectReferenceValue as CustomerProfile;
+                var body = seat.FindPropertyRelative("body").objectReferenceValue as Transform;
+                var ticket = seat.FindPropertyRelative("ticketSpot").objectReferenceValue as Transform;
+                sb.AppendLine($"  {i + 1}. {(profile ? profile.displayName : "MISSING profile")} on {Name(body)}, ticket {Name(ticket)}");
+                if (!profile) issues.Add($"Drink Game seat {i + 1}: no customer profile");
+                if (!body) issues.Add($"Drink Game seat {i + 1}: no character");
+                if (!ticket) issues.Add($"Drink Game seat {i + 1}: no ticket");
+            }
+            if (seats.arraySize == 0) issues.Add("Drink Game has no customer seats");
+
+            foreach (var field in new[] { "playerSpot", "iceScoop" })
+                if (!so.FindProperty(field).objectReferenceValue) issues.Add($"Drink Game: {field} isn't set");
+            // transition: the game builds these when Play starts until they are in the scene
+            foreach (var field in new[] { "serve", "resetButton", "rulesSign", "menuBoardText" })
+                if (!so.FindProperty(field).objectReferenceValue) sb.AppendLine($"  {field}: not in the scene yet (built when Play starts)");
+        }
 
         // ------------------------------------------------------------------ helpers
         /// <summary>The objects in a group: direct children, and the children of sub-groups (Props/Glasses).</summary>

@@ -69,7 +69,6 @@ Use `M_*` names for materials that already exist in `Environment/Materials`, so 
 - every object in the bar is a piece prefab, a marker or a light, with no loose meshes;
 - every material is one of the shared bar materials;
 - room pieces have colliders, and props have a collider, physics, grabbing and respawn;
-- `BarLayout` knows every prop;
 - there are no missing scripts or duplicate names.
 
 Run it after editing the bar.
