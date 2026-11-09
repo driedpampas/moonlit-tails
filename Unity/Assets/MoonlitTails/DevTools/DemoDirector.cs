@@ -17,8 +17,8 @@ using Debug = UnityEngine.Debug;
 namespace MoonlitTails.EditorTools
 {
     /// <summary>
-    /// The script for the editor's DemoVideoRecorder (editor only: it lives here because Unity can't add a component
-    /// from an Editor folder): a camera that eases between shots, props moved by an invisible
+    /// The script for the editor's DemoVideoRecorder (editor only: it sits outside DevTools/Editor because Unity can't
+    /// add a component from an Editor folder): a camera that eases between shots, props moved by an invisible
     /// hand through the real game rules (pouring, shaking, stirring, ice, garnish, serving, reset), and every frame
     /// piped into ffmpeg. Game time runs at exactly 1/30 s per frame, so the video plays at real speed however slow
     /// the rendering is. Captions are burned in at the end.

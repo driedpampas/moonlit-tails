@@ -80,11 +80,12 @@ Run these from **Tools > Moonlit Tails**:
 
 1. **Configure Project**: URP, OpenXR + hand tracking (PC and Android), XR Interaction Toolkit samples, and the character prefabs. Safe to run again.
 2. **Rebuild VR Scene**: builds the scene from scratch: the bar prefab, the XR rig and the customers.
-   - It replaces manual scene edits, so agree who runs it. You rarely need it: bar changes go into the piece prefabs (see [BAR_PIECES.md](BAR_PIECES.md)).
+   - It replaces manual scene edits, so it asks first. You rarely need it: bar changes go into the piece prefabs (see [BAR_PIECES.md](BAR_PIECES.md)).
    - Your sizes in `BarTuning.asset` are kept.
-3. **Capture Player Views**: a desk check without a headset. It renders what a standing player sees in every direction, throws a glass and resets it. Output goes to `Captures/` with a `report.txt`.
-4. **Check Drink Setup** and 5. **Play Smoke Test**: see [DRINK_GAME.md](DRINK_GAME.md).
+4. **Check Drink Setup**: see [DRINK_GAME.md](DRINK_GAME.md). It changes nothing.
 6. **Assemble Split Bar**, 7. **Refresh Bar Pieces** and 8. **Check Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
+
+**Automation** (Capture Player Views, Play Smoke Test, Record Demo Video) runs the game without a headset for desk checks, tests and the demo video. You don't need it to work on the game, and it never saves the scene. It lives in `Assets/MoonlitTails/DevTools` (see the README there).
 
 ## Building an APK instead of Link
 

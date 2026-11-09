@@ -220,6 +220,16 @@ namespace MoonlitTails.EditorTools
         [MenuItem("Tools/Moonlit Tails/2. Rebuild VR Scene")]
         public static void BuildScene()
         {
+            if (!Application.isBatchMode)
+            {
+                if (File.Exists(ScenePath) && !EditorUtility.DisplayDialog("Rebuild VR Scene?",
+                        "This deletes " + Path.GetFileName(ScenePath) + " and generates it again from code.\n\n" +
+                        "Anything you changed by hand in the scene is lost. Kept: the bar piece prefabs, " +
+                        "BarTuning.asset and the character prefabs.\n\nYou usually don't need this.",
+                        "Rebuild the scene", "Cancel"))
+                    return;
+                if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            }
             PlayerSettings.runInBackground = true;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 

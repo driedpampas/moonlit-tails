@@ -1,5 +1,4 @@
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MoonlitTails.EditorTools
@@ -8,7 +7,7 @@ namespace MoonlitTails.EditorTools
     /// Records a progress video without a headset. It plays the bar scene, makes drinks by moving the real props,
     /// films it with a scripted camera and writes an .mp4 with captions to &lt;project&gt;/Captures/Demo.
     /// It needs ffmpeg on the PATH.
-    /// Tools > Moonlit Tails > 6. Record Demo Video, or from the command line (editor closed, but a display needed):
+    /// Tools > Moonlit Tails > Automation > Record Demo Video, or from the command line (editor closed, but a display needed):
     /// Unity -batchmode -projectPath Unity -executeMethod MoonlitTails.EditorTools.DemoVideoRecorder.RunBatch
     /// Add -demoSize 960x540 for a quick, small test render. It never saves the scene.
     /// </summary>
@@ -23,21 +22,15 @@ namespace MoonlitTails.EditorTools
             if (SessionState.GetBool(Key, false)) EditorApplication.update += Tick;
         }
 
-        [MenuItem("Tools/Moonlit Tails/6. Record Demo Video")]
+        [MenuItem("Tools/Moonlit Tails/Automation/Record Demo Video")]
         public static void Run() => Start(false);
 
         public static void RunBatch() => Start(true);
 
         static void Start(bool batch)
         {
-            if (GameObject.Find("MoonlitBar") == null) EditorSceneManager.OpenScene(MoonlitSetup.ScenePath);
-            if (batch)
-            {
-                // the XR Interaction Simulator's on-screen menu crashes in batch mode (batch mode never saves the scene)
-                foreach (var mb in Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                    if (mb && mb.GetType().Name.Contains("Simulator") && mb.gameObject.activeSelf)
-                        mb.gameObject.SetActive(false);
-            }
+            if (!HeadlessRun.OpenBarScene(batch)) return;
+            if (batch) HeadlessRun.SwitchOffSimulator("Demo");
             SessionState.SetBool(Key, true);
             SessionState.SetBool(BatchKey, batch);
             EditorApplication.update -= Tick;
@@ -69,8 +62,7 @@ namespace MoonlitTails.EditorTools
             EditorApplication.update -= Watchdog;
             SessionState.SetBool(Key, false);
             started = false;
-            if (SessionState.GetBool(BatchKey, false)) EditorApplication.Exit(ok ? 0 : 1);
-            else EditorApplication.ExitPlaymode();
+            HeadlessRun.End(SessionState.GetBool(BatchKey, false), ok);
         }
 
         // a stuck script shouldn't keep the editor busy forever
@@ -87,13 +79,8 @@ namespace MoonlitTails.EditorTools
         static void ParseSize(out int w, out int h)
         {
             w = 1920; h = 1080;
-            var args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length - 1; i++)
-            {
-                if (args[i] != "-demoSize") continue;
-                var p = args[i + 1].Split('x');
-                if (p.Length == 2 && int.TryParse(p[0], out int a) && int.TryParse(p[1], out int b)) { w = a; h = b; }
-            }
+            var p = HeadlessRun.Arg("-demoSize")?.Split('x');
+            if (p is { Length: 2 } && int.TryParse(p[0], out int a) && int.TryParse(p[1], out int b)) { w = a; h = b; }
         }
     }
 }

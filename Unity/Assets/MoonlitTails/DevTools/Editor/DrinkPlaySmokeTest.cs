@@ -12,9 +12,9 @@ namespace MoonlitTails.EditorTools
     /// <summary>
     /// Plays the bar scene and makes drinks by moving the real props around (no headset needed): pours, a wrong and a
     /// right mix, stirring with the spoon, a mixed and a layered glass, ice, garnish, adjustments and serving.
-    /// Tools > Moonlit Tails > 5. Play Smoke Test, or from the command line:
+    /// Tools > Moonlit Tails > Automation > Play Smoke Test, or from the command line:
     /// Unity -batchmode -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkPlaySmokeTest.RunBatch
-    /// (exit code 0 = everything passed). It never saves the scene.
+    /// (exit code 0 = everything passed). It never saves the scene: the props it moves go back when Play stops.
     /// </summary>
     [InitializeOnLoad]
     public static class DrinkPlaySmokeTest
@@ -27,25 +27,15 @@ namespace MoonlitTails.EditorTools
             if (SessionState.GetBool(Key, false)) EditorApplication.update += Tick;
         }
 
-        [MenuItem("Tools/Moonlit Tails/5. Play Smoke Test")]
+        [MenuItem("Tools/Moonlit Tails/Automation/Play Smoke Test")]
         public static void Run() => Start(false);
 
         public static void RunBatch() => Start(true);
 
         static void Start(bool batch)
         {
-            if (GameObject.Find("MoonlitBar") == null) EditorSceneManager.OpenScene(MoonlitSetup.ScenePath);
-            if (batch)
-            {
-                // the XR Interaction Simulator's on-screen menu crashes without a display; it isn't needed here.
-                // (Batch mode never saves the scene, so this doesn't change the file.)
-                foreach (var mb in UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                    if (mb && mb.GetType().Name.Contains("Simulator") && mb.gameObject.activeSelf)
-                    {
-                        Debug.Log("[Moonlit] Smoke test: switching off " + mb.gameObject.name);
-                        mb.gameObject.SetActive(false);
-                    }
-            }
+            if (!HeadlessRun.OpenBarScene(batch)) return;
+            if (batch) HeadlessRun.SwitchOffSimulator("Smoke test");
             SessionState.SetBool(Key, true);
             SessionState.SetBool(BatchKey, batch);
             EditorApplication.update -= Tick;
@@ -87,8 +77,7 @@ namespace MoonlitTails.EditorTools
             if (failures.Count > 0) Debug.LogError(result); else Debug.Log(result);
             bool batch = SessionState.GetBool(BatchKey, false);
             steps = null;
-            if (batch) EditorApplication.Exit(failures.Count == 0 ? 0 : 1);
-            else EditorApplication.ExitPlaymode();
+            HeadlessRun.End(batch, failures.Count == 0);
         }
 
         static void Expect(bool ok, string what)

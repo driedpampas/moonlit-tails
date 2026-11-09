@@ -4,17 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.XR.Management;
 
 namespace MoonlitTails.EditorTools
 {
     /// <summary>
     /// Desk check without a headset: plays the VR scene, renders what a standing player sees in every direction
     /// (front, down at the counter, left, right, behind, up) plus a few close-ups, then throws a glass and resets the props.
-    /// Images and a report go to &lt;project&gt;/Captures. Tools > Moonlit Tails > 3. Capture Player Views.
+    /// Images and a report go to &lt;project&gt;/Captures. Tools > Moonlit Tails > Automation > Capture Player Views.
+    /// It never saves the scene, and XR is skipped for this one Play session only (in memory, see PlayModeXR).
     /// </summary>
     [InitializeOnLoad]
     public static class MoonlitCapture
@@ -35,7 +34,7 @@ namespace MoonlitTails.EditorTools
             if (SessionState.GetBool(ActiveKey, false)) EditorApplication.update += Tick;
         }
 
-        [MenuItem("Tools/Moonlit Tails/3. Capture Player Views")]
+        [MenuItem("Tools/Moonlit Tails/Automation/Capture Player Views")]
         public static void RunFromMenu() => Begin(false);
 
         /// <summary>Command line: Unity.exe -projectPath ... -executeMethod MoonlitTails.EditorTools.MoonlitCapture.RunAndExit</summary>
@@ -43,10 +42,10 @@ namespace MoonlitTails.EditorTools
 
         static void Begin(bool exitAfter)
         {
+            if (!HeadlessRun.OpenBarScene(exitAfter)) return;
             SessionState.SetBool(ActiveKey, true);
             SessionState.SetBool(ExitKey, exitAfter);
-            SetXRStartup(false);   // no headset on the desk: don't let OpenXR try to start
-            EditorSceneManager.OpenScene(MoonlitSetup.ScenePath);
+            PlayModeXR.SkipNextPlay();   // no headset on the desk: don't let OpenXR try to start
             EditorApplication.update -= Tick; EditorApplication.update += Tick;
             EditorApplication.isPlaying = true;
         }
@@ -81,10 +80,8 @@ namespace MoonlitTails.EditorTools
             File.WriteAllText(Path.Combine(dir, "report.txt"), report.ToString());
             Debug.Log("[MoonlitCapture] done\n" + report);
             startTime = -1;
-            bool exit = SessionState.GetBool(ExitKey, false);
-            EditorApplication.isPlaying = false;
-            SetXRStartup(true);
-            if (exit) EditorApplication.Exit(0);
+            string text = report.ToString();
+            HeadlessRun.End(SessionState.GetBool(ExitKey, false), !text.Contains("TIMEOUT") && !text.Contains("EXCEPTION"));
         }
 
         // ------------------------------------------------------------------ views
@@ -224,16 +221,6 @@ namespace MoonlitTails.EditorTools
             string dir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Captures"));
             Directory.CreateDirectory(dir);
             return dir;
-        }
-
-        static void SetXRStartup(bool on)
-        {
-            UnityEditor.EditorBuildSettings.TryGetConfigObject(XRGeneralSettings.k_SettingsKey, out UnityEditor.XR.Management.XRGeneralSettingsPerBuildTarget per);
-            var s = per ? per.SettingsForBuildTarget(BuildTargetGroup.Standalone) : null;   // editor Play mode uses the PC settings
-            if (s == null) return;
-            s.InitManagerOnStart = on;
-            EditorUtility.SetDirty(s);
-            AssetDatabase.SaveAssets();
         }
     }
 }

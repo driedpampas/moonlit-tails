@@ -5,21 +5,21 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 
-// Blocks out a basic bar room with ProBuilder shapes. Runs once automatically,
-// or again any time from Tools > Moonlit Tails > Build Bar Room.
-[InitializeOnLoad]
+// Blocks out a basic bar room with ProBuilder shapes into Assets/Scenes/BarRoom.unity.
+// Only from Tools > Moonlit Tails > Build Bar Room (it used to run by itself whenever that scene was missing,
+// which replaced whatever scene was open).
 static class BuildBarRoom
 {
     const string ScenePath = "Assets/Scenes/BarRoom.unity";
 
-    static BuildBarRoom()
-    {
-        if (!File.Exists(ScenePath)) EditorApplication.delayCall += Build;
-    }
-
     [MenuItem("Tools/Moonlit Tails/Build Bar Room")]
     static void Build()
     {
+        if (File.Exists(ScenePath) && !EditorUtility.DisplayDialog("Build Bar Room?",
+                "This replaces " + ScenePath + " with a fresh ProBuilder blockout. Hand edits to it are lost.",
+                "Replace it", "Cancel"))
+            return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
         var root = new GameObject("BarRoom").transform;
 
