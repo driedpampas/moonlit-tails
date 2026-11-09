@@ -4,7 +4,7 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 
 ## Basics
 - **Animal and colours:** fox. Cream, white, teal.
-- **Age vibe:** young adult, about 21, with a soft, kid-like vibe.
+- **Age vibe:** young adult, about 18, with a soft, kid-like vibe.
 - **In town:** the local baker, with a passion for warm pastries.
 - **Comes in with:** usually alone, sometimes with Vex if he's in the mood.
 - **Concept art hints:** holding a warm mug of a hot drink with marshmallows.
@@ -28,7 +28,7 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 - **Recipe:** Bourbon, then Dark Caramel (shake), then Syrup (shake). 3 units.
 - **Taste:** Bitter 0, Sweet +4, Sour −1.
 - **Served:** mixed, in a Mug, not cold, with Mint (her teal).
-- **Loves:** warm mugs and whipped cream: the Mug. There are no toppings yet.
+- **Loves:** warm mugs and whipped cream: the Mug.
 - **Hates:** sour lemon juice (Lime Juice, Sour Mix, the Lemon garnish) and Ice.
 - **Her own words for a drink:** "Cozy cup." "Warm milk for the soul." "Sweet as chocolate, oh wait it already has chocolate! My bad!"
 - **Orders:**
@@ -55,11 +55,13 @@ Not written yet.
 
 **Quest.** "Should I hand Vex my gift directly, or leave it hidden as a secret?"
 
+The quest is answered with the next drink you serve: its highest taste picks the answer. If that taste is neither answer, or the two answers tie, it's the third ending. Strong on the original sheet means Bitter, the game's "kick".
+
 | Answer | She says | What happens |
 |---|---|---|
-| Strong | "I'll be direct with him. Make me something strong! I'll definitely need it." | She hands Vex the gift. He's flustered, praises her baking, and they talk a lot more after the event and become closer friends. Vex becomes kinder, and Cloudy more straightforward. |
+| Bitter (strong) | "I'll be direct with him. Make me something strong! I'll definitely need it." | She hands Vex the gift. He's flustered, praises her baking, and they talk a lot more after the event and become closer friends. Vex becomes kinder, and Cloudy more straightforward. |
 | Sweet | "I don't want to make him feel awkward or anything, so just leave it as a sweet surprise." | She leaves the gift anonymously. Vex finds it and smiles softly. After the event he asks if she made it, she says yes, and they talk more about it. Vex becomes kinder, and Cloudy stays about the same. |
-| Neither | | She sells the pastry at her shop instead, and ends up a little quieter. |
+| Anything else | | She sells the pastry at her shop instead, and ends up a little quieter. |
 
 ## Never
 - Is mean to anyone on purpose.

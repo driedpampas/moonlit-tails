@@ -73,11 +73,13 @@ On the original sheet his usual was lemon juice + orange juice + simple syrup, i
 
 **Quest.** "Should I keep this distinguished style for the showcase, or should I try experimenting with something more 'casual'?"
 
+The quest is answered with the next drink you serve: its highest taste picks the answer. If that taste is neither answer, or the two answers tie, it's the third ending. Strong on the original sheet means Bitter, the game's "kick". His sheet said Sweet or Fizzy for the second answer: the game has no Fizzy taste, so it's Sweet.
+
 | Answer | He says | What happens |
 |---|---|---|
-| Strong | "Make it as strong as my brilliance and mastery of the craft!" | The showcase goes ahead as normal, but only a few of the elite show up, and none of his peers. Vex is quieter from now on. |
-| Sweet or Fizzy | "Hold on some of the kick this time. I want people to see something a little cozier." | He brings a more casual style. Some of the professionals leave, but his friends show up instead, and he makes a few new ones. Vex is more casual from now on. |
-| Neither | | He's stuck on the dilemma and drops out as guest of honour. Vex is quieter from now on. |
+| Bitter (strong) | "Make it as strong as my brilliance and mastery of the craft!" | The showcase goes ahead as normal, but only a few of the elite show up, and none of his peers. Vex is quieter from now on. |
+| Sweet | "Hold on some of the kick this time. I want people to see something a little cozier." | He brings a more casual style. Some of the professionals leave, but his friends show up instead, and he makes a few new ones. Vex is more casual from now on. |
+| Anything else | | He's stuck on the dilemma and drops out as guest of honour. Vex is quieter from now on. |
 
 ## Never
 - Drinks from a mug, or from anything that isn't a stemmed glass.

@@ -70,11 +70,11 @@ Use only the ingredients, glasses and garnishes in [MENU_AND_CHARACTERS.md](../M
   3.
 - **Their quest** (see the quest guide): the question, the two drink answers, and what happens after each.
   - Question:
-  - Answer 1 (taste) and what they say:
-  - Answer 2 (taste) and what they say:
+  - Answer 1 (Bitter, Sweet or Sour) and what they say:
+  - Answer 2 (a different taste) and what they say:
   - Outcome 1:
   - Outcome 2:
-  - Neutral (neither answer):
+  - Neutral (any other drink, or the two answers tie):
 
 ## 9. Never
 - **Things this character would never say or do:**

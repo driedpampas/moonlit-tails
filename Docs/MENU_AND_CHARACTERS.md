@@ -96,18 +96,18 @@ The first four characters, from the team's character sheets. Each one has a page
 | Name | Animal | Colours | Who | Hello | Story |
 |---|---|---|---|---|---|
 | [Sabre](Characters/Sabre.md) | Wolf | Grey, hot pink, black | Underground rock musician, about 22. Edgy, fierce, passionate. Says very little. | "Hit me up with something good." | Her bandmates Razor and Sniper won't stop arguing. Does she talk to them, or let them sort it out? |
-| [Ember](Characters/Ember.md) | Fox | Warm brown, red, cream | Keeps the soul shrine and talks with spirits, about 21. Silly, proud, playful. | "Hayo, my name's Ember, and I'm the one and only spirit caster in town!" | Her flying-carpet spell keeps failing. Does she ask the spirit grandmaster at the mausoleum for help? |
+| [Ember](Characters/Ember.md) | Fox | Warm brown, red, cream | Keeps the soul shrine and talks with spirits, about 18. Silly, proud, playful. | "Hayo, my name's Ember, and I'm the one and only spirit caster in town!" | Her flying-carpet spell keeps failing. Does she ask the spirit grandmaster at the mausoleum for help? |
 | [Vex](Characters/Vex.md) | Cat | Navy blue, gold | Fashion critic, about 20. Proud, ambitious, confident, very formal. | "Greetings, (player name). Make it your best today." | Guest of honour at the fashion showcase, and nobody has congratulated him. Keep his style, or go casual? |
-| [Cloudy](Characters/Cloudy.md) | Fox | Cream, white, teal | The local baker, about 21. Cozy, gentle, shy. | "Hello! May I please know if this seat is taken?" | She's baked something for Vex's showcase. Give it to him herself, or leave it as a secret? |
+| [Cloudy](Characters/Cloudy.md) | Fox | Cream, white, teal | The local baker, about 18. Cozy, gentle, shy. | "Hello! May I please know if this seat is taken?" | She's baked something for Vex's showcase. Give it to him herself, or leave it as a secret? |
 
-Each quest is answered with a drink's taste:
+Each quest is answered with the next drink you serve after the question. Its highest taste picks the answer. If that taste is neither answer, or the two answers tie, the character gets their third ending. The sheets said Strong, which is Bitter in the game (the "kick"), and Vex's Fizzy is folded into Sweet.
 
-| Character | Answers |
-|---|---|
-| Sabre | Strong or Sweet |
-| Ember | Sweet or Sour |
-| Vex | Strong, or Sweet / Fizzy |
-| Cloudy | Strong or Sweet |
+| Character | Answers | Third ending |
+|---|---|---|
+| Sabre | Bitter or Sweet | Sour, or a tie |
+| Ember | Sweet or Sour | Bitter, or a tie |
+| Vex | Bitter or Sweet | Sour, or a tie |
+| Cloudy | Bitter or Sweet | Sour, or a tie |
 
 **Named, but no sheet yet:** Razor and Sniper (Sabre's bandmates), Fiza and Koda (in Vex's relationships).
 
@@ -149,8 +149,6 @@ What they love and hate, in game terms:
 | Cloudy | The Mug | Lime Juice, Sour Mix and the Lemon garnish (sour lemon), Ice |
 
 **Still missing from the game:**
-- **Strong and Fizzy:** the quests answer with these, but the tastes are Bitter, Sweet and Sour.
 - **Warm drinks:** a drink can be made Cold, but not warm. Cloudy's Cozy Cup is just served without ice for now.
-- **Toppings:** no whipped cream or marshmallows.
 - **Any stemmed glass:** orders ask for one exact glass, so "a stemmed glass" has to be a Coupe, Martini or Wine.
 - **Particles:** colour comes only from the garnish.

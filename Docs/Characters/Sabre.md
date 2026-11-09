@@ -55,11 +55,13 @@ Not written yet.
 
 **Quest.** "Should I go talk to them? They always seem heated whenever they're both together."
 
+The quest is answered with the next drink you serve: its highest taste picks the answer. If that taste is neither answer, or the two answers tie, it's the third ending. Strong on the original sheet means Bitter, the game's "kick".
+
 | Answer | She says | What happens |
 |---|---|---|
-| Strong | "Yea, I got the perfect plan. But for this, I'll need only the strongest hit." | She writes an emotional song about how sad it makes her to see her friends fight. Razor and Sniper are touched, come to terms with how the albums should go from now on, and give each other more leeway. They finish the album and have a successful first concert. All three are more communicative from now on. |
+| Bitter (strong) | "Yea, I got the perfect plan. But for this, I'll need only the strongest hit." | She writes an emotional song about how sad it makes her to see her friends fight. Razor and Sniper are touched, come to terms with how the albums should go from now on, and give each other more leeway. They finish the album and have a successful first concert. All three are more communicative from now on. |
 | Sweet | "Meh, I guess they should fix it on their own." | She chills and doesn't do much else. Things in the band don't get better, and it eventually breaks up. All three come in separately from now on. |
-| Neither | | She has a serious talk with them, because she's had enough of the arguing. They become a little more understanding, but some arguments still happen. Sabre is more talkative from now on. |
+| Anything else | | She has a serious talk with them, because she's had enough of the arguing. They become a little more understanding, but some arguments still happen. Sabre is more talkative from now on. |
 
 ## Never
 - Drinks softer drinks.

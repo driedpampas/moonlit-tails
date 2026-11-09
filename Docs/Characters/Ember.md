@@ -4,7 +4,7 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 
 ## Basics
 - **Animal and colours:** fox. Warm brown, red, cream.
-- **Age vibe:** young adult, about 21, with playful, kid-like energy. She can talk with souls.
+- **Age vibe:** young adult, about 18, with playful, kid-like energy. She can talk with souls.
 - **In town:** keeps the soul shrine, and specialises in soul magic.
 - **Comes in with:** anyone who's down to hang out. She's rarely alone.
 - **Concept art hints:** floating spirits, warm crimson, a floral aura.
@@ -55,11 +55,13 @@ Not written yet.
 
 **Quest.** "You think he will be able to teach me? What if I'm just simply, not good enough to do this?"
 
+The quest is answered with the next drink you serve: its highest taste picks the answer. If that taste is neither answer, or the two answers tie, it's the third ending.
+
 | Answer | She says | What happens |
 |---|---|---|
 | Sweet | "Yummy! Alright, I've decided I will go find him! Worst case, I simply get to meet new folks and maybe make a new friend!" | She goes to the mausoleum. The grandmaster has sadly passed away, but he left a book with all his spells. With it she casts spells she's never seen before, including the flying carpet. **Ember doesn't come back to the bar**: she's busy trying out new spells. |
 | Sour | "I got this! Maybe I simply need to try something new to get the powers, without creepy outside help!" | She spends the next day practising the carpet spell and gets it to work. She's so excited that she wants to try new things: **she orders any drink from now on**. |
-| Neither | | She loses focus, can't learn the carpet spell, and gives up on it. |
+| Anything else | | She loses focus, can't learn the carpet spell, and gives up on it. |
 
 ## Never
 - Stops talking about all her crazy magic and spells.
