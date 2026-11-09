@@ -50,6 +50,7 @@ namespace MoonlitTails.Gameplay
         RigidbodyConstraints constraintsBefore;
         readonly List<XRGrabInteractable> watched = new List<XRGrabInteractable>();
         bool started, bellHooked;
+        int shownState = int.MinValue;   // what the panel shows, as a hash: it's redrawn only when this changes
         float serveCooldownUntil;
 
         const RigidbodyConstraints Pinned =
@@ -103,6 +104,9 @@ namespace MoonlitTails.Gameplay
         {
             if (!started) return;
             glass = FindGlass();
+            int state = PanelState();
+            if (state == shownState) return;
+            shownState = state;
             if (!glass)
             {
                 title.text = "<b>Serve here</b>";
@@ -114,6 +118,15 @@ namespace MoonlitTails.Gameplay
             string extras = (glass.Cold ? "Cold" : "not cold") + " · " + (glass.Garnish ? glass.Garnish.color + " garnish" : "no garnish");
             info.text = $"{extras}\n<size=80%>Adjustment points left: {glass.AdjustmentLeft} · then ring the bell</size>";
             bars.Show(glass.FinalStats, "");
+        }
+
+        int PanelState()
+        {
+            if (!glass) return System.HashCode.Combine(0, game.ServedCount);
+            var s = glass.FinalStats;
+            int flags = (glass.IsEmpty ? 1 : 0) | (glass.Cold ? 2 : 0) | ((int)glass.Method << 2);
+            return System.HashCode.Combine(glass.GetInstanceID(), flags, glass.Garnish ? glass.Garnish.color : null,
+                                           s.Bitter, s.Sweet, s.Sour, glass.AdjustmentLeft);
         }
 
         DrinkContainer FindGlass()
@@ -149,7 +162,7 @@ namespace MoonlitTails.Gameplay
             glass = FindGlass();
             if (!glass || glass.IsEmpty)
             {
-                info.text = "Put a filled glass on the coaster first";
+                info.text = "Put a filled glass on the coaster first";   // stays until what the panel shows changes
                 return;
             }
             bool ok = game.TryServe(glass.ToServed(), out string summary);

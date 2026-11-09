@@ -161,6 +161,8 @@ namespace MoonlitTails.Gameplay
             }
         }
 
+        void LateUpdate() => DrinkContainer.RefreshChanged();
+
         void FixedUpdate()
         {
             for (int i = 0; i < PropRespawn.All.Count; i++) PropRespawn.All[i].ApplyPendingHome();
