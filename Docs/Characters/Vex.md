@@ -24,16 +24,19 @@ From the team's character sheet. Lines in quotes are his actual words. Back to [
 - **Goodbye:** "Keep your standards high, (player name). Have a good one."
 
 ## Drinks
-- **His usual:** lemon juice + orange juice + simple syrup, in a stemmed glass.
-- **Loves:** stemmed glasses and gold hues.
-- **Hates:** thick mugs, milk, cream.
+**His usual: Golden Standard.** A margarita: tequila, lime and orange (the Orange Peel prop is the Triple Sec bottle), softened with a little syrup. Crisp gold, with a small kick.
+- **Recipe:** Tequila, then Lime Juice (stir), then Orange Peel (stir), then Syrup (shake). 4 units.
+- **Taste:** Bitter +2, Sweet +1, Sour +3.
+- **Served:** mixed, in a Martini glass, Cold, with an Orange.
+- **Loves:** stemmed glasses (Coupe, Martini, Wine) and gold hues (the Orange garnish).
+- **Hates:** thick mugs (the Mug), milk and cream (Dark Caramel, which is the milk carton for now).
 - **His own words for a drink:** "The golden standard." "Stemmed glass for the stars." "Crisp gold, with a small kick to it."
 - **Orders:**
-  - Easy: "Give me a stemmed glass filled with your sharpest citrus blend."
+  - Easy: "Give me a stemmed glass filled with your sharpest citrus blend. Tequila, lime, orange peel, a touch of syrup. Chilled, with an orange slice."
   - A feeling: "Give me something to invigorate me on this mundane day."
   - A picture: "Bring on the drink to match my sense of fashion and my amber glow."
 
-Some of these ingredients aren't in the game yet: see [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+On the original sheet his usual was lemon juice + orange juice + simple syrup, in a stemmed glass. All four drinks are on [the characters page](../MENU_AND_CHARACTERS.md#their-drinks), and the rules tests make each one.
 
 ## Relationships
 | Character | How he feels | What he'd say |
@@ -83,5 +86,4 @@ Some of these ingredients aren't in the game yet: see [Drinks the characters ask
 
 ## To check
 - Fiza and Koda don't have sheets yet.
-- His quest happens at the same showcase as [Cloudy's](Cloudy.md). Cloudy's endings say Vex "becomes kinder" and they talk after the event, while his own Strong and Neither endings make him quieter or drop out. Which order do the two quests run in, and what happens when the endings disagree?
 - A few typos were fixed in the lines here: "Greeting" → "Greetings", "Looks who" → "Look who", "fashion designed" → "fashion designer".

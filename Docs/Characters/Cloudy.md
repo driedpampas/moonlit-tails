@@ -4,7 +4,7 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 
 ## Basics
 - **Animal and colours:** fox. Cream, white, teal.
-- **Age vibe:** kid-like, about 18.
+- **Age vibe:** young adult, about 21, with a soft, kid-like vibe.
 - **In town:** the local baker, with a passion for warm pastries.
 - **Comes in with:** usually alone, sometimes with Vex if he's in the mood.
 - **Concept art hints:** holding a warm mug of a hot drink with marshmallows.
@@ -24,16 +24,19 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 - **Goodbye:** "Thank you so much for the service. Have a wonderful day."
 
 ## Drinks
-- **Her usual:** milk + chocolate syrup + cream, in a warm mug.
-- **Loves:** warm mugs and whipped cream.
-- **Hates:** sour lemon juice, and ice (pretty much anything cold).
+**Her usual: Cozy Cup.** Like a hot chocolate with a splash of bourbon: sweet, creamy caramel in a mug, never iced.
+- **Recipe:** Bourbon, then Dark Caramel (shake), then Syrup (shake). 3 units.
+- **Taste:** Bitter 0, Sweet +4, Sour −1.
+- **Served:** mixed, in a Mug, not cold, with Mint (her teal).
+- **Loves:** warm mugs and whipped cream: the Mug. There are no toppings yet.
+- **Hates:** sour lemon juice (Lime Juice, Sour Mix, the Lemon garnish) and Ice.
 - **Her own words for a drink:** "Cozy cup." "Warm milk for the soul." "Sweet as chocolate, oh wait it already has chocolate! My bad!"
 - **Orders:**
-  - Easy: "Can I please have a warm mug with sweet, sweet chocolate milk and some cream on top?"
+  - Easy: "Can I please have a warm mug with sweet, sweet caramel and a little bourbon? No ice, please!"
   - A feeling: "May I please have something to make me feel like I'm in a warm cabin, cuddled in a warm blanket?"
   - A picture: "I'd like it to be fluffy and sweet like a chocolate river, please!"
 
-Most of these ingredients aren't in the game yet: see [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+On the original sheet her usual was milk + chocolate syrup + cream, in a warm mug. The game can't make a drink warm yet, only Cold, so "warm" means no ice for now. All four drinks are on [the characters page](../MENU_AND_CHARACTERS.md#their-drinks), and the rules tests make each one.
 
 ## Relationships
 Not written yet. [Vex](Vex.md) calls her his best friend.
@@ -64,7 +67,4 @@ Not written yet.
 - Has specific preferences.
 
 ## To check
-- **"Never has specific preferences"**, but she hates lemon, ice and anything cold, and loves warm mugs. Did it mean she's never picky or demanding about it?
-- **A warm drink:** the game can make a drink Cold, but not warm or hot yet.
 - The sheet called Vex "Vix" twice. It's "Vex" here.
-- Her quest happens at the same showcase as Vex's. See the note in [Vex](Vex.md#to-check).

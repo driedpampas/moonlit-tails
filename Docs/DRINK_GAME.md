@@ -40,7 +40,7 @@ Labels float over the bottles, cups and glasses when you're close. Buttons work 
 
 Based on the drink crafting guide, with the team's answers to the open questions (6 Nov 2026).
 
-The character sheets were written against a different drinks file (Sweet / Sour / Strong / Fizzy, no spirits), so none of the characters' usual drinks can be made with these rules yet. See [Drinks the characters ask for](MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+Each character's usual drink is made with these rules: see [Their drinks](MENU_AND_CHARACTERS.md#their-drinks).
 
 | Rule | Value |
 |---|---|
@@ -68,7 +68,7 @@ Two choices aren't in the guide yet. Check them with the designers:
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
 | `Gameplay/DrinkGame.cs` | **The tables to edit**: which prop is which ingredient, and the glass lengths. |
 | `Gameplay/CustomerScripts.cs` | What each customer says. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
-| `Tests/DrinkRules.Tests/` | Rules tests: `dotnet run`. |
+| `Tests/DrinkRules.Tests/` | Rules tests, including the characters' usual drinks: `dotnet run`. |
 
 **Ingredients and props.** The bar has cocktail bottles, so for now each ingredient is assigned to an existing prop:
 

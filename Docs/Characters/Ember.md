@@ -4,7 +4,7 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 
 ## Basics
 - **Animal and colours:** fox. Warm brown, red, cream.
-- **Age vibe:** kid-like energy, about 16. She can talk with souls.
+- **Age vibe:** young adult, about 21, with playful, kid-like energy. She can talk with souls.
 - **In town:** keeps the soul shrine, and specialises in soul magic.
 - **Comes in with:** anyone who's down to hang out. She's rarely alone.
 - **Concept art hints:** floating spirits, warm crimson, a floral aura.
@@ -24,16 +24,19 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 - **Goodbye:** "Departing, my friends! May see you on the other side, hihi!"
 
 ## Drinks
-- **Her usual:** cranberry juice + strawberry syrup + chocolate syrup, in a stemmed glass.
-- **Loves:** tiny particles and vibrant colours.
-- **Hates:** plain water, and bitter drinks.
+**Her usual: Spirit Order.** Two layers in a stemmed glass: a red one like cranberry and strawberry, and a dark caramel one where the chocolate was.
+- **Recipe:** two prepared drinks, layered. Bottom: Bourbon, then Grenadine (shake). Top: Bourbon, then Dark Caramel (shake). One pour of each.
+- **Taste:** Bitter −1, Sweet +6, Sour 0.
+- **Served:** layered, in a Coupe, with a Cherry. Not cold.
+- **Loves:** tiny particles and vibrant colours: layered drinks and a garnish.
+- **Hates:** plain water (Tonic Water is the closest) and anything with Bitter above 0.
 - **Her own word for a drink:** "The order of all spirits together."
 - **Orders:**
-  - Easy: "Hayo, I'd like a stemmed glass with cranberry juice, alongside strawberry and chocolate syrups, please!"
+  - Easy: "Hayo, I'd like a stemmed glass with two layers, please! Bourbon and grenadine at the bottom, bourbon and dark caramel on top, and a cherry!"
   - A feeling: "I need something sweet enough to make any soul happy. Make it as vibrant as possible!"
   - A picture: "Summon everything to create the order of all spirits!"
 
-Most of these ingredients aren't in the game yet: see [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+On the original sheet her usual was cranberry juice + strawberry syrup + chocolate syrup, in a stemmed glass. All four drinks are on [the characters page](../MENU_AND_CHARACTERS.md#their-drinks), and the rules tests make each one.
 
 ## Relationships
 Not written yet.
@@ -63,6 +66,4 @@ Not written yet.
 - Calls magic just science.
 
 ## To check
-- **She's about 16, and every base in the game right now is a spirit** (Whiskey, Bourbon, Tequila). Her own drinks have no alcohol. See [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
-- The Sweet answer means she leaves the game for good. Is that intended, given it's the "good" ending?
 - "I draw spirits whenever I want": draw as in summon?

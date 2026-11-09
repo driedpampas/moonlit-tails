@@ -38,6 +38,20 @@ static class Program
         return Mixing.Combine(a, c, Mixing.RequiredMethod(a, c)).Liquid;
     }
 
+    // Pours the ingredients one by one, mixing after each pour with the method the rules require.
+    static Liquid Make(string who, params Ingredient[] pours)
+    {
+        var liquid = L(pours[0]);
+        foreach (var i in pours.Skip(1))
+        {
+            var add = L(i);
+            var r = Mixing.Combine(liquid, add, Mixing.RequiredMethod(liquid, add));
+            Check(r.Succeeded, $"{who}: adding {i.DisplayName} mixes");
+            if (r.Succeeded) liquid = r.Liquid;
+        }
+        return liquid;
+    }
+
     static int Main()
     {
         // --- Taste
@@ -203,6 +217,27 @@ static class Program
         }
         int canLayer = drinks.Count(x => drinks.Any(y => y.RecipeKey != x.RecipeKey && Layering.Holds(x.Stats, y.Stats)));
         Console.WriteLine($"Layering at threshold {Layering.MinSharedPoints}: {pairs} of {possible} ordered pairs hold; {canLayer} of {drinks.Count} drinks have a partner.");
+
+        // --- The characters' usual drinks (Docs/Characters, Docs/MENU_AND_CHARACTERS.md). Each is poured in this
+        // order, mixing after every pour with the method the rules ask for, so these are the steps a player takes.
+        var sabre = Make("Sabre", Whiskey, Espresso, Cola);
+        Eq(new Taste(4, 1, 0), sabre.Stats, "Sabre's Neon Storm: Whiskey + Espresso + Cola");
+        Check(Glass.Fits(sabre.Units, GlassLength.Medium), "Sabre's Neon Storm fits a Mug");
+
+        var vex = Make("Vex", Tequila, LimeJuice, OrangePeel, Syrup);
+        Eq(new Taste(2, 1, 3), vex.Stats, "Vex's Golden Standard: Tequila + Lime Juice + Orange Peel + Syrup");
+        Check(Glass.Fits(vex.Units, GlassLength.Long), "Vex's Golden Standard fits a Martini glass");
+
+        var cloudy = Make("Cloudy", Bourbon, DarkCaramel, Syrup);
+        Eq(new Taste(0, 4, -1), cloudy.Stats, "Cloudy's Cozy Cup: Bourbon + Dark Caramel + Syrup");
+        Check(Glass.Fits(cloudy.Units, GlassLength.Medium), "Cloudy's Cozy Cup fits a Mug");
+
+        var emberRed = Drink(Bourbon, Grenadine);
+        var emberDark = Drink(Bourbon, DarkCaramel);
+        Check(Layering.Holds(emberRed.Stats, emberDark.Stats), "Ember's two layers hold");
+        var ember = Layering.Resolve(new[] { emberRed, emberDark }, GlassLength.Medium);
+        Check(ember.Ok && !ember.Collapsed.Any(c => c), "Ember's Spirit Order layers in a Coupe without collapsing");
+        Eq(new Taste(-1, 6, 0), ember.Stats, "Ember's Spirit Order: Bourbon + Grenadine under Bourbon + Dark Caramel");
 
         Console.WriteLine($"{passed} passed, {failed} failed");
         return failed == 0 ? 0 : 1;

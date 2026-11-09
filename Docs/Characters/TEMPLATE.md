@@ -26,9 +26,7 @@ One line per answer. For lines they say, write **the actual words**, in their vo
 - **Goodbye:**
 
 ## 4. Drinks
-Use only Sweet / Sour / Strong / Fizzy and how the drink looks. See the drinks file.
-
-> The drinks file isn't in the repo yet, and the game currently uses Bitter / Sweet / Sour. See [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+Use only the ingredients, glasses and garnishes in [MENU_AND_CHARACTERS.md](../MENU_AND_CHARACTERS.md), so the drink can be made in the game. Tastes are Bitter, Sweet and Sour. Every drink starts with a spirit (Whiskey, Bourbon or Tequila). See [Their drinks](../MENU_AND_CHARACTERS.md#their-drinks) for examples.
 
 - **Their usual:**
 - **Loves** (said out loud the first time):

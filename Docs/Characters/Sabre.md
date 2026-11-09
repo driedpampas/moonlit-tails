@@ -24,16 +24,19 @@ From the team's character sheet. Lines in quotes are her actual words. Back to [
 - **Goodbye:** "I'll catch you later, rockstar."
 
 ## Drinks
-- **Her usual:** cold brew + ginger syrup + crushed ice, in a mug.
-- **Loves:** strong kicks.
-- **Hates:** strawberry syrup, and anything to do with lemons. She finds them disgusting.
+**Her usual: Neon Storm.** A spiked cold brew: whiskey and espresso on ice, with cola for the kick the ginger syrup gave.
+- **Recipe:** Whiskey, then Espresso (shake), then Cola (shake). 3 units.
+- **Taste:** Bitter +4, Sweet +1, Sour 0.
+- **Served:** mixed, in a Mug, Cold, with a Cherry.
+- **Loves:** strong kicks: a high Bitter.
+- **Hates:** Grenadine (the closest thing to strawberry syrup) and the Lemon garnish.
 - **Her own word for a drink:** "Dark, intense, deep enough to make you scream your lungs out."
 - **Orders:**
-  - Easy: "Hey, I want a dark, strong cold-crushed brew with ginger syrup."
+  - Easy: "Hey, I want a dark, strong whiskey brew. Espresso, cola, on ice. In a mug."
   - A feeling: "What's up, give me to strike me to the cord. And make it cold."
   - A picture: "Sup, make me the drink that reminds me of a thunderstorm in a neon-lit city."
 
-Most of these ingredients aren't in the game yet: see [Drinks the characters ask for](../MENU_AND_CHARACTERS.md#drinks-the-characters-ask-for).
+On the original sheet her usual was cold brew + ginger syrup + crushed ice, in a mug. All four drinks are on [the characters page](../MENU_AND_CHARACTERS.md#their-drinks), and the rules tests make each one.
 
 ## Relationships
 Not written yet. Razor and Sniper are her bandmates, but they don't have sheets yet.
@@ -66,4 +69,3 @@ Not written yet.
 ## To check
 - The "feeling" order reads "give me to strike me to the cord". Was it meant to be "give me something to strike me to the core"?
 - The quest outcomes said "come in terms" and "more understandable". They're written here as "come to terms" and "more understanding".
-- "Never stops singing" says she sings, and her habit is daydreaming about the guitar. Is she the band's singer, guitarist, or both?

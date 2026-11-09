@@ -96,18 +96,9 @@ The first four characters, from the team's character sheets. Each one has a page
 | Name | Animal | Colours | Who | Hello | Story |
 |---|---|---|---|---|---|
 | [Sabre](Characters/Sabre.md) | Wolf | Grey, hot pink, black | Underground rock musician, about 22. Edgy, fierce, passionate. Says very little. | "Hit me up with something good." | Her bandmates Razor and Sniper won't stop arguing. Does she talk to them, or let them sort it out? |
-| [Ember](Characters/Ember.md) | Fox | Warm brown, red, cream | Keeps the soul shrine and talks with spirits, about 16. Silly, proud, playful. | "Hayo, my name's Ember, and I'm the one and only spirit caster in town!" | Her flying-carpet spell keeps failing. Does she ask the spirit grandmaster at the mausoleum for help? |
+| [Ember](Characters/Ember.md) | Fox | Warm brown, red, cream | Keeps the soul shrine and talks with spirits, about 21. Silly, proud, playful. | "Hayo, my name's Ember, and I'm the one and only spirit caster in town!" | Her flying-carpet spell keeps failing. Does she ask the spirit grandmaster at the mausoleum for help? |
 | [Vex](Characters/Vex.md) | Cat | Navy blue, gold | Fashion critic, about 20. Proud, ambitious, confident, very formal. | "Greetings, (player name). Make it your best today." | Guest of honour at the fashion showcase, and nobody has congratulated him. Keep his style, or go casual? |
-| [Cloudy](Characters/Cloudy.md) | Fox | Cream, white, teal | The local baker, about 18. Cozy, gentle, shy. | "Hello! May I please know if this seat is taken?" | She's baked something for Vex's showcase. Give it to him herself, or leave it as a secret? |
-
-Their usual drinks:
-
-| Character | Usual | Glass | Loves | Hates |
-|---|---|---|---|---|
-| Sabre | Cold brew + ginger syrup + crushed ice | Mug | Strong kicks | Strawberry syrup, anything with lemon |
-| Ember | Cranberry juice + strawberry syrup + chocolate syrup | Stemmed | Tiny particles, vibrant colours | Plain water, bitter drinks |
-| Vex | Lemon juice + orange juice + simple syrup | Stemmed | Stemmed glasses, gold hues | Thick mugs, milk, cream |
-| Cloudy | Milk + chocolate syrup + cream, warm | Mug | Warm mugs, whipped cream | Sour lemon juice, ice, anything cold |
+| [Cloudy](Characters/Cloudy.md) | Fox | Cream, white, teal | The local baker, about 21. Cozy, gentle, shy. | "Hello! May I please know if this seat is taken?" | She's baked something for Vex's showcase. Give it to him herself, or leave it as a secret? |
 
 Each quest is answered with a drink's taste:
 
@@ -128,25 +119,38 @@ The scene still has the three old **placeholder** customers, with made-up lines 
 - Customers order random drinks from the recipes above, not their usual.
 - There's no gift, reaction or quest system yet: a right drink just plays the next story line.
 
-## Drinks the characters ask for
+## Their drinks
 
-**None of the four usual drinks can be made in the game yet.** The character sheets say to use "only Sweet / Sour / Strong / Fizzy and how the drink looks" from a drinks file. That file isn't in the repo, and the game was built from the drink crafting guide instead, which uses Bitter / Sweet / Sour and spirits as the base. The two have to be brought together: either the ingredient list in `Scripts/Drinks/Ingredient.cs` (and this page) changes to match the drinks file, or the drinks on the sheets are rewritten with the ingredients above.
+Each character's usual, made only from the ingredients above, so every one can be made in the game today. They're written to stay close to what the character sheets asked for. The rules tests (`Tests/DrinkRules.Tests`) make each one step by step and check the result.
 
-| On the sheets | Who | In the game now |
+| Drink | For | Recipe, in pouring order | Taste (Bitter / Sweet / Sour) | Served |
+|---|---|---|---|---|
+| **Neon Storm** | [Sabre](Characters/Sabre.md) | Whiskey, Espresso (shake), Cola (shake) | +4 / +1 / 0 | Mixed, Mug, Cold, Cherry |
+| **Spirit Order** | [Ember](Characters/Ember.md) | Layer 1: Bourbon, Grenadine (shake). Layer 2: Bourbon, Dark Caramel (shake). | −1 / +6 / 0 | Layered, Coupe, Cherry |
+| **Golden Standard** | [Vex](Characters/Vex.md) | Tequila, Lime Juice (stir), Orange Peel (stir), Syrup (shake) | +2 / +1 / +3 | Mixed, Martini, Cold, Orange |
+| **Cozy Cup** | [Cloudy](Characters/Cloudy.md) | Bourbon, Dark Caramel (shake), Syrup (shake) | 0 / +4 / −1 | Mixed, Mug, Mint |
+
+How each one replaces the drink on the sheet:
+
+| Drink | On the sheet | Now |
 |---|---|---|
-| **Strong** and **Fizzy** tastes | All four quests | No. The tastes are Bitter, Sweet and Sour. |
-| A drink with no spirit in it | All four | No. Every recipe starts with Whiskey, Bourbon or Tequila. Ember is about 16. |
-| Cold brew | Sabre | No. Espresso is the closest. |
-| Ginger syrup, strawberry syrup, chocolate syrup | Sabre, Ember, Cloudy | No. There's one plain Syrup. |
-| Simple syrup | Vex | Yes: Syrup. |
-| Lemon juice | Vex, and Sabre and Cloudy hate it | No. Lime Juice is the closest. Lemon is only a garnish. |
-| Orange juice | Vex | No. Orange Peel is a bitter modifier, and Orange is a garnish. |
-| Cranberry juice | Ember | No. |
-| Milk, cream | Cloudy, and Vex hates them | No. The Milk carton is Dark Caramel for now. |
-| Whipped cream, marshmallows | Cloudy | No. There are no toppings. |
-| Crushed ice | Sabre | Partly. Ice makes a drink Cold. There's no crushed or cubed. |
-| Warm or hot | Cloudy | No. A drink can only be made Cold. |
-| Mug | Sabre, Cloudy | Yes. |
-| Stemmed glass | Ember, Vex | Partly. Coupe, Martini and Wine are stemmed, but orders ask for one exact glass, not "any stemmed". |
-| Gold or orange colour | Vex | Partly. Colour comes only from the garnish (Orange). |
-| Tiny particles, vibrant colours | Ember | Partly. Colour from the garnish only, no particles. |
+| Neon Storm | Cold brew + ginger syrup + crushed ice, in a mug | A spiked cold brew. Espresso for the cold brew, Cola for the ginger kick, Ice for the crushed ice. |
+| Spirit Order | Cranberry juice + strawberry syrup + chocolate syrup, in a stemmed glass | Grenadine for the red fruit, Dark Caramel for the chocolate. Layered, because she loves vibrant colours. |
+| Golden Standard | Lemon juice + orange juice + simple syrup, in a stemmed glass | A margarita. Lime Juice for the lemon, Orange Peel (the Triple Sec bottle) for the orange, and the same Syrup. |
+| Cozy Cup | Milk + chocolate syrup + cream, in a warm mug | A bourbon hot chocolate. Dark Caramel (the milk carton) for the milk and chocolate, Syrup for the extra sweetness, and no ice. |
+
+What they love and hate, in game terms:
+
+| Character | Loves | Hates |
+|---|---|---|
+| Sabre | A high Bitter | Grenadine (closest to strawberry syrup), the Lemon garnish |
+| Ember | Layered drinks, a garnish | Tonic Water (closest to plain water), any Bitter above 0 |
+| Vex | Coupe, Martini, Wine (stemmed), the Orange garnish (gold) | The Mug, Dark Caramel (milk and cream) |
+| Cloudy | The Mug | Lime Juice, Sour Mix and the Lemon garnish (sour lemon), Ice |
+
+**Still missing from the game:**
+- **Strong and Fizzy:** the quests answer with these, but the tastes are Bitter, Sweet and Sour.
+- **Warm drinks:** a drink can be made Cold, but not warm. Cloudy's Cozy Cup is just served without ice for now.
+- **Toppings:** no whipped cream or marshmallows.
+- **Any stemmed glass:** orders ask for one exact glass, so "a stemmed glass" has to be a Coupe, Martini or Wine.
+- **Particles:** colour comes only from the garnish.
