@@ -4,7 +4,7 @@ Scene: `Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`
 
 The scene contains:
 - **The bar.** `Environment/Bar/MoonlitBar.prefab`, built from one prefab per piece. The Blender source is in `Art/Bar/`. See [BAR_PIECES.md](BAR_PIECES.md).
-- **Three customers:**
+- **Three placeholder customers** (the real characters are in [MENU_AND_CHARACTERS.md](MENU_AND_CHARACTERS.md#characters)):
   - Kintsu stands at the ordering spot in front of you.
   - Character03 sits on the right-hand bar stool.
   - Character02 sits at the left table in the lounge.
