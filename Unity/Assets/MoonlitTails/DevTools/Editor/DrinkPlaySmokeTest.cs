@@ -308,7 +308,7 @@ namespace MoonlitTails.EditorTools
                     Expect(game.ResetButtonObject != null, "the reset button is on the counter");
                     Place(whiskey, away);
                     Place(cup, away + right);
-                    game.ResetAllProps();
+                    Expect(Press(game.ResetButtonObject), "the reset button is a button");
                     bool AtHome(Component c) { var h = c.GetComponent<PropRespawn>(); return h && Vector3.Distance(c.transform.position, h.HomePosition) < 0.001f; }
                     Expect(AtHome(whiskey) && AtHome(cup) && AtHome(rocks) && AtHome(highball), "pressing it puts the props back where they started");
                 }),
