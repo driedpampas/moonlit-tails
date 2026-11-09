@@ -65,6 +65,8 @@ namespace VRCharacters
 
         Vector3 lastRootPos;
         bool built;
+        Renderer[] renderers;
+        bool wasVisible = true;
 
         void OnEnable()
         {
@@ -104,6 +106,8 @@ namespace VRCharacters
                 }
                 c.nodes = list.ToArray();
             }
+            renderers = GetComponentsInChildren<Renderer>();
+            wasVisible = true;
             built = true;
             ResetSimulation();
         }
@@ -125,6 +129,15 @@ namespace VRCharacters
             lastRootPos = transform.position;
         }
 
+        /// <summary>True if any camera sees one of the character's renderers. A character with no renderers always counts.</summary>
+        bool Visible()
+        {
+            if (renderers == null || renderers.Length == 0) return true;
+            for (int i = 0; i < renderers.Length; i++)
+                if (renderers[i] && renderers[i].isVisible) return true;
+            return false;
+        }
+
         Vector3 Wind(float time)
         {
             if (windZone != null)
@@ -143,6 +156,11 @@ namespace VRCharacters
             if (!built) Build();
             float dt = Time.deltaTime;
             if (dt <= 0f) return;
+
+            // Nobody sees this character: skip the solve (the biggest cost of our scripts), and start from the pose when it's seen again.
+            bool visible = Visible();
+            if (!visible) { wasVisible = false; return; }
+            if (!wasVisible) { wasVisible = true; ResetSimulation(); }
 
             if ((transform.position - lastRootPos).sqrMagnitude > resetDistance * resetDistance) ResetSimulation();
             lastRootPos = transform.position;
