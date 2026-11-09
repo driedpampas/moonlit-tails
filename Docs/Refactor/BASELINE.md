@@ -1,6 +1,6 @@
 # Refactor baseline
 
-Recorded before any refactor change (FIX_PLAN.md Phase 0), on `devtools-separation` after merging `main` (2446f86), 2026-11-09.
+Recorded before any refactor change (see [REFACTOR.md](REFACTOR.md)), on `devtools-separation` after merging `main` (2446f86), 2026-11-09.
 
 | Check | Result |
 |---|---|
@@ -18,7 +18,7 @@ HandGrab feel values in `BarTuning.asset`, kept for the headset comparison once 
 
 ## Runtime baseline (`Automation > Record Runtime Baseline`)
 
-Measured with `RuntimeBaseline.RunBatch` on the Linux editor in batch mode, 72 fps cap. Each state is a 3-second window of about 200 profiled frames. The numbers are **only our own scripts** (Profiler samples from `MoonlitTails.Runtime` and `VRCharacters.Runtime`). Times are desktop CPU, so expect them to be several times higher on a Quest. Full data and the layout dump: [`runtime-baseline.json`](runtime-baseline.json).
+Measured with `RuntimeBaseline.RunBatch` on the Linux editor in batch mode, 72 fps cap. Each state is a 3-second window of about 200 profiled frames. The numbers are **only our own scripts** (Profiler samples from `MoonlitTails.Runtime` and `VRCharacters.Runtime`). Times are desktop CPU, so expect them to be several times higher on a Quest.
 
 | State | Our scripts: GC per frame | Our scripts: time per frame |
 |---|---|---|
@@ -58,14 +58,3 @@ Same measurement, on the same machine, after Phases 1–7. Each cell is the rang
 - `ServeStation`: 446 B/frame with a glass on the coaster, now about 3 B. `Pourer`: 500 B/frame while pouring, now about 29 B.
 - **`SpringBoneSystem` still costs about 1 ms on desktop while a character is in view.** It's skipped only while no camera sees the character. In batch mode nothing is drawn to the Game view, so these runs measure the "nobody in view" case; the "in view" column is the earlier figure, since that code path didn't change. The next steps from the plan (a fixed 30–45 Hz step, fewer collider checks, a Burst job) need a profile on a Quest Development build first.
 - The whole-frame figure (editor included) jumps between 1 KB and over 1 MB per frame from run to run, with and without these changes, so it isn't used here.
-
-## Runtime layout (for the Phase 4 Editor work)
-
-The layout dump was removed from the tool once the panel, the reset button and the signs became scene objects (Phase 4). The copy from before is still in [`runtime-baseline.json`](runtime-baseline.json).
-
-`runtime-baseline.json` → `layout` has the full hierarchy of everything built at runtime, with world and local position, rotation and scale of every object, plus text, font size, alignment, rect size and colour for each TMP text, and mesh and colour for each primitive:
-- `Serve Panel` (34 objects, at (0.28, 1.246, −0.83))
-- `Reset Button` (5, at (1.05, 1.02, −0.42))
-- `How To Play Sign` (4, the back-wall sign) and `How To Play` (3, the chalkboard text)
-
-It also has the characters after BarLayout re-seats them (Kintsu standing at (0, 0.5, −1.42); Character03 seated at (−1, 0.991, −1.48), yaw 30°; Character02 seated at (3.52, 0.937, −3.5), yaw 270°), the XR Origin at (0, 0, 0.25), and all 44 floating labels with their heights.
