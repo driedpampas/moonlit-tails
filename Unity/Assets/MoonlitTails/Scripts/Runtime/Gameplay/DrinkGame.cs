@@ -16,7 +16,8 @@ namespace MoonlitTails.Gameplay
     /// they leave the bar. A correct drink tells the next line of that customer's story.
     ///
     /// Transition: until the scene has its own Drink Game object, it adds itself to any scene with a "MoonlitBar"
-    /// object and finds the props by name (see <see cref="Plan"/>).
+    /// object and finds the serve spot, player spot, bell and tickets by name (see <see cref="Plan"/>). The props
+    /// already carry their own gameplay components, set in their prefabs.
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {
@@ -80,48 +81,7 @@ namespace MoonlitTails.Gameplay
         bool ordersEnabled, resetHooked;
         Transform resetButtonObject;   // transition: the runtime-built reset button
 
-        // ------------------------------------------------------------------ transition: prop names
-        /// <summary>Prop name prefix (after "PROP_") to ingredient.</summary>
-        public static readonly (string prop, Ingredient ingredient)[] Sources =
-        {
-            // base drinks
-            ("Bottle_Rum", Ingredients.Whiskey),
-            ("Bottle_Vodka", Ingredients.Bourbon),
-            ("Bottle_Tequila", Ingredients.Tequila),
-            // bitter
-            ("Fridge_Tonic", Ingredients.TonicWater),
-            ("Bottle_TripleSec", Ingredients.OrangePeel),
-            ("Bottle_Gin", Ingredients.Espresso),
-            ("Bottle_Violet", Ingredients.BlackTea),
-            // sweet
-            ("Bottle_PeachSyrup", Ingredients.Syrup),
-            ("Fridge_Cola", Ingredients.Cola),
-            ("Fridge_Milk", Ingredients.DarkCaramel),
-            ("Bottle_Grenadine", Ingredients.Grenadine),
-            // sour
-            ("Fridge_Soda", Ingredients.LimeJuice),
-            ("Fridge_Juice", Ingredients.AppleCider),
-            ("Bottle_MelonLiqueur", Ingredients.GrapefruitAcid),
-            ("Bottle_BlueCuracao", Ingredients.SourMix),
-        };
-
-        /// <summary>Glass type (the word after "PROP_Glass_") to length. Short holds 3 units, Medium 4, Long 5.</summary>
-        public static readonly Dictionary<string, GlassLength> GlassLengths = new Dictionary<string, GlassLength>
-        {
-            ["Shot"] = GlassLength.Short,
-            ["Rocks"] = GlassLength.Medium,
-            ["Mug"] = GlassLength.Medium,
-            ["Coupe"] = GlassLength.Medium,
-            ["Highball"] = GlassLength.Long,
-            ["Martini"] = GlassLength.Long,
-            ["Wine"] = GlassLength.Long,
-        };
-
-        public const string StirCupPropName = "PROP_Blender_Jar";
-        public const string ShakeMixerPropName = "PROP_Shaker_Tin";
-        public const string SpoonPropName = "PROP_BarSpoon";
-        public const string IceScoopPropName = "PROP_IceScoop";
-        public const string IceWellName = "ENV_IceWell";
+        // ------------------------------------------------------------------ transition: scene object names
         public const string BellPropName = "PROP_ServiceBell";
         public const string ServeSpotName = "MK_ServeSpot";
         public const string PlayerSpotName = "MK_PlayerStart";
@@ -333,17 +293,8 @@ namespace MoonlitTails.Gameplay
             var plan = Plan(bar.transform);
             foreach (var w in plan.warnings) Debug.LogWarning("[Moonlit] DrinkGame: " + w);
 
-            foreach (var (t, ing) in plan.sources) if (!t.TryGetComponent<IngredientSource>(out _)) t.gameObject.AddComponent<IngredientSource>().Init(ing);
-            foreach (var (t, type) in plan.glasses) if (!t.TryGetComponent<DrinkContainer>(out _)) t.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.Glass, type, GlassLengths[type]);
-            if (plan.stirCup && !plan.stirCup.TryGetComponent<DrinkContainer>(out _)) plan.stirCup.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.StirCup, "Stir Cup", GlassLength.Long);
-            if (plan.shaker && !plan.shaker.TryGetComponent<DrinkContainer>(out _)) plan.shaker.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.ShakeMixer, "Shake Mixer", GlassLength.Long);
-            foreach (var (t, color) in plan.garnishes) if (!t.TryGetComponent<Garnish>(out _)) t.gameObject.AddComponent<Garnish>().Init(color);
-            if (plan.spoon && !plan.spoon.TryGetComponent<StirTool>(out _)) plan.spoon.gameObject.AddComponent<StirTool>();
-            if (plan.scoop)
-            {
-                if (!plan.scoop.TryGetComponent(out iceScoop)) iceScoop = plan.scoop.gameObject.AddComponent<IceScoop>();
-                if (plan.iceWell) iceScoop.Init(plan.iceWell);
-            }
+            // the props carry their own gameplay components (set up in their prefabs)
+            iceScoop = bar.GetComponentInChildren<IceScoop>(true);
             playerSpot = plan.player;
 
             var layout = FindFirstObjectByType<BarLayout>();
@@ -370,56 +321,26 @@ namespace MoonlitTails.Gameplay
 
         public class SetupPlan
         {
-            public readonly List<(Transform t, Ingredient ingredient)> sources = new List<(Transform, Ingredient)>();
-            public readonly List<(Transform t, string type)> glasses = new List<(Transform, string)>();
-            public readonly List<(Transform t, string color)> garnishes = new List<(Transform, string)>();
             public readonly List<Transform> tickets = new List<Transform>();
-            public Transform stirCup, shaker, spoon, scoop, iceWell, bell, serveSpot, player, menuBoard;
+            public Transform bell, serveSpot, player, menuBoard;
             public readonly List<string> warnings = new List<string>();
         }
 
-        /// <summary>Works out which object gets which role, without changing anything (also used by the editor check).</summary>
+        /// <summary>Transition: finds the serve spot, player spot, bell, tickets and menu board by name.</summary>
         public static SetupPlan Plan(Transform bar)
         {
             var plan = new SetupPlan();
             var all = bar.GetComponentsInChildren<Transform>(true);
             Transform Named(string n) => all.FirstOrDefault(t => t.name == n);
-            bool Grabbable(Transform t) => t.GetComponent<XRGrabInteractable>() && t.GetComponent<Rigidbody>();
-
-            foreach (var (prop, ing) in Sources)
-            {
-                var found = all.Where(t => t.name.StartsWith("PROP_" + prop) && t.GetComponent<MeshFilter>()).ToList();
-                if (found.Count == 0) plan.warnings.Add($"no prop for {ing.DisplayName} (PROP_{prop}*)");
-                foreach (var t in found)
-                {
-                    if (Grabbable(t)) plan.sources.Add((t, ing));
-                    else plan.warnings.Add($"{t.name} isn't grabbable");
-                }
-            }
-            foreach (var t in all.Where(t => t.name.StartsWith("PROP_Glass_") && t.GetComponent<MeshFilter>()))
-            {
-                string type = t.name.Substring("PROP_Glass_".Length).Split('_')[0];
-                if (!GlassLengths.ContainsKey(type)) { plan.warnings.Add($"{t.name}: no length set for glass type '{type}'"); continue; }
-                if (Grabbable(t)) plan.glasses.Add((t, type));
-            }
-            foreach (var t in all.Where(t => t.name.StartsWith("PROP_Garnish_") && t.GetComponent<MeshFilter>()))
-                if (Grabbable(t)) plan.garnishes.Add((t, t.name.Substring("PROP_Garnish_".Length).Split('_')[0]));
-
-            Transform Need(string n, bool grab)
+            Transform Need(string n)
             {
                 var t = Named(n);
                 if (!t) plan.warnings.Add($"missing {n}");
-                else if (grab && !Grabbable(t)) { plan.warnings.Add($"{n} isn't grabbable"); return null; }
                 return t;
             }
-            plan.stirCup = Need(StirCupPropName, true);
-            plan.shaker = Need(ShakeMixerPropName, true);
-            plan.spoon = Need(SpoonPropName, true);
-            plan.scoop = Need(IceScoopPropName, true);
-            plan.iceWell = Need(IceWellName, false);
-            plan.bell = Need(BellPropName, false);
-            plan.serveSpot = Need(ServeSpotName, false);
-            plan.player = Need(PlayerSpotName, false);
+            plan.bell = Need(BellPropName);
+            plan.serveSpot = Need(ServeSpotName);
+            plan.player = Need(PlayerSpotName);
             plan.menuBoard = Named(MenuBoardName);
             foreach (var n in TicketNames) { var t = Named(n); if (t) plan.tickets.Add(t); else plan.warnings.Add($"missing {n}"); }
             return plan;

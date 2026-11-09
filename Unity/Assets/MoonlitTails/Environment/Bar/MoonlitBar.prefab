@@ -18649,6 +18649,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7951197968437855507, guid: 84953a6b2bbe454e08e1bccb7e3c819b, type: 3}
+      propertyPath: iceWell
+      value: 
+      objectReference: {fileID: 7588460534066376612}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

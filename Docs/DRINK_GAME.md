@@ -66,7 +66,8 @@ Two choices aren't in the guide yet. Check them with the designers:
 |---|---|
 | `Unity/Assets/MoonlitTails/Scripts/Drinks/` | The rules as plain C# with no Unity dependency: ingredients, mixing, layering, glasses, adjustments, order checking and the order generator. |
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
-| `Gameplay/DrinkGame.cs` | **The tables to edit**: which prop is which ingredient, and the glass lengths. |
+| `Gameplay/DrinkGame.cs` | The night at the bar: customers, orders, tickets, serving, and the reset. |
+| The prop prefabs (`Environment/Bar/Prefabs/Props`) | **What each prop is**: the ingredient on each bottle's *Ingredient Source*, the kind, name and length on each glass's *Drink Container*, the colour on each *Garnish*. |
 | `Gameplay/CustomerScripts.cs` | What each customer says. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
 | `Tests/DrinkRules.Tests/` | Rules tests, including the characters' usual drinks: `dotnet run`. |
 
@@ -90,7 +91,14 @@ Two choices aren't in the guide yet. Check them with the designers:
 | Grapefruit Acid | Melon Liqueur bottle |
 | Sour Mix | Blue Curaçao bottle |
 
-The label over each prop shows the ingredient's name. Swap the models later, or change the table in `DrinkGame.cs`.
+The label over each prop shows the ingredient's name. To change what a prop pours, open its prefab and pick another **Ingredient** on its *Ingredient Source*.
+
+**Adding a prop to the game:** open its prefab (it needs a collider, a Rigidbody, an XR Grab Interactable and a Prop Respawn, like the others) and add one component:
+- a bottle or carton: **Ingredient Source**, then pick the ingredient;
+- a glass: **Drink Container**, Kind *Glass*, a Variant name (what customers ask for, e.g. *Highball*) and a Length (Short holds 3 units, Medium 4, Long 5);
+- a fruit slice: **Garnish**, with its colour name (e.g. *Lime*).
+
+Then run **Tools > Moonlit Tails > Automation > Check Scene** to see it listed.
 
 ## Testing
 

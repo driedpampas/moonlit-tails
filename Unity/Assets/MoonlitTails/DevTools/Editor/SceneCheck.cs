@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MoonlitTails.Drinks;
 using MoonlitTails.Gameplay;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -168,29 +169,62 @@ namespace MoonlitTails.EditorTools
         }
 
         // ------------------------------------------------------------------ drink setup
-        /// <summary>Which bar props the drink game will use and for what; warnings for anything it can't find.</summary>
+        /// <summary>
+        /// What the drink game will use: the gameplay components on the bar's props, and the Drink Game object's
+        /// references. Warns about props that look like they should have a role but don't, and about empty settings.
+        /// </summary>
         static bool CheckDrinkSetup(out int warnings)
         {
-            warnings = 0;
+            var issues = new List<string>();
             var bar = GameObject.Find("MoonlitBar");
             if (!bar) { Debug.LogError("[Moonlit] Open MoonlitBar_VR.unity first (no MoonlitBar object)."); warnings = 1; return false; }
-            var plan = DrinkGame.Plan(bar.transform);
             var sb = new StringBuilder("[Moonlit] Drink setup\n");
-            sb.AppendLine($"Ingredients ({plan.sources.Count}):");
-            foreach (var g in plan.sources.GroupBy(s => s.ingredient.DisplayName))
-                sb.AppendLine($"  {g.Key,-16} <- {string.Join(", ", g.Select(s => s.t.name))}");
-            sb.AppendLine($"Glasses ({plan.glasses.Count}):");
-            foreach (var g in plan.glasses.GroupBy(s => s.type))
-                sb.AppendLine($"  {g.Key,-9} {DrinkGame.GlassLengths[g.Key],-6} x{g.Count()}");
-            sb.AppendLine($"Garnishes ({plan.garnishes.Count}): {string.Join(", ", plan.garnishes.Select(g => g.color).Distinct())}");
-            sb.AppendLine($"Stir Cup: {Name(plan.stirCup)}   Shake Mixer: {Name(plan.shaker)}   Spoon: {Name(plan.spoon)}");
-            sb.AppendLine($"Ice: {Name(plan.scoop)} + {Name(plan.iceWell)}   Bell: {Name(plan.bell)}   Serve: {Name(plan.serveSpot)}");
-            sb.AppendLine($"Tickets: {plan.tickets.Count}   Menu board: {Name(plan.menuBoard)}");
-            var layout = Object.FindFirstObjectByType<BarLayout>();
-            sb.AppendLine($"Customers: {(layout ? string.Join(", ", layout.characters.Select(c => c.id)) : "none (no BarLayout)")}");
-            foreach (var w in plan.warnings) sb.AppendLine("  WARNING: " + w);
-            warnings = plan.warnings.Count;
-            Debug.Log(sb.ToString());
+
+            var sources = bar.GetComponentsInChildren<IngredientSource>(true);
+            sb.AppendLine($"Ingredients ({sources.Length}):");
+            foreach (var g in sources.GroupBy(s => s.Id).OrderBy(g => (int)g.Key))
+                sb.AppendLine($"  {g.Key,-16} <- {string.Join(", ", g.Select(s => s.name))}");
+            foreach (var s in sources.Where(s => s.Id == IngredientId.None)) issues.Add($"{s.name}: IngredientSource has no ingredient");
+
+            var containers = bar.GetComponentsInChildren<DrinkContainer>(true);
+            var glasses = containers.Where(c => c.IsGlass).ToList();
+            sb.AppendLine($"Glasses ({glasses.Count}):");
+            foreach (var g in glasses.GroupBy(c => (c.variant, c.length)).OrderBy(g => g.Key.variant))
+                sb.AppendLine($"  {g.Key.variant,-9} {g.Key.length,-6} x{g.Count()}");
+            foreach (var c in containers.Where(c => string.IsNullOrEmpty(c.variant))) issues.Add($"{c.name}: DrinkContainer has no variant name");
+            string Vessel(ContainerKind k) => string.Join(", ", containers.Where(c => c.kind == k).Select(c => c.name).DefaultIfEmpty("MISSING"));
+            sb.AppendLine($"Stir Cup: {Vessel(ContainerKind.StirCup)}   Shake Mixer: {Vessel(ContainerKind.ShakeMixer)}");
+            if (!containers.Any(c => c.kind == ContainerKind.StirCup)) issues.Add("no Stir Cup (a DrinkContainer of kind StirCup)");
+            if (!containers.Any(c => c.kind == ContainerKind.ShakeMixer)) issues.Add("no Shake Mixer (a DrinkContainer of kind ShakeMixer)");
+
+            var garnishes = bar.GetComponentsInChildren<Garnish>(true);
+            sb.AppendLine($"Garnishes ({garnishes.Length}): {string.Join(", ", garnishes.Select(g => g.color).Distinct().OrderBy(c => c))}");
+            foreach (var g in garnishes.Where(g => string.IsNullOrEmpty(g.color))) issues.Add($"{g.name}: Garnish has no colour");
+
+            var spoons = bar.GetComponentsInChildren<StirTool>(true);
+            var scoops = bar.GetComponentsInChildren<IceScoop>(true);
+            sb.AppendLine($"Spoon: {string.Join(", ", spoons.Select(s => s.name).DefaultIfEmpty("MISSING"))}   " +
+                          $"Ice: {string.Join(", ", scoops.Select(s => s.name + " + " + Name(s.IceWell)).DefaultIfEmpty("MISSING"))}");
+            if (spoons.Length == 0) issues.Add("no bar spoon (StirTool)");
+            if (scoops.Length == 0) issues.Add("no ice scoop (IceScoop)");
+            foreach (var s in scoops.Where(s => !s.IceWell)) issues.Add($"{s.name}: IceScoop has no ice well");
+
+            // props named like a bottle, carton or glass that have no gameplay component
+            foreach (var t in bar.GetComponentsInChildren<Transform>(true))
+            {
+                if (!t.GetComponent<XRGrabInteractable>()) continue;
+                string n = t.name;
+                if ((n.StartsWith("PROP_Bottle_") || n.StartsWith("PROP_Fridge_")) && !t.GetComponent<IngredientSource>()) issues.Add($"{n}: a bottle or carton with no IngredientSource");
+                if (n.StartsWith("PROP_Glass_") && !t.GetComponent<DrinkContainer>()) issues.Add($"{n}: a glass with no DrinkContainer");
+                if (n.StartsWith("PROP_Garnish_") && !t.GetComponent<Garnish>()) issues.Add($"{n}: a garnish with no Garnish");
+            }
+
+            var game = Object.FindFirstObjectByType<DrinkGame>();
+            sb.AppendLine(game ? $"Drink Game: {game.name}" : "Drink Game: none in the scene (transition: it adds itself when Play starts)");
+
+            foreach (var w in issues) sb.AppendLine("  WARNING: " + w);
+            warnings = issues.Count;
+            if (warnings == 0) Debug.Log(sb.ToString()); else Debug.LogWarning(sb.ToString());
             return warnings == 0;
         }
 

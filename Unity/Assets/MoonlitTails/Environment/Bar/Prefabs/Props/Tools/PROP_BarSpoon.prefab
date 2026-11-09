@@ -68,6 +68,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 97c486c3c23bf2b3296791a903de26c6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9046928386090311793}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 97c486c3c23bf2b3296791a903de26c6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5678548323487560154}
   m_SourcePrefab: {fileID: 100100000, guid: 97c486c3c23bf2b3296791a903de26c6, type: 3}
 --- !u!1 &2515469541092918974 stripped
 GameObject:
@@ -268,3 +271,16 @@ MonoBehaviour:
   space: {fileID: 0}
   homePosition: {x: 0, y: 0, z: 0}
   homeRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &5678548323487560154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2515469541092918974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dc7da1aaa514ba369abf8fb3d31ee36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.StirTool
+  stirDistance: 0.35
