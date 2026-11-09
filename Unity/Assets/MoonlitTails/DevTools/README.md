@@ -15,6 +15,17 @@ What they promise:
 - **They never save a scene or an asset.** Everything they move happens in Play mode and goes back when Play stops.
 - **They don't throw away your work.** If another scene with unsaved changes is open, they ask you to save it first. If the bar scene is already open, they play it as it is.
 - **The XR settings don't change.** XR startup is turned off for that one Play session in memory (`Scripts/Editor/PlayModeXR.cs`), so the Quest build and the XR asset in git are untouched.
-- Their output (`Unity/Captures/`) is ignored by git.
+- Their output (`Unity/Captures/`) is ignored by git. **The demo recorder overwrites `Captures/Demo/`**, so copy last week's files out first if you still need them.
 
-`DemoDirector.cs` sits outside `Editor/` only because Unity can't add a component from an Editor folder. It is wrapped in `#if UNITY_EDITOR`, so it's never in a build.
+## How they're kept apart from the game
+
+| Assembly | Folder | Builds into the APK? |
+|---|---|---|
+| `MoonlitTails.DevTools` | `DevTools/` (DemoDirector) | No: `defineConstraints: UNITY_EDITOR`. It isn't Editor-only because Unity can't add a component from an Editor-only assembly |
+| `MoonlitTails.DevTools.Editor` | `DevTools/Editor/` | No: Editor only |
+
+The rules:
+- **The game never references DevTools.** The game's assemblies (`MoonlitTails.Runtime`, `MoonlitTails.Drinks`, `VRCharacters.Runtime`, `MoonlitTails.Editor`) don't list DevTools as a reference, so they can't use it. DevTools may use the game's public API.
+- **No reflection.** DevTools only calls public members. If a tool needs something, make it public on the game side, with a comment saying the tool uses it.
+- **Never save** a scene or an asset.
+- **Proof:** `Tools/check_devtools_isolation.sh` (repo root) deletes DevTools in a copy-on-write copy of the project and compiles it. Exit code 0 means the game builds without DevTools.

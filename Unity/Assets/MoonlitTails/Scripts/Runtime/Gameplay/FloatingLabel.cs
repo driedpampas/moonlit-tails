@@ -22,6 +22,9 @@ namespace MoonlitTails.Gameplay
         float messageUntil;
         Camera cam;
 
+        /// <summary>The camera this label turns to face. Defaults to <see cref="Camera.main"/>; the demo recorder sets its own.</summary>
+        public Camera ViewCamera { get => cam; set => cam = value; }
+
         public static FloatingLabel Create(Transform target, float height, float titleSize = 0.3f)
         {
             var go = new GameObject("Label " + target.name);

@@ -75,7 +75,8 @@ namespace MoonlitTails.Gameplay
             }
         }
 
-        void ShowTicket(Customer c)
+        /// <summary>Redraws a customer's ticket from their current order. Public so the demo recorder can set orders.</summary>
+        public void ShowTicket(Customer c)
         {
             if (!c.ticket) return;
             if (c.order == null) { c.ticket.SetTitle($"<b>{c.profile.DisplayName}</b>\n<size=75%>...</size>"); c.ticket.ShowBars(null); return; }
@@ -147,7 +148,8 @@ namespace MoonlitTails.Gameplay
             return "(" + string.Join(", ", bits) + ")";
         }
 
-        void Say(Customer c, string text, Color color, float seconds)
+        /// <summary>Shows a line in a customer's speech bubble. Public so the demo recorder can script greetings.</summary>
+        public void Say(Customer c, string text, Color color, float seconds)
         {
             if (!c.bubble) return;
             c.bubble.SetTitle("");

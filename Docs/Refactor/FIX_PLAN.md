@@ -241,6 +241,12 @@ Docs:
 
    It never touches the main working copy. Run it at the end of Phases 2, 4 and 9.
 
+   **As implemented (Phase 2):** the script makes a `cp --reflink=always` copy of `Unity/` next to the repo instead of using a git worktree.
+   - `/tmp` is a 9.7 GB tmpfs, too small for the 8.6 GB Library.
+   - A worktree checkout would duplicate every LFS model on a nearly full disk.
+   - The reflink copy costs almost no space, and it refuses to fall back to a full copy.
+   - It passed in about 2 minutes.
+
 **Checks:**
 - batch compile
 - isolation script

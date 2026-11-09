@@ -63,7 +63,6 @@ namespace MoonlitTails.EditorTools
                     report.AppendLine($"Play mode ran {Time.frameCount} frames, game time {Time.time:F1} s");
                     foreach (var c in UnityEngine.Object.FindFirstObjectByType<BarLayout>().characters)
                         if (c.seated) report.AppendLine($"{c.id}: measured seated hip height {c.seatedHipHeight:F3} (per metre)");
-                    HandGrabReport();
                     SettleReport(); Shoot(); ThrowGlass(); phase = 1;
                 }
                 else if (phase == 1 && t > 7) { ThrowReport(); ResetAll(); phase = 2; }
@@ -192,27 +191,6 @@ namespace MoonlitTails.EditorTools
         static void ResetReport()
         {
             report.AppendLine($"Reset: {thrown.name} is {Vector3.Distance(thrown.position, thrownFrom):F3} m from its home spot");
-        }
-
-        // feeds HandGrab a fake hand movement (no headset here) to check the throw speed it would give
-        static void HandGrabReport()
-        {
-            var grabs = Resources.FindObjectsOfTypeAll<HandGrab>().Where(h => h.gameObject.scene.IsValid()).ToList();
-            report.AppendLine($"HandGrab components: {grabs.Count} ({string.Join(", ", grabs.Select(g => g.handedness + " on " + g.name))})");
-            var hg = grabs.FirstOrDefault();
-            if (hg == null) return;
-            var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-            var history = (List<(float t, Vector3 p, Quaternion r)>)typeof(HandGrab).GetField("history", flags).GetValue(hg);
-            history.Clear();
-            // 90 Hz samples: hand speeds up to 3 m/s forward, then slows to 1 m/s while the fingers open
-            float t = 0f; Vector3 p = Vector3.zero;
-            float[] speeds = { 0.5f, 1f, 1.8f, 2.5f, 3f, 3f, 2.6f, 2f, 1.4f, 1f };
-            foreach (var s in speeds) { t += 1f / 90f; p += Vector3.forward * s / 90f; history.Add((t, p, Quaternion.Euler(0, t * 180f, 0))); }
-            var args = new object[] { Vector3.zero, Vector3.zero };
-            typeof(HandGrab).GetMethod("HandVelocity", flags).Invoke(hg, args);
-            var v = (Vector3)args[0]; var w = (Vector3)args[1];
-            report.AppendLine($"Throw speed from a hand peaking at 3.0 m/s and slowing to 1.0 m/s at release: {v.magnitude:F2} m/s (spin {w.magnitude * Mathf.Rad2Deg:F0} deg/s, hand turned 180 deg/s)");
-            history.Clear();
         }
 
         // ------------------------------------------------------------------ helpers

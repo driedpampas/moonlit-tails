@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +5,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using MoonlitTails.Drinks;
 using MoonlitTails.Gameplay;
@@ -56,7 +54,6 @@ namespace MoonlitTails.EditorTools
         ServeStation station;
         OrderBook orders;
         readonly Dictionary<Transform, Quaternion> upright = new Dictionary<Transform, Quaternion>();
-        static readonly FieldInfo LabelCam = typeof(FloatingLabel).GetField("cam", BindingFlags.NonPublic | BindingFlags.Instance);
 
         // ------------------------------------------------------------------ setup and capture
         void Start()
@@ -141,7 +138,7 @@ namespace MoonlitTails.EditorTools
             // labels face whatever camera they last saw: make them face this one, every frame
             foreach (var l in FindObjectsByType<FloatingLabel>(FindObjectsSortMode.None))
             {
-                LabelCam.SetValue(l, cam);
+                l.ViewCamera = cam;
                 Vector3 away = l.transform.position - camPos;
                 if (away.sqrMagnitude > 1e-6f) l.transform.rotation = Quaternion.LookRotation(away, Vector3.up);
             }
@@ -431,24 +428,20 @@ namespace MoonlitTails.EditorTools
             station.Serve();
         }
 
-        static readonly MethodInfo ShowTicket = typeof(OrderBook).GetMethod("ShowTicket", BindingFlags.NonPublic | BindingFlags.Instance);
-
         /// <summary>The order book picks random orders; for the video, the first two ask for the drinks made below.</summary>
         void SetOrder(int customer, DrinkOrder order)
         {
             var c = orders.Customers[customer];
             c.order = order;
             c.missed = false;
-            ShowTicket.Invoke(orders, new object[] { c });
+            orders.ShowTicket(c);
         }
-
-        static readonly MethodInfo SayLine = typeof(OrderBook).GetMethod("Say", BindingFlags.NonPublic | BindingFlags.Instance);
 
         void Greet(OrderBook.Customer c)
         {
             var lines = c.profile?.Greetings;
             if (lines == null || lines.Length == 0) return;
-            SayLine.Invoke(orders, new object[] { c, lines[0], GameVisuals.Ink, 6f });
+            orders.Say(c, lines[0], GameVisuals.Ink, 6f);
         }
 
         Bounds HeadOf(OrderBook.Customer c)
@@ -672,4 +665,3 @@ namespace MoonlitTails.EditorTools
         }
     }
 }
-#endif
