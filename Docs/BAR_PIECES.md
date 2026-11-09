@@ -69,7 +69,8 @@ Use `M_*` names for materials that already exist in `Environment/Materials`, so 
 - every object in the bar is a piece prefab, a marker or a light, with no loose meshes;
 - every material is one of the shared bar materials;
 - room pieces have colliders, and props have a collider, physics, grabbing and respawn;
-- there are no missing scripts or duplicate names.
+- there are no missing scripts or duplicate names;
+- the Drink Game object has its customer seats, serve panel, reset button and rules signs set.
 
 Run it after editing the bar.
 

@@ -6,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MoonlitTails.Gameplay
 {
     /// <summary>A fruit slice. Let go of it near a glass's rim and it sticks there, giving the drink its colour.</summary>
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class Garnish : MonoBehaviour
     {
         [Tooltip("The colour this garnish gives a drink, e.g. Lime. Customers ask for it by this name.")]
@@ -19,24 +20,15 @@ namespace MoonlitTails.Gameplay
         PropRespawn home;
         DrinkContainer glass;
         Transform originalParent;
-        bool setUp;
 
         void Awake()
         {
-            if (!string.IsNullOrEmpty(color)) EnsureSetUp();
-        }
-
-        /// <summary>Configures a garnish added from code. Prefabs set the colour in the Inspector instead.</summary>
-        public void Init(string garnishColor)
-        {
-            color = garnishColor;
-            EnsureSetUp();
-        }
-
-        void EnsureSetUp()
-        {
-            if (setUp) return;
-            setUp = true;
+            if (string.IsNullOrEmpty(color))
+            {
+                Debug.LogError($"[Moonlit] {name}: Garnish has no colour set", this);
+                enabled = false;
+                return;
+            }
             originalParent = transform.parent;
             grab = GetComponent<XRGrabInteractable>();
             body = GetComponent<Rigidbody>();

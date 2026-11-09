@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.Gameplay
 {
     /// <summary>Dip the scoop in the ice well to fill it, then bring it to a glass's rim: the drink becomes Cold.</summary>
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class IceScoop : MonoBehaviour
     {
         [Tooltip("The ice well the scoop is filled in (ENV_IceWell in the bar).")]
@@ -19,21 +21,10 @@ namespace MoonlitTails.Gameplay
         Bounds wellBounds;
         Transform wellBoundsOf;   // the well the cached bounds belong to
         DrinkContainer refused;   // last glass that said "Already has ice", so it's said once, not every frame
-        bool setUp;
 
-        void Awake() => EnsureSetUp();
-
-        /// <summary>Sets the ice well from code. Prefabs set it in the Inspector instead.</summary>
-        public void Init(Transform well)
+        void Awake()
         {
-            iceWell = well;
-            EnsureSetUp();
-        }
-
-        void EnsureSetUp()
-        {
-            if (setUp) return;
-            setUp = true;
+            if (!iceWell) Debug.LogError($"[Moonlit] {name}: IceScoop has no ice well set", this);
             self = GetComponent<Renderer>();
             label = FloatingLabel.Create(transform, 0.12f, 0.22f);
             label.showWithin = 1.0f;

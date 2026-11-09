@@ -244,7 +244,7 @@ namespace MoonlitTails.EditorTools
             }
             if (seats.arraySize == 0) issues.Add("Drink Game has no customer seats");
 
-            foreach (var field in new[] { "playerSpot", "iceScoop" })
+            foreach (var field in new[] { "serve", "playerSpot", "iceScoop", "resetButton", "rulesSign", "menuBoardText" })
                 if (!so.FindProperty(field).objectReferenceValue) issues.Add($"Drink Game: {field} isn't set");
 
             if (so.FindProperty("serve").objectReferenceValue is ServeStation station)
@@ -254,9 +254,6 @@ namespace MoonlitTails.EditorTools
                     if (!sso.FindProperty(field).objectReferenceValue) issues.Add($"Serve Panel: {field} isn't set");
                 if (sso.FindProperty("game").objectReferenceValue != game) issues.Add("Serve Panel: its Drink Game isn't this one");
             }
-            // transition: the game builds these when Play starts until they are in the scene
-            foreach (var field in new[] { "serve", "resetButton", "rulesSign", "menuBoardText" })
-                if (!so.FindProperty(field).objectReferenceValue) sb.AppendLine($"  {field}: not in the scene yet (built when Play starts)");
         }
 
         // ------------------------------------------------------------------ helpers

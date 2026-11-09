@@ -12,6 +12,7 @@ using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.EditorTools
 {
@@ -114,7 +115,7 @@ namespace MoonlitTails.EditorTools
             switch (phase)
             {
                 case Phase.Settle:
-                    // the labels and the runtime-built objects exist by now
+                    // the floating labels exist by now
                     if (Time.time < 3f || UnityEngine.Object.FindFirstObjectByType<DrinkGame>() == null)
                     {
                         if (EditorApplication.timeSinceStartup > SessionState.GetFloat(DeadlineKey, float.MaxValue))
@@ -214,7 +215,7 @@ namespace MoonlitTails.EditorTools
 
         /// <summary>
         /// The script type of a Profiler sample from one of our assemblies, or null. Script samples are named like
-        /// "MoonlitTails.Runtime.dll!MoonlitTails.Gameplay::PokeButton.Update() [Invoke]".
+        /// "MoonlitTails.Runtime.dll!MoonlitTails.Gameplay::ServeStation.Update() [Invoke]".
         /// </summary>
         static string OurScript(string sample)
         {
@@ -321,8 +322,8 @@ namespace MoonlitTails.EditorTools
             if (mf && mf.sharedMesh) sb.Append($",\"mesh\":{Str(mf.sharedMesh.name)}");
             var r = t.GetComponent<MeshRenderer>();
             if (!tmp && r && r.sharedMaterial) sb.Append($",\"color\":{Str("#" + ColorUtility.ToHtmlStringRGBA(r.sharedMaterial.color))}");
-            var button = t.GetComponent<PokeButton>();
-            if (button) sb.Append($",\"pokeButton\":{{\"radius\":{Num(button.radius)}}}");
+            var button = t.GetComponent<XRBaseInteractable>();
+            if (button) sb.Append($",\"button\":{Str(button.GetType().Name)}");
             if (t.childCount > 0)
             {
                 sb.Append(",\"children\":[");

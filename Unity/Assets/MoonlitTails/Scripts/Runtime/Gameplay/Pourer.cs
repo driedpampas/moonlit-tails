@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.Gameplay
 {
@@ -11,6 +12,7 @@ namespace MoonlitTails.Gameplay
     ///
     /// Subclasses that need a Unity message this class uses (Update) override it and call the base version.
     /// </summary>
+    [RequireComponent(typeof(XRGrabInteractable))]
     public abstract class Pourer : MonoBehaviour
     {
         [Header("Pouring")]

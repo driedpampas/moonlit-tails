@@ -4,8 +4,6 @@
     "references": [
         "MoonlitTails.Drinks",
         "Unity.XR.Interaction.Toolkit",
-        "Unity.XR.CoreUtils",
-        "Unity.XR.Hands",
         "Unity.InputSystem",
         "Unity.TextMeshPro"
     ],

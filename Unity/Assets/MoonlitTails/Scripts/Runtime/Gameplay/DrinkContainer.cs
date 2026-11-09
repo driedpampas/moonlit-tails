@@ -69,19 +69,12 @@ namespace MoonlitTails.Gameplay
 
         void Awake()
         {
-            if (!string.IsNullOrEmpty(variant)) EnsureSetUp();
-        }
-
-        /// <summary>Configures a container added from code. Prefabs set kind, variant and length in the Inspector instead.</summary>
-        public void Init(ContainerKind k, string variantName, GlassLength len)
-        {
-            kind = k; variant = variantName; length = len;
-            EnsureSetUp();
-        }
-
-        void EnsureSetUp()
-        {
-            if (setUp) return;
+            if (string.IsNullOrEmpty(variant))
+            {
+                Debug.LogError($"[Moonlit] {name}: DrinkContainer has no variant name set", this);
+                enabled = false;
+                return;
+            }
             setUp = true;
             EnsureGeometry();
             grab = GetComponent<XRGrabInteractable>();
@@ -107,8 +100,6 @@ namespace MoonlitTails.Gameplay
         public Vector3 OpeningWorld => transform.TransformPoint(bounds.center + upAxis * HalfHeight);
         public Vector3 BottomWorld => transform.TransformPoint(bounds.center - upAxis * HalfHeight);
         public Vector3 CenterWorld => transform.TransformPoint(bounds.center);
-        /// <summary>The direction the glass's opening points, in world space.</summary>
-        public Vector3 UpWorld => transform.TransformDirection(upAxis);
         public float OpeningRadiusWorld => GameVisuals.Radius(bounds, upAxis) * transform.lossyScale.x;
         bool Upright => Vector3.Angle(transform.TransformDirection(upAxis), Vector3.up) < 45f;
 

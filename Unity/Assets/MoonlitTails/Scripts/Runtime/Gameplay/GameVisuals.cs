@@ -38,9 +38,8 @@ namespace MoonlitTails.Gameplay
             var col = go.GetComponent<Collider>();
             if (col)
             {
-                // off at once so it never pushes anything; removed at the end of the frame (DestroyImmediate only in edit mode)
-                col.enabled = false;
-                if (Application.isPlaying) Object.Destroy(col); else Object.DestroyImmediate(col);
+                col.enabled = false;   // off at once so it never pushes anything; removed at the end of the frame
+                Object.Destroy(col);
             }
             go.transform.SetParent(parent, false);
             var r = go.GetComponent<MeshRenderer>();

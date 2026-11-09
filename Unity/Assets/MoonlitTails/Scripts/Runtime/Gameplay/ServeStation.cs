@@ -55,26 +55,14 @@ namespace MoonlitTails.Gameplay
         const RigidbodyConstraints Pinned =
             RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
 
-        /// <summary>Transition only: sets the station up from code, building its panel at runtime.</summary>
-        public void Init(Transform spot, Transform player, XRBaseInteractable bellInteractable, DrinkGame owner)
-        {
-            serveSpot = spot;
-            bell = bellInteractable;
-            game = owner;
-            if (!title) BuildRuntimePanel(player);
-            Begin();
-        }
-
         void OnEnable() => HookBell(true);
         void OnDisable() => HookBell(false);
-        void Start() => Begin();
 
-        void Begin()
+        void Start()
         {
-            if (started) return;
-            if (!serveSpot || !game || !title)
+            if (!serveSpot || !game || !title || !info)
             {
-                Debug.LogError($"[Moonlit] {name}: ServeStation needs its serve spot, Drink Game and panel text set", this);
+                Debug.LogError($"[Moonlit] {name}: ServeStation needs its serve spot, Drink Game, title and info set", this);
                 enabled = false;
                 return;
             }
@@ -252,52 +240,6 @@ namespace MoonlitTails.Gameplay
         {
             // picked up, sent home by a reset, or returned after serving: let it go
             if (CoasterGlass != null && !OnCoaster(CoasterGlass)) Release();
-        }
-
-        // ------------------------------------------------------------------ transition: the panel built from code
-        void BuildRuntimePanel(Transform player)
-        {
-            // panel beside the serve spot, facing the player
-            Vector3 toPlayer = player.position - serveSpot.position; toPlayer.y = 0;
-            if (toPlayer.sqrMagnitude < 1e-4f) toPlayer = Vector3.back;
-            toPlayer.Normalize();
-            Vector3 side = Vector3.Cross(Vector3.up, toPlayer);
-            var root = new GameObject("Serve Panel").transform;
-            root.SetParent(transform, false);
-            root.position = serveSpot.position + toPlayer * 0.1f + side * 0.28f + Vector3.up * 0.22f;
-            root.rotation = Quaternion.LookRotation(-toPlayer, Vector3.up);
-
-            title = GameVisuals.Text(root, "Title", 0.3f);
-            title.transform.localPosition = new Vector3(0, 0.1f, 0);
-            info = GameVisuals.Text(root, "Info", 0.2f);
-            info.transform.localPosition = new Vector3(0, -0.075f, 0);
-            bars = GameVisuals.BuildStatBars(root, 0.14f);
-            bars.root.transform.localPosition = new Vector3(0, 0.035f, 0);
-
-            for (int i = 0; i < 3; i++)
-            {
-                float y = 0.035f - i * 0.018f;
-                int stat = i;
-                var minus = PokeButton.Create(root, "-", new Vector3(-0.155f, y, 0), 0.016f, new Color(0.35f, 0.3f, 0.6f));
-                var plus = PokeButton.Create(root, "+", new Vector3(0.155f, y, 0), 0.016f, new Color(0.35f, 0.3f, 0.6f));
-                minus.radius = plus.radius = 0.014f;
-                minus.Pressed += () => AdjustStat(stat, -1);
-                plus.Pressed += () => AdjustStat(stat, +1);
-            }
-            var serve = PokeButton.Create(root, "Serve", new Vector3(0, -0.15f, 0), 0.05f, new Color(0.25f, 0.55f, 0.4f));
-            serve.Pressed += Serve;
-
-            if (bell)
-            {
-                var ring = bell.gameObject.AddComponent<PokeButton>();
-                ring.radius = 0.06f;
-                ring.Pressed += Serve;
-            }
-        }
-
-        void AdjustStat(int stat, int delta)
-        {
-            if (stat == 0) AdjustBitter(delta); else if (stat == 1) AdjustSweet(delta); else AdjustSour(delta);
         }
     }
 }

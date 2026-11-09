@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using MoonlitTails.Drinks;
 using UnityEngine;
@@ -19,23 +18,9 @@ namespace MoonlitTails.Gameplay
         public Ingredient Ingredient { get; private set; }
         public IngredientId Id => ingredient;
         FloatingLabel label;
-        bool setUp;
 
         void Awake()
         {
-            if (ingredient != IngredientId.None) EnsureSetUp();
-        }
-
-        /// <summary>Configures a source added from code. Prefabs set the ingredient in the Inspector instead.</summary>
-        public void Init(Ingredient i)
-        {
-            ingredient = (IngredientId)Enum.Parse(typeof(IngredientId), i.Id);
-            EnsureSetUp();
-        }
-
-        void EnsureSetUp()
-        {
-            if (setUp) return;
             Ingredient = Ingredients.Get(ingredient);
             if (Ingredient == null)
             {
@@ -43,7 +28,6 @@ namespace MoonlitTails.Gameplay
                 enabled = false;
                 return;
             }
-            setUp = true;
             EnsureGeometry();
 
             var b = GameVisuals.LocalBounds(gameObject);
