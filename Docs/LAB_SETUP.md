@@ -99,6 +99,11 @@ The Android settings are already filled in:
 
 To build: **File > Build Profiles > Android > Switch Platform**, then Build And Run with the Quest plugged in.
 
+Or without opening the build window: **Tools > Moonlit Tails > Automation > Build Android APK**, or from a terminal (the APK goes to `Unity/Captures/Build/`):
+```
+Unity -batchmode -quit -projectPath Unity -executeMethod MoonlitTails.EditorTools.AndroidBuild.Build
+```
+
 On the Quest itself, keep an eye on performance:
 - **Lights:** the bar uses about 20 realtime lights. Baking the lighting is the next step for a standalone build.
 - **Bloom:** turn off the `PostProcess (Bloom)` object if the frame rate drops.
