@@ -547,6 +547,7 @@ The empty-glasses path is tested by the DrinkRules `TryGenerate` test (D5). Ther
 | `StatBarsView.Show` | Skip when unchanged; `Signed()` uses a cached string table for −20..20 |
 | `Pourer` | Stream material set only when the colour changes; early-out when upright and not armed |
 | `FloatingLabel.LateUpdate` | Cheap squared-distance check first; skip while hidden |
+| **`SpringBoneSystem`** (found by the Phase 0 baseline: 0.9–1.0 ms/frame on desktop, the most expensive of our scripts) | **First, profile it on a Quest Development build.** Then, in order of effort: <ol><li>skip characters that are off-screen or far away (`Renderer.isVisible` / distance)</li><li>step chains at a fixed 30–45 Hz instead of every frame</li><li>drop collider checks for chains that can't reach a collider</li><li>if it's still too slow, a Burst job over all chains</li></ol>Behaviour must look the same in the headset |
 | HandGrab leak / `RemoveAt(0)`; lambda listeners; per-prop R polling | Gone (Phases 3, 4) |
 | `DrinkContainer.All` scans | Only if the baseline shows > 0.1 ms/frame |
 | DevTools `DemoDirector` | `Destroy(rt)` after `Release()`; `Destroy(frame)`; `using` on both `Process` objects; `BeginErrorReadLine()` before `WaitForExit()` (fixes the stderr deadlock) |
@@ -564,7 +565,7 @@ The empty-glasses path is tested by the DrinkRules `TryGenerate` test (D5). Ther
 
 ### Phase 9: final docs and cleanup (Code, ~2 h)
 
-- Remove `Dump Runtime Layout` (the baseline lives in the git-ignored `Unity/Captures/`).
+- Keep `Record Runtime Baseline` (built in Phase 0 as the layout dump plus the performance baseline). It's the before/after measurement for Phase 7, and a regression check later. Its layout part reads runtime-built objects that no longer exist after Phase 4, so trim that part then.
 - Final D10 grep. `DevTools/README.md`.
 - Update the Claude memories:
   - `bar-fbx-split`: manual steps replace Refresh Bar Pieces.
