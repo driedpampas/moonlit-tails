@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace MoonlitTails
 {
@@ -83,7 +81,6 @@ namespace MoonlitTails
                 if (p.prop) SetScale(p.prop, p.baseScale * tuning.PropMultiplier(p.prop.name));
             PlacePlayer();
             foreach (var c in characters) PlaceCharacter(c);
-            ApplyHandSettings();
         }
 
         void PlacePlayer()
@@ -110,19 +107,6 @@ namespace MoonlitTails
             Vector3 look = c.faceTowards ? c.faceTowards.position - c.spot.position : c.spot.forward;
             look.y = 0;
             if (look.sqrMagnitude > 1e-4f) SetRotation(c.character, Quaternion.LookRotation(look) * Quaternion.Euler(0, t.turn, 0));
-        }
-
-        void ApplyHandSettings()
-        {
-            if (Application.isPlaying) Time.fixedDeltaTime = 1f / tuning.physicsRate;
-            foreach (var p in props)
-                if (p.prop && p.prop.TryGetComponent<XRGrabInteractable>(out var g)) g.throwVelocityScale = tuning.throwStrength;
-            if (xrOrigin)
-            {
-                foreach (var i in xrOrigin.GetComponentsInChildren<NearFarInteractor>(true)) i.enableFarCasting = tuning.allowDistanceGrab;
-                // dev option: the body capsule is still there for locomotion, it just doesn't shove props
-                foreach (var body in xrOrigin.GetComponentsInChildren<CharacterController>(true)) body.detectCollisions = tuning.playerBodyPushesProps;
-            }
         }
 
         // only write when the value really changes, so edit mode doesn't keep dirtying the scene

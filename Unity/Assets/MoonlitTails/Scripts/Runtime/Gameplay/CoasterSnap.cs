@@ -54,8 +54,7 @@ namespace MoonlitTails.Gameplay
 
         IEnumerator SnapAfterRelease(DrinkContainer glass)
         {
-            // XRI throws the glass in LateUpdate and HandGrab in the next FixedUpdate: snap after both, so they can't
-            // knock it off again
+            // XRI applies the throw in LateUpdate after the release: snap on the next physics step, so it can't knock it off
             yield return new WaitForFixedUpdate();
             if (glass && !glass.IsHeld) Snap(glass);
         }

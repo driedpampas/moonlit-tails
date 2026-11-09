@@ -28,16 +28,16 @@ Link lets you change sizes in the Inspector while someone is wearing the headset
 
 **Linux (no headset):** OpenXR can't start in the Linux editor, so on Linux Play skips XR startup and the scene's XR Interaction Simulator drives the rig with mouse and keyboard. The XR setting comes back when you stop Play and is never saved, so the Quest build doesn't change. To turn this off (for example to try a Linux OpenXR runtime), use **Tools > Moonlit Tails > Linux: Skip OpenXR in Play Mode**.
 
-**Hands:**
-- **Hold something:** close your hand around it, like a real glass. Your palm must be within about 7 cm of it. It stays in your palm exactly where you touched it, and opening your hand lets go.
-- **Small things** (cherries, garnish, mint): pinch them between thumb and index, and they're held at your fingertips.
-- **Throw:** let go while your hand is moving. The prop leaves at the fastest speed your hand reached in the last 0.12 s, with your hand's spin. A slow toss lands softly and a fast flick flies.
+**Hands** (the stock XR Interaction Toolkit hand rig, no custom grab script):
+- **Hold something:** close your hand around it (grasp) or pinch it between thumb and index. Opening your hand lets go. It's held where your hand touched it.
+- **Throw:** let go while your hand is moving. The XR Grab Interactable on each prop throws it with your hand's speed (Throw Velocity Scale 1.1, smoothed over 0.25 s).
 - **Reset:** press **R** on the PC keyboard to send every prop back to where it started. Anything that leaves the room (out of a window, through the floor) comes back by itself.
 
-If grabbing feels off:
-1. In Play mode, select `Near-Far Interactor` under the left or right hand in the XR rig.
-2. Watch **Finger Curl** and **Pinch Distance** on its `HandGrab` component while you hold a glass.
-3. Set **Grab Curl** / **Release Curl** (and the pinch distances) in `BarTuning` to match what you see.
+If grabbing feels off, tune it on the XR rig in the scene, not in code:
+- **Grab triggers too late, or a fist doesn't grab:** on `Left Hand` / `Right Hand` > `Select Input` (Release Threshold Button Reader), lower **Press Threshold** (default 1) and **Release Threshold** (default 0.9), e.g. to 0.8 / 0.6.
+- **Throws too weak or too strong:** **Throw Velocity Scale** / **Throw Angular Velocity Scale** on the prop prefabs' XR Grab Interactable.
+- **Physics rate:** Project Settings > Time > Fixed Timestep is 0.0111111 (90 Hz). Match the headset refresh rate (72/90/120 Hz) so held props move smoothly.
+- **Props pass through your body:** the XR Origin's CharacterController is disabled (walking and teleporting are off), so leaning over the counter doesn't knock glasses away. Enable it again if locomotion comes back.
 
 ## Changing sizes (nothing is hardcoded)
 
@@ -54,16 +54,6 @@ Because it's an asset, changes you make while playing in the headset are **kept 
 | Characters > Height | Each customer's standing height in metres. They are all modelled 1.0 m tall. |
 | Characters > Height Offset | Moves a customer up or down, e.g. to sit deeper in a seat. |
 | Characters > Turn | Turns a customer left or right from facing their target. |
-| Grab With Whole Hand | Hold props by closing your hand around them. |
-| Grab Curl / Release Curl | How closed the hand must be to grab (0 = flat, 1 = fist), and how far it must open to let go. |
-| Allow Pinch Grab, Pinch Distance / Pinch Release Distance | Thumb-index pinch for small things, in metres between the fingertips. |
-| Grab Reach | How far around the palm (m) a prop can be and still get grabbed. |
-| Palm Grab Offset | How far in front of the palm (m) a held prop sits. |
-| Allow Distance Grab | Off: you have to touch a prop to grab it. On: the hand ray can grab from a distance too. |
-| Throw Strength | 1 = a released prop flies exactly as fast as your hand was moving. Raise it if throws feel weak. |
-| Throw Spin / Throw Window | How much of the hand's spin the prop keeps, and how far back (s) to look for the throwing speed. |
-| Physics Rate | Physics steps per second. Match the headset refresh (72/90/120) so held props move smoothly. |
-| Player Body Pushes Props *(dev option)* | Off (default): props pass through the player's body, the capsule on the XR Origin that follows your head, so leaning over the counter doesn't knock glasses away. Turn it on if walking or teleporting comes back and the body should bump into things again. |
 
 Seated customers measure their own hip height from the sitting animation, so they stay on the seat at any height you give them.
 
