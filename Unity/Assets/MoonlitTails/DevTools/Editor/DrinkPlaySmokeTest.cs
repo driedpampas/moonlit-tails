@@ -6,6 +6,8 @@ using MoonlitTails.Gameplay;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.EditorTools
 {
@@ -128,6 +130,18 @@ namespace MoonlitTails.EditorTools
             Physics.SyncTransforms();
         }
 
+        /// <summary>Presses a stock XRI button the way a fingertip or pinch would: fires its Select Entered event.</summary>
+        static bool Press(Transform button)
+        {
+            var b = button ? button.GetComponent<XRBaseInteractable>() : null;
+            if (!b) return false;
+            b.selectEntered.Invoke(new SelectEnterEventArgs());
+            return true;
+        }
+
+        static Transform PanelButton(ServeStation station, string name) =>
+            station.Panel ? station.Panel.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name) : null;
+
         // ------------------------------------------------------------------ the script
         static List<(float, string, Action)> BuildSteps()
         {
@@ -210,12 +224,17 @@ namespace MoonlitTails.EditorTools
                 (0.2f, "serve", () =>
                 {
                     Place(highball, serve + Vector3.up * 0.01f);
-                    game.SetOrder(0, new DrinkOrder { Target = new Taste(2, 2, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" });
+                    game.SetOrder(0, new DrinkOrder { Target = new Taste(2, 3, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" });
                 }),
-                (0.3f, "ring", () =>
+                (0.3f, "adjust by the panel", () =>
+                {
+                    Expect(Press(PanelButton(station, "Button + Sweet")), "the panel has a + Sweet button");
+                    Expect(highball.FinalStats == new Taste(2, 3, 0) && highball.AdjustmentLeft == 0, "pressing + Sweet adds the mixed drink's 1 point");
+                }),
+                (0.1f, "ring", () =>
                 {
                     int before = game.ServedCount;
-                    station.Serve();
+                    Expect(Press(station.Bell), "the bell is a button");
                     Expect(game.ServedCount == before + 1, "a correct drink is accepted");
                     Expect(highball.IsEmpty && !highball.Cold && highball.Garnish == null, "the served glass is emptied and sent home");
                     Expect(game.Seats[0].Order == null && game.Seats[0].StoryIndex == 1, "the customer tells the next story line");
@@ -260,7 +279,7 @@ namespace MoonlitTails.EditorTools
                 (0.3f, "ring wrong", () =>
                 {
                     int before = game.ServedCount;
-                    station.Serve();
+                    Expect(Press(PanelButton(station, "Button Serve")), "the panel has a Serve button");
                     Expect(game.ServedCount == before, "a wrong drink isn't accepted");
                     Expect(game.Seats.Any(c => c.Missed), "the customer's ticket now shows a tip");
                     Expect(!rocks.IsEmpty, "a refused drink stays in the glass");

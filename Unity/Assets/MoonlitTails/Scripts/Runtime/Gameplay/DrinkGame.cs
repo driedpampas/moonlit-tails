@@ -92,7 +92,7 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ start
         void Start()
         {
-            if (!serve) BuildFromNames();
+            if (!serve || !resetButton || !rulesSign || !menuBoardText) BuildFromNames();
             rng = new System.Random();
             glasses = FindObjectsByType<DrinkContainer>(FindObjectsSortMode.None).Where(c => c.IsGlass && !string.IsNullOrEmpty(c.variant))
                 .GroupBy(c => c.variant).Select(g => new GlassVariant(g.Key, g.First().length)).OrderBy(g => g.Name).ToList();
@@ -276,7 +276,7 @@ namespace MoonlitTails.Gameplay
         string Pick(string[] lines) => lines == null || lines.Length == 0 ? "" : lines[rng.Next(lines.Length)];
 
         // ------------------------------------------------------------------ transition: finding props by name
-        /// <summary>Transition: builds the serve panel, reset button and rules signs, which aren't in the scene yet.</summary>
+        /// <summary>Transition: builds whichever of the serve panel, reset button and rules signs aren't in the scene yet.</summary>
         void BuildFromNames()
         {
             var bar = GameObject.Find("MoonlitBar");
@@ -288,13 +288,19 @@ namespace MoonlitTails.Gameplay
 
             if (plan.serveSpot && plan.player)
             {
-                serve = gameObject.AddComponent<ServeStation>();
-                serve.Init(plan.serveSpot, plan.player, plan.bell ? plan.bell.GetComponent<XRBaseInteractable>() : null, this);
-                var reset = ResetButton.Create(transform, plan.player, plan.serveSpot);
-                if (reset) resetButtonObject = reset.transform;
-                PutRulesOnBackWall(transform, bar.transform, plan.player, plan.serveSpot);
+                if (!serve)
+                {
+                    serve = gameObject.AddComponent<ServeStation>();
+                    serve.Init(plan.serveSpot, plan.player, plan.bell ? plan.bell.GetComponent<XRBaseInteractable>() : null, this);
+                }
+                if (!resetButton)
+                {
+                    var reset = ResetButton.Create(transform, plan.player, plan.serveSpot);
+                    if (reset) resetButtonObject = reset.transform;
+                }
+                if (!rulesSign) PutRulesOnBackWall(transform, bar.transform, plan.player, plan.serveSpot);
             }
-            if (plan.menuBoard && plan.player) WriteMenuBoard(plan.menuBoard, plan.player);
+            if (!menuBoardText && plan.menuBoard && plan.player) WriteMenuBoard(plan.menuBoard, plan.player);
         }
 
         public class SetupPlan

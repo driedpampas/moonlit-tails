@@ -43,7 +43,7 @@ namespace MoonlitTails.EditorTools
         }
 
         static readonly string[] Groups = { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "RemadeModels" };
-        static readonly string[] FixedProps = { "PROP_TapHandle", "PROP_DispenserLever", "PROP_OrderTicket" };
+        static readonly string[] FixedProps = { "PROP_TapHandle", "PROP_DispenserLever", "PROP_OrderTicket", "PROP_ServiceBell" };
         static readonly string[] NoCollider = { "StringLights", "Neon", "Pendant", "Lantern", "WallStars", "Sconces", "Noren", "IceCubes", "Picture", "Medallion", "Straw", "SKY_" };
 
         static bool CheckBar(out int problems)
@@ -246,6 +246,14 @@ namespace MoonlitTails.EditorTools
 
             foreach (var field in new[] { "playerSpot", "iceScoop" })
                 if (!so.FindProperty(field).objectReferenceValue) issues.Add($"Drink Game: {field} isn't set");
+
+            if (so.FindProperty("serve").objectReferenceValue is ServeStation station)
+            {
+                var sso = new SerializedObject(station);
+                foreach (var field in new[] { "serveSpot", "game", "bell", "title", "info" })
+                    if (!sso.FindProperty(field).objectReferenceValue) issues.Add($"Serve Panel: {field} isn't set");
+                if (sso.FindProperty("game").objectReferenceValue != game) issues.Add("Serve Panel: its Drink Game isn't this one");
+            }
             // transition: the game builds these when Play starts until they are in the scene
             foreach (var field in new[] { "serve", "resetButton", "rulesSign", "menuBoardText" })
                 if (!so.FindProperty(field).objectReferenceValue) sb.AppendLine($"  {field}: not in the scene yet (built when Play starts)");
