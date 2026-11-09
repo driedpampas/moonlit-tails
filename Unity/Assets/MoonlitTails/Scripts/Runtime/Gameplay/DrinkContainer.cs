@@ -27,14 +27,16 @@ namespace MoonlitTails.Gameplay
     /// Glasses hold either one mixed drink or up to their capacity of layers, plus ice, a garnish and the
     /// end-of-drink stat adjustment. Tip anything out over nothing to empty it.
     /// </summary>
-    public class DrinkContainer : MonoBehaviour, IPourer
+    public class DrinkContainer : Pourer
     {
         public static readonly List<DrinkContainer> All = new List<DrinkContainer>();
         public const int VesselCapacity = 5;
 
         public ContainerKind kind;
-        [Tooltip("For glasses: the variant customers ask for, e.g. Highball.")] public string variant;
+        [Tooltip("For glasses: the variant customers ask for, e.g. Highball. For the vessels: Stir Cup / Shake Mixer.")] public string variant;
         public GlassLength length = GlassLength.Medium;
+        [Tooltip("The label shows when the player's head is closer than this (m). 0 = always.")]
+        [SerializeField] float showWithin = -1f;   // -1 = default: 0.9 m for glasses, always for the vessels
 
         // mixing vessels
         readonly List<Liquid> parts = new List<Liquid>();
@@ -53,8 +55,6 @@ namespace MoonlitTails.Gameplay
         public bool IsHeld => grab && grab.isSelected;
         public int Capacity => IsGlass ? Glass.Capacity(length) : VesselCapacity;
 
-        Vector3 upAxis;
-        Bounds bounds;
         XRGrabInteractable grab;
         PropRespawn home;
         Transform liquidRoot;
@@ -65,14 +65,27 @@ namespace MoonlitTails.Gameplay
         Vector3 lastPos, lastDir;
         readonly Queue<float> reversals = new Queue<float>();
 
+        bool setUp;
+
+        void Awake()
+        {
+            if (!string.IsNullOrEmpty(variant)) EnsureSetUp();
+        }
+
+        /// <summary>Configures a container added from code. Prefabs set kind, variant and length in the Inspector instead.</summary>
         public void Init(ContainerKind k, string variantName, GlassLength len)
         {
             kind = k; variant = variantName; length = len;
-            upAxis = GameVisuals.LocalUpAxis(transform);
-            bounds = GameVisuals.LocalBounds(gameObject);
+            EnsureSetUp();
+        }
+
+        void EnsureSetUp()
+        {
+            if (setUp) return;
+            setUp = true;
+            EnsureGeometry();
             grab = GetComponent<XRGrabInteractable>();
             home = GetComponent<PropRespawn>();
-            gameObject.AddComponent<PourSpout>().Init(this, true);
 
             liquidRoot = new GameObject("Liquid").transform;
             liquidRoot.SetParent(transform, false);
@@ -80,12 +93,13 @@ namespace MoonlitTails.Gameplay
             liquidRoot.localPosition = bounds.center;
 
             Label = FloatingLabel.Create(transform, OpeningWorld.y - transform.position.y + 0.05f, IsGlass ? 0.22f : 0.26f);
-            if (IsGlass) Label.showWithin = 0.9f;
+            Label.showWithin = showWithin >= 0f ? showWithin : IsGlass ? 0.9f : 0f;
             lastPos = transform.position;
+            if (isActiveAndEnabled && !All.Contains(this)) All.Add(this);
             Refresh();
         }
 
-        void OnEnable() { if (!All.Contains(this)) All.Add(this); }
+        void OnEnable() { if (setUp && !All.Contains(this)) All.Add(this); }
         void OnDisable() => All.Remove(this);
 
         // ------------------------------------------------------------------ geometry
@@ -235,7 +249,7 @@ namespace MoonlitTails.Gameplay
             Vector3 side = Vector3.Cross(Vector3.up, transform.right).normalized;
             if (side.sqrMagnitude < 0.01f) side = Vector3.forward;
             g.AttachTo(this, OpeningWorld + side * OpeningRadiusWorld * 0.9f);
-            Label.Flash($"Garnish: {g.color}", GameVisuals.Good);
+            if (Label) Label.Flash($"Garnish: {g.color}", GameVisuals.Good);
             Refresh();
         }
 
@@ -256,7 +270,7 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ mixing
         public void TryMix(MixMethod method)
         {
-            if (IsGlass || parts.Count < 2) return;
+            if (IsGlass || parts.Count < 2 || !setUp) return;
             var result = Mixing.Combine(parts[0], parts[1], method);
             switch (result.Outcome)
             {
@@ -279,9 +293,10 @@ namespace MoonlitTails.Gameplay
             Refresh();
         }
 
-        void Update()
+        protected override void Update()
         {
-            if (IsGlass) return;
+            base.Update();   // pouring
+            if (IsGlass || !setUp) return;
             // hand shaking: quick back-and-forth while held
             Vector3 p = transform.position;
             float dt = Time.deltaTime;
@@ -308,10 +323,11 @@ namespace MoonlitTails.Gameplay
         }
 
         // ------------------------------------------------------------------ pouring out
-        public bool HasSomethingToPour => !IsEmpty;
-        public Color StreamColor => IsGlass ? GameVisuals.LiquidColor(RawStats) : GameVisuals.LiquidColor(parts.Count > 0 ? parts[0].Stats : Taste.Zero);
+        public override bool HasSomethingToPour => !IsEmpty;
+        protected override bool CanDump => true;
+        public override Color StreamColor => IsGlass ? GameVisuals.LiquidColor(RawStats) : GameVisuals.LiquidColor(parts.Count > 0 ? parts[0].Stats : Taste.Zero);
 
-        public bool PourInto(DrinkContainer target, out string message)
+        public override bool PourInto(DrinkContainer target, out string message)
         {
             if (IsGlass) { message = "Serve the glass at the serve spot"; return false; }
             if (parts.Count != 1) { message = "Mix it first"; return false; }
@@ -339,11 +355,11 @@ namespace MoonlitTails.Gameplay
             return landed && !collapsed;
         }
 
-        public void Dump()
+        public override void Dump()
         {
             if (IsEmpty && !Cold && !Garnish) return;
             Clear();
-            Label.Flash("Emptied", GameVisuals.Ink, 1.5f);
+            if (Label) Label.Flash("Emptied", GameVisuals.Ink, 1.5f);
         }
 
         public void Clear()

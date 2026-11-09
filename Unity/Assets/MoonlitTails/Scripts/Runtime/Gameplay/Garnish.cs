@@ -8,19 +8,35 @@ namespace MoonlitTails.Gameplay
     /// <summary>A fruit slice. Let go of it near a glass's rim and it sticks there, giving the drink its colour.</summary>
     public class Garnish : MonoBehaviour
     {
+        [Tooltip("The colour this garnish gives a drink, e.g. Lime. Customers ask for it by this name.")]
         public string color;
+        [Tooltip("How close to a glass's rim (m) it has to be let go to stick.")]
         public float reach = 0.07f;
 
         XRGrabInteractable grab;
         Rigidbody body;
-        Collider[] colliders;
+        Collider[] colliders = new Collider[0];
         PropRespawn home;
         DrinkContainer glass;
         Transform originalParent;
+        bool setUp;
 
+        void Awake()
+        {
+            if (!string.IsNullOrEmpty(color)) EnsureSetUp();
+        }
+
+        /// <summary>Configures a garnish added from code. Prefabs set the colour in the Inspector instead.</summary>
         public void Init(string garnishColor)
         {
             color = garnishColor;
+            EnsureSetUp();
+        }
+
+        void EnsureSetUp()
+        {
+            if (setUp) return;
+            setUp = true;
             originalParent = transform.parent;
             grab = GetComponent<XRGrabInteractable>();
             body = GetComponent<Rigidbody>();
@@ -49,7 +65,7 @@ namespace MoonlitTails.Gameplay
         {
             glass = target;
             if (body) { body.isKinematic = true; body.detectCollisions = false; }
-            foreach (var c in colliders) c.enabled = false;
+            foreach (var c in colliders) if (c) c.enabled = false;
             if (grab) grab.enabled = false;
             transform.SetParent(target.transform, true);
             transform.position = rimPoint;
@@ -61,7 +77,7 @@ namespace MoonlitTails.Gameplay
             var from = glass;
             glass = null;
             transform.SetParent(originalParent, true);
-            foreach (var c in colliders) c.enabled = true;
+            foreach (var c in colliders) if (c) c.enabled = true;
             if (body) { body.isKinematic = false; body.detectCollisions = true; }
             if (grab) grab.enabled = true;
             if (from) from.ForgetGarnish(this);

@@ -7,6 +7,7 @@ using System.Text;
 using MoonlitTails.Gameplay;
 using TMPro;
 using Unity.Profiling;
+using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
@@ -136,7 +137,7 @@ namespace MoonlitTails.EditorTools
                     var glass = DrinkContainer.All.First(c => c.IsGlass && c.variant == "Highball");
                     Hold(glass.transform);
                     var station = UnityEngine.Object.FindFirstObjectByType<ServeStation>();
-                    station.Snap.Snap(glass);
+                    station.TrySnap(glass);
                     BeginWindow(Phase.Coaster);
                     return;
 
@@ -283,23 +284,22 @@ namespace MoonlitTails.EditorTools
         {
             var sb = new StringBuilder("{");
             var game = UnityEngine.Object.FindFirstObjectByType<DrinkGame>();
-            var station = UnityEngine.Object.FindFirstObjectByType<ServeStation>();
             var roots = new List<Transform>();
-            if (station) roots.Add(station.transform.Find("Serve Panel"));
             if (game)
             {
-                roots.Add(game.transform.Find(ResetButton.Name));
-                roots.Add(game.transform.Find("How To Play Sign"));
+                if (game.Station) roots.Add(game.Station.Panel);
+                var reset = game.ResetButtonObject;
+                if (reset) roots.Add(reset.parent ? reset.parent : reset);   // the whole button: base, dome, caption
+                roots.Add(game.RulesSign);
+                roots.Add(game.MenuBoardText);
             }
-            var chalk = GameObject.Find("How To Play");
-            if (chalk) roots.Add(chalk.transform);
             sb.Append("\"built\":[").Append(string.Join(",", roots.Where(r => r).Select(r => Node(r)))).Append("],");
 
-            var layout = UnityEngine.Object.FindFirstObjectByType<BarLayout>();
-            var chars = layout ? layout.characters.Where(c => c.character).Select(c =>
-                $"{{\"id\":{Str(c.id)},\"seated\":{(c.seated ? "true" : "false")},\"transform\":{Pose(c.character)}}}") : Enumerable.Empty<string>();
+            var chars = game ? game.Seats.Where(c => c.Body).Select(c =>
+                $"{{\"id\":{Str(c.Body.name)},\"name\":{Str(c.DisplayName)},\"transform\":{Pose(c.Body)}}}") : Enumerable.Empty<string>();
             sb.Append("\"characters\":[").Append(string.Join(",", chars)).Append("],");
-            sb.Append("\"xrOrigin\":").Append(layout && layout.xrOrigin ? Pose(layout.xrOrigin) : "null").Append(',');
+            var origin = UnityEngine.Object.FindFirstObjectByType<XROrigin>();
+            sb.Append("\"xrOrigin\":").Append(origin ? Pose(origin.transform) : "null").Append(',');
 
             var labels = UnityEngine.Object.FindObjectsByType<FloatingLabel>(FindObjectsSortMode.None)
                 .Where(l => l.target).OrderBy(l => l.target.name)
@@ -366,7 +366,7 @@ namespace MoonlitTails.EditorTools
 
         static void TipOver(IngredientSource source, DrinkContainer into)
         {
-            var spout = source.GetComponent<PourSpout>();
+            var spout = source.GetComponent<Pourer>();
             source.transform.rotation = Quaternion.AngleAxis(130f, Vector3.right) * bottleUpright;
             source.transform.position += into.OpeningWorld + Vector3.up * 0.12f - spout.SpoutWorld;
         }

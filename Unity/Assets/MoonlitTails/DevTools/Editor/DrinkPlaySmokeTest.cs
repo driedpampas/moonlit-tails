@@ -112,7 +112,7 @@ namespace MoonlitTails.EditorTools
         static void TipOver(Component c, DrinkContainer into)
         {
             Hold(c);
-            var spout = c.GetComponent<PourSpout>();
+            var spout = c.GetComponent<Pourer>();
             c.transform.rotation = Quaternion.AngleAxis(130f, Vector3.right) * upright[c.transform];
             Vector3 target = into.OpeningWorld + Vector3.up * 0.12f;
             c.transform.position += target - spout.SpoutWorld;
@@ -122,26 +122,24 @@ namespace MoonlitTails.EditorTools
         static void TipOverNothing(Component c, Vector3 where)
         {
             Hold(c);
-            var spout = c.GetComponent<PourSpout>();
+            var spout = c.GetComponent<Pourer>();
             c.transform.rotation = Quaternion.AngleAxis(130f, Vector3.right) * upright[c.transform];
             c.transform.position += where - spout.SpoutWorld;
             Physics.SyncTransforms();
         }
 
-        static Transform Find(string n) => GameObject.Find("MoonlitBar").GetComponentsInChildren<Transform>(true).First(t => t.name == n);
-
         // ------------------------------------------------------------------ the script
         static List<(float, string, Action)> BuildSteps()
         {
-            var serve = Find(DrinkGame.ServeSpot).position;
+            var game = UnityEngine.Object.FindFirstObjectByType<DrinkGame>();
+            var station = game.Station;
+            var serve = station.ServeSpot.position;
             Vector3 right = Vector3.right * 0.35f, up = Vector3.up * 0.25f;
             Vector3 work = serve + up;   // a work area floating above the counter, out of the way
             var shaker = Vessel(ContainerKind.ShakeMixer);
             var cup = Vessel(ContainerKind.StirCup);
             var highball = GlassOf("Highball");
             var rocks = GlassOf("Rocks");
-            var game = UnityEngine.Object.FindFirstObjectByType<DrinkGame>();
-            var station = UnityEngine.Object.FindFirstObjectByType<ServeStation>();
             var whiskey = Source(Ingredients.Whiskey);
             var cola = Source(Ingredients.Cola);
             var tonic = Source(Ingredients.TonicWater);
@@ -156,7 +154,7 @@ namespace MoonlitTails.EditorTools
                     Place(highball, work - right);
                     Place(rocks, work - right * 2f);
                     Expect(shaker.IsEmpty && cup.IsEmpty && highball.IsEmpty, "containers start empty");
-                    Expect(game.Orders.Customers.Count == 3, "three customers");
+                    Expect(game.Seats.Count == 3, "three customers");
                 }),
                 (0.2f, "pour whiskey", () => TipOver(whiskey, shaker)),
                 (0.9f, "check whiskey", () =>
@@ -191,7 +189,7 @@ namespace MoonlitTails.EditorTools
                 (0.2f, "fill ice scoop", () =>
                 {
                     var scoop = UnityEngine.Object.FindFirstObjectByType<IceScoop>();
-                    var well = GameVisuals.WorldBounds(Find(DrinkGame.IceWell)).center;
+                    var well = GameVisuals.WorldBounds(game.IceScoop.IceWell).center;
                     Hold(scoop);
                     scoop.transform.position += well - scoop.GetComponent<Renderer>().bounds.center;
                 }),
@@ -212,16 +210,15 @@ namespace MoonlitTails.EditorTools
                 (0.2f, "serve", () =>
                 {
                     Place(highball, serve + Vector3.up * 0.01f);
-                    var c = game.Orders.Customers[0];
-                    c.order = new DrinkOrder { Target = new Taste(2, 2, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" };
+                    game.SetOrder(0, new DrinkOrder { Target = new Taste(2, 2, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" });
                 }),
                 (0.3f, "ring", () =>
                 {
-                    int before = game.Orders.Served;
+                    int before = game.ServedCount;
                     station.Serve();
-                    Expect(game.Orders.Served == before + 1, "a correct drink is accepted");
+                    Expect(game.ServedCount == before + 1, "a correct drink is accepted");
                     Expect(highball.IsEmpty && !highball.Cold && highball.Garnish == null, "the served glass is emptied and sent home");
-                    Expect(game.Orders.Customers[0].order == null && game.Orders.Customers[0].storyIndex == 1, "the customer tells the next story line");
+                    Expect(game.Seats[0].Order == null && game.Seats[0].StoryIndex == 1, "the customer tells the next story line");
                 }),
                 (0.2f, "stir cup: whiskey", () => { Place(whiskey, away); TipOver(whiskey, cup); }),
                 (0.9f, "stir cup: tonic", () => { Place(whiskey, away); TipOver(tonic, cup); }),
@@ -257,15 +254,15 @@ namespace MoonlitTails.EditorTools
                 (0.1f, "wrong serve", () =>
                 {
                     Place(rocks, serve + Vector3.up * 0.01f);
-                    foreach (var c in game.Orders.Customers)
-                        if (c.order == null) c.order = new DrinkOrder { Target = new Taste(9, 9, 9), Method = PrepMethod.Mixed, GlassVariant = "Wine", Hint = "test" };
+                    for (int i = 0; i < game.Seats.Count; i++)
+                        if (game.Seats[i].Order == null) game.SetOrder(i, new DrinkOrder { Target = new Taste(9, 9, 9), Method = PrepMethod.Mixed, GlassVariant = "Wine", Hint = "test" });
                 }),
                 (0.3f, "ring wrong", () =>
                 {
-                    int before = game.Orders.Served;
+                    int before = game.ServedCount;
                     station.Serve();
-                    Expect(game.Orders.Served == before, "a wrong drink isn't accepted");
-                    Expect(game.Orders.Customers.Any(c => c.missed), "the customer's ticket now shows a tip");
+                    Expect(game.ServedCount == before, "a wrong drink isn't accepted");
+                    Expect(game.Seats.Any(c => c.Missed), "the customer's ticket now shows a tip");
                     Expect(!rocks.IsEmpty, "a refused drink stays in the glass");
                 }),
                 (0.1f, "dump", () => TipOverNothing(rocks, serve + Vector3.up * 0.6f + right * 2f)),
@@ -274,32 +271,29 @@ namespace MoonlitTails.EditorTools
                 (0.9f, "check raw", () => Expect(rocks.IsEmpty, "raw ingredients can't go straight into a glass")),
                 (0.1f, "coaster snap", () =>
                 {
-                    var snap = station.Snap;
                     Hold(rocks);
                     rocks.transform.rotation = Quaternion.AngleAxis(35f, Vector3.forward) * upright[rocks.transform];
                     rocks.transform.position = serve + new Vector3(0.07f, 0.12f, -0.04f);
                     Physics.SyncTransforms();
-                    Expect(snap.InReach(rocks), "a tilted glass let go just above the coaster is close enough to snap");
-                    Expect(snap.Snap(rocks), "it snaps onto the coaster");
+                    Expect(station.InReach(rocks), "a tilted glass let go just above the coaster is close enough to snap");
+                    Expect(station.TrySnap(rocks), "it snaps onto the coaster");
                     Vector3 off = rocks.CenterWorld - serve; float lift = rocks.BottomWorld.y - serve.y; off.y = 0;
                     Expect(Vector3.Angle(rocks.UpWorld, Vector3.up) < 1f, "the snapped glass stands upright");
                     Expect(off.magnitude < 0.005f && Mathf.Abs(lift) < 0.005f, "the snapped glass stands in the middle of the coaster");
-                    Expect(!snap.Snap(highball), "a second glass doesn't snap onto a taken coaster");
+                    Expect(!station.TrySnap(highball), "a second glass doesn't snap onto a taken coaster");
                     Place(highball, serve + new Vector3(0.5f, 0.12f, 0f));
-                    Expect(!snap.InReach(highball), "a glass let go farther away doesn't snap");
+                    Expect(!station.InReach(highball), "a glass let go farther away doesn't snap");
                 }),
                 (0.2f, "reset button", () =>
                 {
-                    var button = UnityEngine.Object.FindObjectsByType<PokeButton>(FindObjectsSortMode.None)
-                        .FirstOrDefault(b => b.transform.parent && b.transform.parent.name == ResetButton.Name);
-                    Expect(button != null, "the reset button is on the counter");
+                    Expect(game.ResetButtonObject != null, "the reset button is on the counter");
                     Place(whiskey, away);
                     Place(cup, away + right);
-                    button?.Press();
+                    game.ResetAllProps();
                     bool AtHome(Component c) { var h = c.GetComponent<PropRespawn>(); return h && Vector3.Distance(c.transform.position, h.HomePosition) < 0.001f; }
                     Expect(AtHome(whiskey) && AtHome(cup) && AtHome(rocks) && AtHome(highball), "pressing it puts the props back where they started");
                 }),
-                (0.2f, "check reset", () => Expect(station.Snap.Glass == null, "a glass sent home leaves the coaster")),
+                (0.2f, "check reset", () => Expect(station.CoasterGlass == null, "a glass sent home leaves the coaster")),
             }).ToList();
         }
 

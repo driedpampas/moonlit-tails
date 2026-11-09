@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using MoonlitTails.Gameplay;
+using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -61,8 +63,6 @@ namespace MoonlitTails.EditorTools
                 if (phase == 0 && t > 4)
                 {
                     report.AppendLine($"Play mode ran {Time.frameCount} frames, game time {Time.time:F1} s");
-                    foreach (var c in UnityEngine.Object.FindFirstObjectByType<BarLayout>().characters)
-                        if (c.seated) report.AppendLine($"{c.id}: measured seated hip height {c.seatedHipHeight:F3} (per metre)");
                     SettleReport(); Shoot(); ThrowGlass(); phase = 1;
                 }
                 else if (phase == 1 && t > 7) { ThrowReport(); ResetAll(); phase = 2; }
@@ -86,8 +86,8 @@ namespace MoonlitTails.EditorTools
         // ------------------------------------------------------------------ views
         static void Shoot()
         {
-            var layout = UnityEngine.Object.FindFirstObjectByType<BarLayout>();
-            Transform origin = layout.xrOrigin;
+            var game = UnityEngine.Object.FindFirstObjectByType<DrinkGame>();
+            Transform origin = Origin();
             Vector3 eye = origin.position + Vector3.up * EyeHeight;
             Quaternion facing = Quaternion.Euler(0, origin.eulerAngles.y, 0);
 
@@ -114,21 +114,20 @@ namespace MoonlitTails.EditorTools
 
             // close-ups of each character from the player's eye, narrower lens
             cam.fieldOfView = 45f;
-            foreach (var c in layout.characters)
+            foreach (var c in game.Seats)
             {
-                if (!c.character) continue;
-                var anim = c.character.GetComponent<Animator>();
+                if (!c.Body) continue;
+                var anim = c.Body.GetComponent<Animator>();
                 var head = anim ? anim.GetBoneTransform(HumanBodyBones.Head) : null;
-                Vector3 target = head ? head.position : c.character.position + Vector3.up * 0.7f;
+                Vector3 target = head ? head.position : c.Body.position + Vector3.up * 0.7f;
                 go.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(target - Vector3.up * 0.25f - eye));
-                Save(cam, "20_char_" + c.id, 1600, 1200);
-                report.AppendLine($"{c.id}: head at {target.y:F2} m (player eye {eye.y:F2} m), {Vector3.Distance(eye, target):F2} m away");
+                Save(cam, "20_char_" + c.Body.name, 1600, 1200);
+                report.AppendLine($"{c.Body.name} ({c.DisplayName}): head at {target.y:F2} m (player eye {eye.y:F2} m), {Vector3.Distance(eye, target):F2} m away");
             }
 
             // overview from the back corner of the room
             cam.fieldOfView = 75f;
-            var bar = layout.environment;
-            var serve = bar.GetComponentsInChildren<Transform>(true).First(t => t.name == "MK_ServeSpot");
+            var serve = game.Station.ServeSpot;
             Vector3 fwd = (serve.position - origin.position); fwd.y = 0; fwd.Normalize();
             Vector3 right = Vector3.Cross(Vector3.up, fwd);
             Vector3 overviewPos = origin.position - fwd * 1.2f + right * 3.6f + Vector3.up * 3.0f;
@@ -166,21 +165,22 @@ namespace MoonlitTails.EditorTools
 
         static void ThrowGlass()
         {
-            thrown = Props().FirstOrDefault(r => r.name.Contains("Glass_Rocks_01")) ?? Props().First();
-            var layout = UnityEngine.Object.FindFirstObjectByType<BarLayout>();
+            var rocks = DrinkContainer.All.FirstOrDefault(c => c.IsGlass && c.variant == "Rocks");
+            thrown = rocks ? rocks.GetComponent<Rigidbody>() : Props().First();
+            var origin = Origin();
             thrownFrom = thrown.position;
             // a gentle toss from above the counter toward the back bar
-            thrown.position = layout.xrOrigin.position + Vector3.up * 1.3f;
-            thrown.linearVelocity = -layout.xrOrigin.forward * 3f + Vector3.up * 1.5f;
+            thrown.position = origin.position + Vector3.up * 1.3f;
+            thrown.linearVelocity = -origin.forward * 3f + Vector3.up * 1.5f;
             thrown.angularVelocity = new Vector3(4, 1, 2);
         }
 
         static void ThrowReport()
         {
-            var layout = UnityEngine.Object.FindFirstObjectByType<BarLayout>();
-            float floorY = layout.xrOrigin.position.y;
+            var origin = Origin();
+            float floorY = origin.position.y;
             report.AppendLine($"Throw: {thrown.name} ended at height {thrown.position.y - floorY:F2} m above the player floor, " +
-                              $"{Vector3.Distance(thrown.position, layout.xrOrigin.position):F2} m from the player, speed now {thrown.linearVelocity.magnitude:F2} m/s");
+                              $"{Vector3.Distance(thrown.position, origin.position):F2} m from the player, speed now {thrown.linearVelocity.magnitude:F2} m/s");
         }
 
         static void ResetAll()
@@ -194,6 +194,8 @@ namespace MoonlitTails.EditorTools
         }
 
         // ------------------------------------------------------------------ helpers
+        static Transform Origin() => UnityEngine.Object.FindFirstObjectByType<XROrigin>().transform;
+
         static string CaptureDir()
         {
             string dir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Captures"));

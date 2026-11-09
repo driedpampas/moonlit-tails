@@ -1,23 +1,87 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonlitTails.Drinks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.Gameplay
 {
     /// <summary>
-    /// Turns the bar's props into the drink-making game when Play starts. It adds itself to any scene with a
-    /// "MoonlitBar" object, so the scene file doesn't need editing (no scene merges).
+    /// The night at the bar: the customers and their orders (one ticket per customer on the ticket rail, a speech
+    /// bubble over each customer, the check when a drink is served), the reset button, and putting props back when
+    /// they leave the bar. A correct drink tells the next line of that customer's story.
     ///
-    /// Which prop is which ingredient, glass size, etc. is all in the tables below. Change them freely: the props
-    /// are found by name, and Tools > Moonlit Tails > Automation > Check Scene lists what matched.
+    /// Transition: until the scene has its own Drink Game object, it adds itself to any scene with a "MoonlitBar"
+    /// object and finds the props by name (see <see cref="Plan"/>).
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {
-        // ------------------------------------------------------------------ tables (edit these)
-        /// <summary>Prop name prefix (after "PROP_") to ingredient. Each prop shows a label with its ingredient name.</summary>
+        /// <summary>A customer's place: who sits there and which ticket on the rail is theirs.</summary>
+        [Serializable]
+        public class Seat
+        {
+            public CustomerProfile profile;
+            [Tooltip("The character model.")] public Transform body;
+            [Tooltip("Their ticket on the ticket rail.")] public Transform ticketSpot;
+        }
+
+        /// <summary>A customer during play. Read it from tools; change it only through DrinkGame's methods.</summary>
+        public sealed class SeatState
+        {
+            public CustomerProfile Profile { get; internal set; }
+            public string DisplayName => Profile ? Profile.displayName : "Customer";
+            public Transform Body { get; internal set; }
+            public Transform TicketSpot { get; internal set; }
+            public FloatingLabel Bubble { get; internal set; }
+            public FloatingLabel Ticket { get; internal set; }
+            public DrinkOrder Order { get; internal set; }
+            public int StoryIndex { get; internal set; }
+            public bool Missed { get; internal set; }
+            internal float nextOrderAt;
+        }
+
+        [Header("Customers")]
+        [SerializeField] List<Seat> seats = new List<Seat>();
+        [Tooltip("Seconds between a served drink and that customer's next order.")]
+        public float newOrderDelay = 5f;
+
+        [Header("Scene")]
+        [SerializeField] ServeStation serve;
+        [Tooltip("Where the player stands (MK_PlayerStart).")]
+        [SerializeField] Transform playerSpot;
+        [SerializeField] IceScoop iceScoop;
+        [Tooltip("Pressing it puts every prop back where it started.")]
+        [SerializeField] XRBaseInteractable resetButton;
+        [Tooltip("The rules sign on the back wall.")]
+        [SerializeField] Transform rulesSign;
+        [Tooltip("The rules written on the chalkboard.")]
+        [SerializeField] Transform menuBoardText;
+        [Tooltip("Editor/dev shortcut: R on the keyboard resets the props too.")]
+        [SerializeField] bool keyboardReset = true;
+
+        public IReadOnlyList<SeatState> Seats => states;
+        public int ServedCount { get; private set; }
+        public ServeStation Station => serve;
+        public Transform PlayerSpot => playerSpot;
+        public IceScoop IceScoop => iceScoop;
+        public Transform RulesSign => rulesSign;
+        public Transform MenuBoardText => menuBoardText;
+        public Transform ResetButtonObject => resetButtonObject ? resetButtonObject : resetButton ? resetButton.transform : null;
+
+        readonly List<SeatState> states = new List<SeatState>();
+        readonly List<CustomerProfile> runtimeProfiles = new List<CustomerProfile>();
+        IReadOnlyList<GlassVariant> glasses = new GlassVariant[0];
+        IReadOnlyList<string> garnishColors = new string[0];
+        System.Random rng;
+        bool ordersEnabled, resetHooked;
+        Transform resetButtonObject;   // transition: the runtime-built reset button
+
+        // ------------------------------------------------------------------ transition: prop names
+        /// <summary>Prop name prefix (after "PROP_") to ingredient.</summary>
         public static readonly (string prop, Ingredient ingredient)[] Sources =
         {
             // base drinks
@@ -53,62 +117,257 @@ namespace MoonlitTails.Gameplay
             ["Wine"] = GlassLength.Long,
         };
 
-        public const string StirCupProp = "PROP_Blender_Jar";
-        public const string ShakeMixerProp = "PROP_Shaker_Tin";
-        public const string SpoonProp = "PROP_BarSpoon";
-        public const string IceScoopProp = "PROP_IceScoop";
-        public const string IceWell = "ENV_IceWell";
-        public const string BellProp = "PROP_ServiceBell";
-        public const string ServeSpot = "MK_ServeSpot";
-        public const string PlayerSpot = "MK_PlayerStart";
-        public const string MenuBoard = "DECO_MenuBoard";
-        public static readonly string[] Tickets = { "PROP_OrderTicket_01", "PROP_OrderTicket_02", "PROP_OrderTicket_03" };
+        public const string StirCupPropName = "PROP_Blender_Jar";
+        public const string ShakeMixerPropName = "PROP_Shaker_Tin";
+        public const string SpoonPropName = "PROP_BarSpoon";
+        public const string IceScoopPropName = "PROP_IceScoop";
+        public const string IceWellName = "ENV_IceWell";
+        public const string BellPropName = "PROP_ServiceBell";
+        public const string ServeSpotName = "MK_ServeSpot";
+        public const string PlayerSpotName = "MK_PlayerStart";
+        public const string MenuBoardName = "DECO_MenuBoard";
+        public static readonly string[] TicketNames = { "PROP_OrderTicket_01", "PROP_OrderTicket_02", "PROP_OrderTicket_03" };
 
-        // ------------------------------------------------------------------ boot
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
         {
             if (FindFirstObjectByType<DrinkGame>() != null) return;
             if (GameObject.Find("MoonlitBar") == null) return;
-            new GameObject("Drink Game").AddComponent<DrinkGame>();
+            new GameObject("Drink Game").AddComponent<DrinkGame>().bootstrapped = true;
         }
 
-        public OrderBook Orders { get; private set; }
+        bool bootstrapped;
 
+        // ------------------------------------------------------------------ start
         void Start()
+        {
+            if (bootstrapped) BuildFromNames();
+            rng = new System.Random();
+            glasses = FindObjectsByType<DrinkContainer>(FindObjectsSortMode.None).Where(c => c.IsGlass && !string.IsNullOrEmpty(c.variant))
+                .GroupBy(c => c.variant).Select(g => new GlassVariant(g.Key, g.First().length)).OrderBy(g => g.Name).ToList();
+            garnishColors = FindObjectsByType<Garnish>(FindObjectsSortMode.None).Where(g => !string.IsNullOrEmpty(g.color))
+                .Select(g => g.color).Distinct().OrderBy(c => c).ToList();
+
+            ordersEnabled = true;
+            if (!serve) { Debug.LogError($"[Moonlit] {name}: no ServeStation set, so drinks can't be served", this); ordersEnabled = false; }
+            if (seats.Count == 0) { Debug.LogError($"[Moonlit] {name}: no customer seats set", this); ordersEnabled = false; }
+            if (glasses.Count == 0) { Debug.LogError($"[Moonlit] {name}: no glasses in the scene, so customers can't order", this); ordersEnabled = false; }
+
+            int i = 0;
+            foreach (var seat in seats)
+            {
+                if (!seat.body) continue;
+                var profile = seat.profile;
+                if (!profile) { profile = CustomerProfile.Fallback(seat.body.name); runtimeProfiles.Add(profile); }
+                var s = new SeatState { Profile = profile, Body = seat.body, TicketSpot = seat.ticketSpot };
+                s.Bubble = FloatingLabel.Create(seat.body, HeadHeight(seat.body) + 0.12f, 0.28f);
+                if (seat.ticketSpot) s.Ticket = FloatingLabel.Create(seat.ticketSpot, 0.06f, 0.2f);
+                s.nextOrderAt = Time.time + 1.5f + i * 2.5f;   // customers order one after another
+                states.Add(s);
+                ShowTicket(states.Count - 1);
+                i++;
+            }
+            HookReset(true);
+
+            Debug.Log($"[Moonlit] DrinkGame ready: {FindObjectsByType<IngredientSource>(FindObjectsSortMode.None).Length} ingredient props, " +
+                      $"{DrinkContainer.All.Count(c => c.IsGlass)} glasses, {FindObjectsByType<Garnish>(FindObjectsSortMode.None).Length} garnishes, " +
+                      $"{states.Count} customers.");
+        }
+
+        void OnEnable() => HookReset(true);
+        void OnDisable() => HookReset(false);
+
+        void OnDestroy()
+        {
+            foreach (var p in runtimeProfiles) if (p) Destroy(p);
+            runtimeProfiles.Clear();
+        }
+
+        void HookReset(bool on)
+        {
+            if (!resetButton || on == resetHooked) return;
+            resetHooked = on;
+            if (on) resetButton.selectEntered.AddListener(OnResetPressed); else resetButton.selectEntered.RemoveListener(OnResetPressed);
+        }
+
+        void OnResetPressed(SelectEnterEventArgs _) => ResetAllProps();
+
+        /// <summary>Every prop back where it started, including ones in a hand or behind the bar. Contents stay.</summary>
+        public void ResetAllProps() => PropRespawn.ResetAll();
+
+        static float HeadHeight(Transform body)
+        {
+            float top = 1f;
+            foreach (var r in body.GetComponentsInChildren<Renderer>())
+                top = Mathf.Max(top, r.bounds.max.y - body.position.y);
+            return top;
+        }
+
+        // ------------------------------------------------------------------ every frame
+        void Update()
+        {
+            if (keyboardReset && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ResetAllProps();
+            for (int i = 0; i < PropRespawn.All.Count; i++) PropRespawn.All[i].CheckLost();
+
+            if (!ordersEnabled) return;
+            for (int i = 0; i < states.Count; i++)
+            {
+                var c = states[i];
+                if (c.Order != null || Time.time < c.nextOrderAt) continue;
+                if (!OrderGenerator.TryGenerate(rng, glasses, garnishColors, out var order)) continue;
+                c.Order = order;
+                c.Missed = false;
+                Say(i, Pick(c.Profile.greetings), GameVisuals.Ink, 6f);
+                ShowTicket(i);
+            }
+        }
+
+        void FixedUpdate()
+        {
+            for (int i = 0; i < PropRespawn.All.Count; i++) PropRespawn.All[i].ApplyPendingHome();
+        }
+
+        // ------------------------------------------------------------------ orders
+        /// <summary>Gives a customer this order (replacing theirs) and redraws their ticket. Used by the demo and tests.</summary>
+        public void SetOrder(int seat, DrinkOrder order)
+        {
+            var c = states[seat];
+            c.Order = order;
+            c.Missed = false;
+            ShowTicket(seat);
+        }
+
+        /// <summary>Redraws a customer's ticket from their current order.</summary>
+        public void ShowTicket(int seat)
+        {
+            var c = states[seat];
+            if (!c.Ticket) return;
+            if (c.Order == null) { c.Ticket.SetTitle($"<b>{c.DisplayName}</b>\n<size=75%>...</size>"); c.Ticket.ShowBars(null); return; }
+            var o = c.Order;
+            var extras = new List<string> { o.Method.ToString(), o.GlassVariant };
+            if (o.Cold) extras.Add("Cold");
+            if (o.Color != null) extras.Add(o.Color + " garnish");
+            string hint = c.Missed ? $"\n<size=60%><color=#BFE3FF>Tip: {o.Hint}</color></size>" : "";
+            c.Ticket.SetTitle($"<b>{c.DisplayName}</b>\n<size=75%>{string.Join(" · ", extras)}</size>{hint}");
+            c.Ticket.ShowBars(o.Target);
+        }
+
+        /// <summary>Shows a line in a customer's speech bubble.</summary>
+        public void Say(int seat, string text, Color color, float seconds)
+        {
+            var c = states[seat];
+            if (!c.Bubble) return;
+            c.Bubble.SetTitle("");
+            c.Bubble.Flash(text, color, seconds);
+        }
+
+        /// <summary>Hands a drink over. Picks the open order it matches best and says how it went.</summary>
+        public bool TryServe(ServedDrink drink, out string summary)
+        {
+            int best = -1, bestScore = int.MaxValue;
+            for (int i = 0; i < states.Count; i++)
+            {
+                if (states[i].Order == null) continue;
+                int score = Score(Finishing.Check(states[i].Order, drink));
+                if (score < bestScore) { bestScore = score; best = i; }
+            }
+            if (best < 0) { summary = "Nobody's waiting for a drink"; return false; }
+
+            var c = states[best];
+            var miss = Finishing.Check(c.Order, drink);
+            if (miss == Mismatch.None)
+            {
+                ServedCount++;
+                var story = c.Profile.story ?? new string[0];
+                string line = c.StoryIndex < story.Length ? story[c.StoryIndex++] : c.Profile.storyDone;
+                Say(best, Pick(c.Profile.thanks) + "\n<size=85%>" + line + "</size>", GameVisuals.Good, 10f);
+                c.Order = null;
+                c.nextOrderAt = Time.time + newOrderDelay + 8f;
+                ShowTicket(best);
+                summary = $"{c.DisplayName} loved it!";
+                return true;
+            }
+
+            c.Missed = true;
+            Say(best, Pick(c.Profile.wrong) + "\n<size=80%>" + Explain(c.Order, drink, miss) + "</size>", GameVisuals.Bad, 8f);
+            ShowTicket(best);
+            summary = $"Not quite right for {c.DisplayName}";
+            return false;
+        }
+
+        static int Score(Mismatch m)
+        {
+            int s = 0;
+            if ((m & Mismatch.Taste) != 0) s += 10;
+            if ((m & Mismatch.Method) != 0) s += 4;
+            if ((m & Mismatch.Glass) != 0) s += 3;
+            if ((m & Mismatch.Cold) != 0) s += 1;
+            if ((m & Mismatch.Color) != 0) s += 1;
+            return s;
+        }
+
+        static string Explain(DrinkOrder o, ServedDrink d, Mismatch m)
+        {
+            var bits = new List<string>();
+            if ((m & Mismatch.Taste) != 0)
+            {
+                if (d.Stats.Bitter != o.Target.Bitter) bits.Add(d.Stats.Bitter > o.Target.Bitter ? "too bitter" : "not bitter enough");
+                if (d.Stats.Sweet != o.Target.Sweet) bits.Add(d.Stats.Sweet > o.Target.Sweet ? "too sweet" : "not sweet enough");
+                if (d.Stats.Sour != o.Target.Sour) bits.Add(d.Stats.Sour > o.Target.Sour ? "too sour" : "not sour enough");
+            }
+            if ((m & Mismatch.Method) != 0) bits.Add(o.Method == PrepMethod.Layered ? "I wanted it layered" : "I wanted it mixed");
+            if ((m & Mismatch.Glass) != 0) bits.Add($"in a {o.GlassVariant} glass, please");
+            if ((m & Mismatch.Cold) != 0) bits.Add("with ice");
+            if ((m & Mismatch.Color) != 0) bits.Add($"with a {o.Color} garnish");
+            return "(" + string.Join(", ", bits) + ")";
+        }
+
+        string Pick(string[] lines) => lines == null || lines.Length == 0 ? "" : lines[rng.Next(lines.Length)];
+
+        // ------------------------------------------------------------------ transition: finding props by name
+        /// <summary>Transition: turns the bar's props into the game when the scene has no Drink Game object of its own.</summary>
+        void BuildFromNames()
         {
             var bar = GameObject.Find("MoonlitBar");
             if (!bar) { Debug.LogWarning("[Moonlit] DrinkGame: no MoonlitBar in the scene"); return; }
             var plan = Plan(bar.transform);
             foreach (var w in plan.warnings) Debug.LogWarning("[Moonlit] DrinkGame: " + w);
 
-            foreach (var (t, ing) in plan.sources) t.gameObject.AddComponent<IngredientSource>().Init(ing);
-            foreach (var (t, type) in plan.glasses) t.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.Glass, type, GlassLengths[type]);
-            if (plan.stirCup) plan.stirCup.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.StirCup, "Stir Cup", GlassLength.Long);
-            if (plan.shaker) plan.shaker.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.ShakeMixer, "Shake Mixer", GlassLength.Long);
-            foreach (var (t, color) in plan.garnishes) t.gameObject.AddComponent<Garnish>().Init(color);
-            if (plan.spoon) plan.spoon.gameObject.AddComponent<StirTool>().Init();
-            if (plan.scoop && plan.iceWell) plan.scoop.gameObject.AddComponent<IceScoop>().Init(plan.iceWell);
+            foreach (var (t, ing) in plan.sources) if (!t.TryGetComponent<IngredientSource>(out _)) t.gameObject.AddComponent<IngredientSource>().Init(ing);
+            foreach (var (t, type) in plan.glasses) if (!t.TryGetComponent<DrinkContainer>(out _)) t.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.Glass, type, GlassLengths[type]);
+            if (plan.stirCup && !plan.stirCup.TryGetComponent<DrinkContainer>(out _)) plan.stirCup.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.StirCup, "Stir Cup", GlassLength.Long);
+            if (plan.shaker && !plan.shaker.TryGetComponent<DrinkContainer>(out _)) plan.shaker.gameObject.AddComponent<DrinkContainer>().Init(ContainerKind.ShakeMixer, "Shake Mixer", GlassLength.Long);
+            foreach (var (t, color) in plan.garnishes) if (!t.TryGetComponent<Garnish>(out _)) t.gameObject.AddComponent<Garnish>().Init(color);
+            if (plan.spoon && !plan.spoon.TryGetComponent<StirTool>(out _)) plan.spoon.gameObject.AddComponent<StirTool>();
+            if (plan.scoop)
+            {
+                if (!plan.scoop.TryGetComponent(out iceScoop)) iceScoop = plan.scoop.gameObject.AddComponent<IceScoop>();
+                if (plan.iceWell) iceScoop.Init(plan.iceWell);
+            }
+            playerSpot = plan.player;
 
-            var glassTypes = plan.glasses.Select(g => g.type).Distinct().Select(n => new GlassVariant(n, GlassLengths[n])).ToList();
-            var colors = plan.garnishes.Select(g => g.color).Distinct().ToList();
             var layout = FindFirstObjectByType<BarLayout>();
-            var people = layout ? layout.characters.Where(c => c.character).Select(c => (c.id, c.character)).ToList()
-                                : new List<(string, Transform)>();
+            if (layout)
+                for (int i = 0; i < layout.characters.Count; i++)
+                {
+                    var c = layout.characters[i];
+                    if (!c.character) continue;
+                    var profile = CustomerProfile.FromScript(CustomerScripts.For(c.id));
+                    runtimeProfiles.Add(profile);
+                    seats.Add(new Seat { profile = profile, body = c.character, ticketSpot = i < plan.tickets.Count ? plan.tickets[i] : null });
+                }
 
-            Orders = gameObject.AddComponent<OrderBook>();
-            Orders.Init(people, plan.tickets, glassTypes, colors);
             if (plan.serveSpot && plan.player)
-                gameObject.AddComponent<ServeStation>().Init(plan.serveSpot, plan.player, plan.bell, Orders);
-            if (plan.serveSpot && plan.player) ResetButton.Create(transform, plan.player, plan.serveSpot);
+            {
+                serve = gameObject.AddComponent<ServeStation>();
+                serve.Init(plan.serveSpot, plan.player, plan.bell ? plan.bell.GetComponent<XRBaseInteractable>() : null, this);
+                var reset = ResetButton.Create(transform, plan.player, plan.serveSpot);
+                if (reset) resetButtonObject = reset.transform;
+                PutRulesOnBackWall(transform, bar.transform, plan.player, plan.serveSpot);
+            }
             if (plan.menuBoard && plan.player) WriteMenuBoard(plan.menuBoard, plan.player);
-            if (plan.player && plan.serveSpot) PutRulesOnBackWall(transform, bar.transform, plan.player, plan.serveSpot);
-
-            Debug.Log($"[Moonlit] DrinkGame ready: {plan.sources.Count} ingredient props, {plan.glasses.Count} glasses, " +
-                      $"{plan.garnishes.Count} garnishes, {people.Count} customers.");
         }
 
-        // ------------------------------------------------------------------ finding props by name
         public class SetupPlan
         {
             public readonly List<(Transform t, Ingredient ingredient)> sources = new List<(Transform, Ingredient)>();
@@ -134,7 +393,7 @@ namespace MoonlitTails.Gameplay
                 foreach (var t in found)
                 {
                     if (Grabbable(t)) plan.sources.Add((t, ing));
-                    else plan.warnings.Add($"{t.name} isn't grabbable (rebuild the scene?)");
+                    else plan.warnings.Add($"{t.name} isn't grabbable");
                 }
             }
             foreach (var t in all.Where(t => t.name.StartsWith("PROP_Glass_") && t.GetComponent<MeshFilter>()))
@@ -153,25 +412,21 @@ namespace MoonlitTails.Gameplay
                 else if (grab && !Grabbable(t)) { plan.warnings.Add($"{n} isn't grabbable"); return null; }
                 return t;
             }
-            plan.stirCup = Need(StirCupProp, true);
-            plan.shaker = Need(ShakeMixerProp, true);
-            plan.spoon = Need(SpoonProp, true);
-            plan.scoop = Need(IceScoopProp, true);
-            plan.iceWell = Need(IceWell, false);
-            plan.bell = Need(BellProp, false);
-            plan.serveSpot = Need(ServeSpot, false);
-            plan.player = Need(PlayerSpot, false);
-            plan.menuBoard = Named(MenuBoard);
-            foreach (var n in Tickets) { var t = Named(n); if (t) plan.tickets.Add(t); else plan.warnings.Add($"missing {n}"); }
+            plan.stirCup = Need(StirCupPropName, true);
+            plan.shaker = Need(ShakeMixerPropName, true);
+            plan.spoon = Need(SpoonPropName, true);
+            plan.scoop = Need(IceScoopPropName, true);
+            plan.iceWell = Need(IceWellName, false);
+            plan.bell = Need(BellPropName, false);
+            plan.serveSpot = Need(ServeSpotName, false);
+            plan.player = Need(PlayerSpotName, false);
+            plan.menuBoard = Named(MenuBoardName);
+            foreach (var n in TicketNames) { var t = Named(n); if (t) plan.tickets.Add(t); else plan.warnings.Add($"missing {n}"); }
             return plan;
         }
 
-        // ------------------------------------------------------------------ how-to-play on the menu board
-        /// <summary>
-        /// Writes the rules on the chalkboard: flat on its face, inside the wooden frame, as big as fits. A dark panel
-        /// goes under the text to hide the painted menu lines.
-        /// </summary>
-        static void WriteMenuBoard(Transform board, Transform player)
+        // ------------------------------------------------------------------ transition: rules text built from code
+        void WriteMenuBoard(Transform board, Transform player)
         {
             if (!TryFace(board, player.position, out var f)) return;
             var root = new GameObject("How To Play").transform;
@@ -179,6 +434,7 @@ namespace MoonlitTails.Gameplay
 
             // the chalk area inside the frame (1.1 x 0.75 board, 0.98 x 0.63 chalk in the model)
             WriteRules(root, f.width * 0.89f, f.height * 0.84f, f.halfThick);
+            menuBoardText = root;
         }
 
         struct Face { public Vector3 center, normal, up; public float halfThick, width, height; }
@@ -211,7 +467,7 @@ namespace MoonlitTails.Gameplay
             return true;
         }
 
-        const string RulesText =
+        public const string RulesText =
             "<b>HOW TO MAKE A DRINK</b>\n" +
             "1. Read a ticket\n" +
             "2. Pour into <b>Stir Cup</b> or <b>Shake Mixer</b>\n" +
@@ -246,9 +502,9 @@ namespace MoonlitTails.Gameplay
         /// <summary>
         /// The wall board is too far away and too side-on to read from behind the bar, so the same rules go on a framed
         /// sign on the back wall right behind the player (about 1.1 m away), where the round logo was. The logo is
-        /// hidden while playing; it's still in the bar prefab, so removing this brings it back.
+        /// hidden while playing; it's still in the bar prefab.
         /// </summary>
-        static void PutRulesOnBackWall(Transform parent, Transform bar, Transform player, Transform serveSpot)
+        void PutRulesOnBackWall(Transform parent, Transform bar, Transform player, Transform serveSpot)
         {
             var all = bar.GetComponentsInChildren<Transform>(true);
             var logo = all.FirstOrDefault(t => t.name == LogoPieces[0]);
@@ -272,6 +528,7 @@ namespace MoonlitTails.Gameplay
             var wood = GameVisuals.Primitive(PrimitiveType.Cube, root, "Frame", new Color(0.34f, 0.2f, 0.12f));
             wood.transform.localScale = new Vector3(w + frame * 2f, h + frame * 2f, depth);
             WriteRules(root, w, h, depth * 0.5f);
+            rulesSign = root;
 
             foreach (var t in all)
                 if (LogoPieces.Contains(t.name)) t.gameObject.SetActive(false);

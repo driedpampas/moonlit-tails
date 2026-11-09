@@ -32,8 +32,16 @@ namespace MoonlitTails.Drinks
 
         public static DrinkOrder Generate(Random rng, IReadOnlyList<GlassVariant> glasses, IReadOnlyList<string> garnishColors, Settings s = null)
         {
+            if (!TryGenerate(rng, glasses, garnishColors, out var order, s)) throw new ArgumentException("No glasses", nameof(glasses));
+            return order;
+        }
+
+        /// <summary>Like <see cref="Generate"/>, but returns false (and no order) when the bar has no glasses, instead of throwing.</summary>
+        public static bool TryGenerate(Random rng, IReadOnlyList<GlassVariant> glasses, IReadOnlyList<string> garnishColors, out DrinkOrder result, Settings s = null)
+        {
+            result = null;
             s = s ?? new Settings();
-            if (glasses == null || glasses.Count == 0) throw new ArgumentException("No glasses", nameof(glasses));
+            if (glasses == null || glasses.Count == 0) return false;
 
             var order = rng.NextDouble() < s.LayeredChance ? MakeLayered(rng, glasses) : null;
             if (order == null) order = MakeMixed(rng, glasses, s);
@@ -60,7 +68,8 @@ namespace MoonlitTails.Drinks
             order.Cold = rng.NextDouble() < s.ColdChance;
             if (garnishColors != null && garnishColors.Count > 0 && rng.NextDouble() < s.GarnishChance)
                 order.Color = garnishColors[rng.Next(garnishColors.Count)];
-            return order;
+            result = order;
+            return true;
         }
 
         static DrinkOrder MakeMixed(Random rng, IReadOnlyList<GlassVariant> glasses, Settings s)

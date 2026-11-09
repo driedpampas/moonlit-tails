@@ -10,21 +10,28 @@ namespace MoonlitTails.Gameplay
         public float stirDistance = 0.35f;
 
         Vector3 axis;
+        Vector3 center;
         float half;
         DrinkContainer current;
         Vector3 lastTip;
         float travelled;
+        bool setUp;
 
-        public void Init()
+        void Awake() => EnsureSetUp();
+
+        /// <summary>Kept for code that adds the spoon at runtime; the spoon sets itself up.</summary>
+        public void Init() => EnsureSetUp();
+
+        void EnsureSetUp()
         {
+            if (setUp) return;
+            setUp = true;
             var b = GameVisuals.LocalBounds(gameObject);
             Vector3 e = b.extents;
             axis = e.x >= e.y && e.x >= e.z ? Vector3.right : e.y >= e.z ? Vector3.up : Vector3.forward;
             half = GameVisuals.Extent(b, axis);
             center = b.center;
         }
-
-        Vector3 center;
 
         Vector3 Tip()
         {

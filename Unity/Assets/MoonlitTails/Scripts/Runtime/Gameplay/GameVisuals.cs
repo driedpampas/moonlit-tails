@@ -36,7 +36,12 @@ namespace MoonlitTails.Gameplay
             var go = GameObject.CreatePrimitive(type);
             go.name = name;
             var col = go.GetComponent<Collider>();
-            if (col) Object.DestroyImmediate(col);
+            if (col)
+            {
+                // off at once so it never pushes anything; removed at the end of the frame (DestroyImmediate only in edit mode)
+                col.enabled = false;
+                if (Application.isPlaying) Object.Destroy(col); else Object.DestroyImmediate(col);
+            }
             go.transform.SetParent(parent, false);
             var r = go.GetComponent<MeshRenderer>();
             r.sharedMaterial = Flat(color);
@@ -58,6 +63,50 @@ namespace MoonlitTails.Gameplay
             t.rectTransform.sizeDelta = new Vector2(0.5f, 0.1f);
             t.richText = true;
             return t;
+        }
+
+        /// <summary>
+        /// Builds a set of taste bars under <paramref name="parent"/>: per taste a background, a fill, a zero tick, a name
+        /// and a value, plus a caption. Used by floating labels; the serve panel has its own in its prefab.
+        /// </summary>
+        public static StatBarsView BuildStatBars(Transform parent, float width)
+        {
+            var root = new GameObject("Taste Bars");
+            root.transform.SetParent(parent, false);
+            var view = new StatBarsView { root = root, width = width };
+            Color[] colors = { BitterColor, SweetColor, SourColor };
+            string[] names = { "Bitter", "Sweet", "Sour" };
+            const float row = 0.018f, barH = 0.011f;
+            var t = root.transform;
+            for (int i = 0; i < 3; i++)
+            {
+                float y = -i * row;
+                var bg = Primitive(PrimitiveType.Quad, t, names[i] + " Bar", new Color(0.12f, 0.1f, 0.22f));
+                bg.transform.localPosition = new Vector3(0, y, 0);
+                bg.transform.localScale = new Vector3(width, barH, 1);
+
+                var fill = Primitive(PrimitiveType.Quad, t, names[i] + " Fill", colors[i]);
+                fill.transform.localPosition = new Vector3(0, y, -0.001f);
+                fill.transform.localScale = new Vector3(0, barH * 0.8f, 1);
+                view.fills[i] = fill.transform;
+
+                var tick = Primitive(PrimitiveType.Quad, t, names[i] + " Zero", Color.white);
+                tick.transform.localPosition = new Vector3(0, y, -0.002f);
+                tick.transform.localScale = new Vector3(0.0012f, barH * 1.3f, 1);
+
+                var label = Text(t, names[i] + " Name", 0.09f, TextAlignmentOptions.Right);
+                label.text = names[i];
+                label.rectTransform.sizeDelta = new Vector2(0.05f, 0.012f);
+                label.transform.localPosition = new Vector3(-width * 0.5f - 0.03f, y, -0.002f);
+
+                var value = Text(t, names[i] + " Value", 0.1f, TextAlignmentOptions.Left);
+                value.rectTransform.sizeDelta = new Vector2(0.03f, 0.012f);
+                value.transform.localPosition = new Vector3(width * 0.5f + 0.02f, y, -0.002f);
+                view.values[i] = value;
+            }
+            view.caption = Text(t, "Caption", 0.1f);
+            view.caption.transform.localPosition = new Vector3(0, 0.017f, -0.002f);
+            return view;
         }
 
         /// <summary>A colour for a liquid, from its tastes (liquids don't change the order's colour; this is just to see them).</summary>

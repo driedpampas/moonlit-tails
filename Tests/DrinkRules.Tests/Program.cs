@@ -239,6 +239,25 @@ static class Program
         Check(ember.Ok && !ember.Collapsed.Any(c => c), "Ember's Spirit Order layers in a Coupe without collapsing");
         Eq(new Taste(-1, 6, 0), ember.Stats, "Ember's Spirit Order: Bourbon + Grenadine under Bourbon + Dark Caramel");
 
+        // ---- ingredient ids (stored in prefabs: the numbers must never change)
+        var pinned = new (IngredientId id, int value)[]
+        {
+            (IngredientId.None, 0), (IngredientId.Whiskey, 1), (IngredientId.Bourbon, 2), (IngredientId.Tequila, 3),
+            (IngredientId.TonicWater, 10), (IngredientId.OrangePeel, 11), (IngredientId.Espresso, 12), (IngredientId.BlackTea, 13),
+            (IngredientId.Syrup, 20), (IngredientId.Cola, 21), (IngredientId.DarkCaramel, 22), (IngredientId.Grenadine, 23),
+            (IngredientId.LimeJuice, 30), (IngredientId.AppleCider, 31), (IngredientId.GrapefruitAcid, 32), (IngredientId.SourMix, 33),
+        };
+        foreach (var (id, value) in pinned) Eq(value, (int)id, $"IngredientId.{id} is stored as {value}");
+        Eq(pinned.Length, Enum.GetValues(typeof(IngredientId)).Length, "every IngredientId has a pinned number");
+        Check(Get(IngredientId.None) == null, "IngredientId.None is no ingredient");
+        var all = Bases.Concat(Modifiers).ToList();
+        foreach (var i in all) Check(Enum.TryParse<IngredientId>(i.Id, out var id) && Get(id) == i, $"{i.Id} has an IngredientId that maps back to it");
+        Eq(all.Count, pinned.Length - 1, "one IngredientId per ingredient");
+
+        // ---- no glasses: no order, no exception
+        Check(!OrderGenerator.TryGenerate(new Random(1), new GlassVariant[0], colors, out var none) && none == null, "no glasses: TryGenerate returns false");
+        Check(OrderGenerator.TryGenerate(new Random(1), glasses, colors, out var some) && some != null, "with glasses: TryGenerate makes an order");
+
         Console.WriteLine($"{passed} passed, {failed} failed");
         return failed == 0 ? 0 : 1;
     }

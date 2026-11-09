@@ -52,7 +52,6 @@ namespace MoonlitTails.EditorTools
         Vector3 serve, player, eye, fwd, right;
         DrinkGame game;
         ServeStation station;
-        OrderBook orders;
         readonly Dictionary<Transform, Quaternion> upright = new Dictionary<Transform, Quaternion>();
 
         // ------------------------------------------------------------------ setup and capture
@@ -69,10 +68,11 @@ namespace MoonlitTails.EditorTools
                 if (mb && mb.GetType().Name.Contains("Simulator")) mb.gameObject.SetActive(false);
 
             game = FindFirstObjectByType<DrinkGame>();
-            station = FindFirstObjectByType<ServeStation>();
-            orders = FindFirstObjectByType<OrderBook>();
-            serve = Find(DrinkGame.ServeSpot).position;
-            player = Find(DrinkGame.PlayerSpot).position;
+            if (!game || !game.Station || !game.PlayerSpot)
+                throw new InvalidOperationException("the bar scene has no ready Drink Game (with its serve station and player spot)");
+            station = game.Station;
+            serve = station.ServeSpot.position;
+            player = game.PlayerSpot.position;
             fwd = serve - player; fwd.y = 0; fwd.Normalize();
             right = Vector3.Cross(Vector3.up, fwd);
             eye = player + Vector3.up * 1.6f;
@@ -244,7 +244,6 @@ namespace MoonlitTails.EditorTools
         }
 
         // ------------------------------------------------------------------ props
-        Transform Find(string n) => GameObject.Find("MoonlitBar").GetComponentsInChildren<Transform>(true).First(t => t.name == n);
         DrinkContainer Vessel(ContainerKind k) => DrinkContainer.All.First(c => c.kind == k);
         DrinkContainer GlassOf(string v) => DrinkContainer.All.First(c => c.IsGlass && c.variant == v);
         IngredientSource Source(Ingredient i) => FindObjectsByType<IngredientSource>(FindObjectsSortMode.None).First(s => s.Ingredient == i);
@@ -305,7 +304,7 @@ namespace MoonlitTails.EditorTools
         /// <summary>Bring a bottle or cup over a container, tip it until one pour lands, then tilt it back.</summary>
         IEnumerator Pour(Component c, DrinkContainer into, int pours = 1)
         {
-            var spout = c.GetComponent<PourSpout>();
+            var spout = c.GetComponent<Pourer>();
             Quaternion up = Upright(c);
             // tip toward the container, seen side-on from the player
             Vector3 toward = into.OpeningWorld - c.transform.position; toward.y = 0;
@@ -328,7 +327,7 @@ namespace MoonlitTails.EditorTools
             }
         }
 
-        IEnumerator Tilt(Component c, PourSpout spout, Vector3 axis, Vector3 mouth, float a0, float a1, float seconds)
+        IEnumerator Tilt(Component c, Pourer spout, Vector3 axis, Vector3 mouth, float a0, float a1, float seconds)
         {
             Quaternion up = Upright(c);
             for (float t = 0; t <= seconds; t += Time.deltaTime)
@@ -412,12 +411,10 @@ namespace MoonlitTails.EditorTools
             yield return Move(c, home.HomePosition, Upright(c), seconds);
         }
 
-        PokeButton PanelButton(int index) =>
-            station.transform.Find("Serve Panel").GetComponentsInChildren<PokeButton>(true)[index];
-
         IEnumerator Ring()
         {
-            var bell = Find(DrinkGame.BellProp);
+            var bell = station.Bell;
+            if (!bell) { station.Serve(); yield break; }
             Vector3 p = bell.position;
             for (float t = 0; t < 0.25f; t += Time.deltaTime)
             {
@@ -429,29 +426,23 @@ namespace MoonlitTails.EditorTools
         }
 
         /// <summary>The order book picks random orders; for the video, the first two ask for the drinks made below.</summary>
-        void SetOrder(int customer, DrinkOrder order)
-        {
-            var c = orders.Customers[customer];
-            c.order = order;
-            c.missed = false;
-            orders.ShowTicket(c);
-        }
+        void SetOrder(int customer, DrinkOrder order) => game.SetOrder(customer, order);
 
-        void Greet(OrderBook.Customer c)
+        void Greet(int seat)
         {
-            var lines = c.profile?.Greetings;
+            var lines = game.Seats[seat].Profile ? game.Seats[seat].Profile.greetings : null;
             if (lines == null || lines.Length == 0) return;
-            orders.Say(c, lines[0], GameVisuals.Ink, 6f);
+            game.Say(seat, lines[0], GameVisuals.Ink, 6f);
         }
 
-        Bounds HeadOf(OrderBook.Customer c)
+        Bounds HeadOf(DrinkGame.SeatState c)
         {
-            var anim = c.body.GetComponentInChildren<Animator>();
+            var anim = c.Body.GetComponentInChildren<Animator>();
             var head = anim && anim.isHuman ? anim.GetBoneTransform(HumanBodyBones.Head) : null;
-            var all = GameVisuals.WorldBounds(c.body);
+            var all = GameVisuals.WorldBounds(c.Body);
             Vector3 centre = head ? head.position : new Vector3(all.center.x, all.max.y - 0.15f, all.center.z);
             // the head and the speech bubble above it (the bubble floats over the top of the whole character)
-            Vector3 bubble = c.bubble ? c.bubble.transform.position : centre + Vector3.up * 0.35f;
+            Vector3 bubble = c.Bubble ? c.Bubble.transform.position : centre + Vector3.up * 0.35f;
             float tall = Mathf.Abs(bubble.y - centre.y) + 0.3f;
             // a bubble floating far over the head (a tall character): frame the words, or they're too small to read
             if (tall > 0.9f) return new Bounds(bubble + Vector3.down * 0.02f, new Vector3(0.42f, 0.14f, 0.05f));
@@ -470,14 +461,13 @@ namespace MoonlitTails.EditorTools
             var tonic = Source(Ingredients.TonicWater);
             var scoop = FindFirstObjectByType<IceScoop>();
             var lime = FindObjectsByType<Garnish>(FindObjectsSortMode.None).First(g => g.color == "Lime");
-            var customers = orders.Customers;
+            var customers = game.Seats;
 
             // work spots on the counter, to the right of the serve coaster (the serve panel is on its left)
             Vector3 W(float r, float f = 0f) => serve + right * r + fwd * f;
             Vector3 work = W(0.42f);
 
             // ---- 1. the bar
-            var layout = FindFirstObjectByType<BarLayout>();
             Vector3 high = player - fwd * 1.2f + right * 3.6f + Vector3.up * 3.0f;
             Cut(high, player + fwd * 2.5f - right * 0.5f, 62f);
             Shot(high - right * 1.6f + fwd * 0.3f, player + fwd * 2.2f + right * 0.3f, 58f, 0.35f);
@@ -500,7 +490,7 @@ namespace MoonlitTails.EditorTools
             yield return Wait(4.5f);
 
             // ---- 2. customers and tickets
-            while (customers.Count > 1 && (customers[0].order == null || customers[1].order == null)) yield return null;
+            while (customers.Count > 1 && (customers[0].Order == null || customers[1].Order == null)) yield return null;
             SetOrder(0, new DrinkOrder { Target = new Taste(2, 2, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "Whiskey and cola, shaken" });
             SetOrder(1, new DrinkOrder { Target = new Taste(3, 1, 1), Method = PrepMethod.Layered, GlassVariant = "Rocks", Hint = "Whiskey and tonic, stirred, two layers, then +1 Sweet and +1 Sour" });
 
@@ -509,10 +499,11 @@ namespace MoonlitTails.EditorTools
             yield return Wait(3.5f);
             for (int i = 0; i < Mathf.Min(2, customers.Count); i++)
             {
-                Greet(customers[i]);
+                Greet(i);
                 FromEye(HeadOf(customers[i]), 0.9f);
                 yield return Wait(3.2f);
-                var ticketAt = Find(DrinkGame.Tickets[i]).position;
+                if (!customers[i].TicketSpot) continue;
+                var ticketAt = customers[i].TicketSpot.position;
                 FromEye(new Bounds(ticketAt + Vector3.up * 0.1f, new Vector3(0.3f, 0.3f, 0.1f)), 0.8f);
                 yield return Wait(2.6f);
             }
@@ -536,7 +527,7 @@ namespace MoonlitTails.EditorTools
             yield return Wait(1.0f);
 
             Caption("Dip the scoop in the ice well, then bring it to the glass: the drink is now Cold");
-            var well = GameVisuals.WorldBounds(Find(DrinkGame.IceWell));
+            var well = GameVisuals.WorldBounds(scoop.IceWell);
             CounterShot((well.center + highball.CenterWorld) / 2f, 0.55f, 0.75f, 0f, 55f);
             Vector3 ScoopTo(Vector3 p) => scoop.transform.position + (p - scoop.GetComponent<Renderer>().bounds.center);
             yield return Move(scoop, ScoopTo(well.center + Vector3.up * 0.12f), scoop.transform.rotation, 1.0f);
@@ -557,7 +548,7 @@ namespace MoonlitTails.EditorTools
             CounterShot(serve, 0.5f, 0.55f, 0.05f, 50f);
             yield return Move(highball, serve + Vector3.up * 0.12f + right * 0.05f, Quaternion.AngleAxis(25f, fwd) * Upright(highball), 1.1f);
             yield return Wait(0.3f);
-            station.Snap.Snap(highball);
+            station.TrySnap(highball);
             yield return Wait(1.8f);
             Caption("The panel shows the final taste. Ring the bell to serve");
             yield return Wait(2.0f);
@@ -588,29 +579,29 @@ namespace MoonlitTails.EditorTools
             Caption("Serve it before the finishing touch...");
             CounterShot(serve, 0.5f, 0.55f, 0.05f, 50f);
             yield return Move(rocks, serve + Vector3.up * 0.1f, Upright(rocks), 1.0f);
-            station.Snap.Snap(rocks);
+            station.TrySnap(rocks);
             yield return Wait(1.0f);
             yield return Ring();
             yield return Wait(0.3f);
-            var missed = customers.FirstOrDefault(c => c.missed) ?? customers[1];
+            var missed = customers.FirstOrDefault(c => c.Missed) ?? customers[1];
             Caption("Wrong drink: the customer says what's off, and their ticket shows a tip");
             FromEye(HeadOf(missed), 0.8f);
             yield return Wait(4.0f);
             int idx = customers.ToList().IndexOf(missed);
-            if (idx >= 0 && idx < DrinkGame.Tickets.Length)
+            if (idx >= 0 && idx < customers.Count && customers[idx].TicketSpot)
             {
-                var ticketAt = Find(DrinkGame.Tickets[idx]).position;
+                var ticketAt = customers[idx].TicketSpot.position;
                 FromEye(new Bounds(ticketAt + Vector3.up * 0.1f, new Vector3(0.3f, 0.3f, 0.1f)), 0.8f);
                 yield return Wait(3.0f);
             }
 
             Caption("End-of-drink adjustment on the panel: 2 points for a layered drink (+1 Sweet, +1 Sour)");
-            var panel = station.transform.Find("Serve Panel");
+            var panel = station.Panel;
             Shot(panel.position - panel.forward * 0.55f + Vector3.up * 0.12f, panel.position, 45f);
             yield return Wait(1.5f);
-            PanelButton(3).Press();
+            station.AdjustSweet(+1);
             yield return Wait(1.0f);
-            PanelButton(5).Press();
+            station.AdjustSour(+1);
             yield return Wait(1.5f);
             yield return Ring();
             yield return Wait(0.3f);
@@ -633,26 +624,25 @@ namespace MoonlitTails.EditorTools
                 yield return Wait(0.15f);
             }
             yield return Wait(1.8f);
-            var reset = FindObjectsByType<PokeButton>(FindObjectsSortMode.None)
-                .FirstOrDefault(b => b.transform.parent && b.transform.parent.name == ResetButton.Name);
+            var reset = game.ResetButtonObject;
             Caption("...so the big red DO NOT PUSH button puts every prop back where it started");
             if (reset)
             {
-                CounterShot(reset.transform.position, 0.45f, 0.5f, 0f, 50f);
+                CounterShot(reset.position, 0.45f, 0.5f, 0f, 50f);
                 yield return Wait(2.0f);
-                reset.Press();
+                game.ResetAllProps();
                 yield return Wait(0.3f);
             }
             Shot(eye + Vector3.up * 0.2f - fwd * 0.3f, serve + Vector3.up * 0.1f, 70f, 1.5f);
             yield return Wait(3.0f);
 
             // ---- 6. the menu board
-            var rules = GameObject.Find("How To Play");
+            var rules = game.MenuBoardText;
             if (rules)
             {
                 // the text faces its local -Z
                 Caption("How to play, on the menu board, now readable");
-                var r = rules.transform;
+                var r = rules;
                 Cut(r.position - r.forward * 1.5f, r.position, 42f);
                 yield return Wait(5.5f);
             }

@@ -4,6 +4,19 @@ namespace MoonlitTails.Drinks
 {
     public enum IngredientKind { Base, Modifier }
 
+    /// <summary>
+    /// Every ingredient, as a value a prefab can store. The numbers are saved in prefabs, so never change or reuse one:
+    /// add new ingredients with new numbers. Each name must equal the ingredient's <see cref="Ingredient.Id"/>.
+    /// </summary>
+    public enum IngredientId
+    {
+        None = 0,
+        Whiskey = 1, Bourbon = 2, Tequila = 3,
+        TonicWater = 10, OrangePeel = 11, Espresso = 12, BlackTea = 13,
+        Syrup = 20, Cola = 21, DarkCaramel = 22, Grenadine = 23,
+        LimeJuice = 30, AppleCider = 31, GrapefruitAcid = 32, SourMix = 33,
+    }
+
     /// <summary>A raw ingredient: a base drink or a flavour modifier. One pour of it is 1 unit.</summary>
     public sealed class Ingredient
     {
@@ -50,10 +63,13 @@ namespace MoonlitTails.Drinks
 
         public static readonly IReadOnlyList<Ingredient> Bases = new[] { Whiskey, Bourbon, Tequila };
 
-        public static Ingredient ById(string id)
+        /// <summary>The ingredient for an id (what a prop's IngredientSource stores), or null for None or an unknown value.</summary>
+        public static Ingredient Get(IngredientId id)
         {
-            foreach (var i in Bases) if (i.Id == id) return i;
-            foreach (var i in Modifiers) if (i.Id == id) return i;
+            if (id == IngredientId.None) return null;
+            string name = id.ToString();
+            foreach (var i in Bases) if (i.Id == name) return i;
+            foreach (var i in Modifiers) if (i.Id == name) return i;
             return null;
         }
 
