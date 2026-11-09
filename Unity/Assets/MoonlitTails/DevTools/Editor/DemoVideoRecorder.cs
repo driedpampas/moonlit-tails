@@ -42,7 +42,17 @@ namespace MoonlitTails.EditorTools
         {
             if (!EditorApplication.isPlaying) return;
             if (Object.FindFirstObjectByType<DemoDirector>() != null) return;
-            if (Time.time < 1f || Object.FindFirstObjectByType<Gameplay.DrinkGame>() == null) return;
+            if (Time.time < 1f) return;
+            if (Object.FindFirstObjectByType<Gameplay.DrinkGame>() == null)
+            {
+                if (Time.time < HeadlessRun.DrinkGameWaitSeconds) return;
+                Debug.LogError("[Moonlit] Demo: there's no Drink Game object in the scene");
+                EditorApplication.update -= Tick;
+                EditorApplication.update -= Watchdog;
+                SessionState.SetBool(Key, false);
+                HeadlessRun.End(SessionState.GetBool(BatchKey, false), HeadlessRun.NotSetUp);
+                return;
+            }
 
             if (started) { Debug.LogError("[Moonlit] Demo: the director went away before the video was finished"); Stop(false); return; }
             started = true;

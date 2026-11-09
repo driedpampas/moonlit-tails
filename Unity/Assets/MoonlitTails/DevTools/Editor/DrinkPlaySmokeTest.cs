@@ -57,7 +57,16 @@ namespace MoonlitTails.EditorTools
             if (!EditorApplication.isPlaying) return;
             if (steps == null)
             {
-                if (Time.time < 2f || UnityEngine.Object.FindFirstObjectByType<DrinkGame>() == null) return;
+                if (Time.time < 2f) return;
+                if (UnityEngine.Object.FindFirstObjectByType<DrinkGame>() == null)
+                {
+                    if (Time.time < HeadlessRun.DrinkGameWaitSeconds) return;
+                    EditorApplication.update -= Tick;
+                    SessionState.SetBool(Key, false);
+                    Debug.LogError("[Moonlit] Smoke test: there's no Drink Game object in the scene");
+                    HeadlessRun.End(SessionState.GetBool(BatchKey, false), HeadlessRun.NotSetUp);
+                    return;
+                }
                 steps = BuildSteps();
                 index = 0;
                 nextAt = Time.time;

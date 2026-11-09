@@ -50,9 +50,17 @@ namespace MoonlitTails.EditorTools
         }
 
         /// <summary>Ends a run: quits Unity with an exit code in batch mode, otherwise just stops Play.</summary>
-        public static void End(bool batch, bool ok)
+        public static void End(bool batch, bool ok) => End(batch, ok ? 0 : 1);
+
+        /// <summary>Exit code 2: the scene isn't set up for the run (e.g. no Drink Game), as opposed to a failed check.</summary>
+        public const int NotSetUp = 2;
+
+        /// <summary>How long a run waits for the Drink Game to show up in Play mode before giving up.</summary>
+        public const float DrinkGameWaitSeconds = 15f;
+
+        public static void End(bool batch, int exitCode)
         {
-            if (batch) EditorApplication.Exit(ok ? 0 : 1);
+            if (batch) EditorApplication.Exit(exitCode);
             else EditorApplication.ExitPlaymode();
         }
     }

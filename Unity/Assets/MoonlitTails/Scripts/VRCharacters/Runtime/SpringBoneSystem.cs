@@ -76,6 +76,7 @@ namespace VRCharacters
         {
             foreach (var c in chains)
             {
+                if (c == null) continue;
                 var list = new List<Node>();
                 var t = c.root;
                 while (t != null && !t.name.EndsWith("_end"))
@@ -113,9 +114,10 @@ namespace VRCharacters
             if (!built) return;
             foreach (var c in chains)
             {
-                if (c.nodes == null) continue;
+                if (c?.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
+                    if (!n.bone) continue;
                     Vector3 tip = n.bone.position + n.bone.rotation * n.localAxis * n.length;
                     n.prevTip = tip; n.currTip = tip;
                 }
@@ -151,7 +153,7 @@ namespace VRCharacters
             for (int ci = 0; ci < chains.Count; ci++)
             {
                 var c = chains[ci];
-                if (c.nodes == null || c.root == null) continue;
+                if (c == null || c.nodes == null || c.root == null) continue;
                 float keep = Mathf.Pow(1f - c.drag, steps);
                 float pull = 1f - Mathf.Pow(1f - c.stiffness, steps);
                 Vector3 accel = (c.gravity + wind * c.windInfluence) * dt * dt;
@@ -160,8 +162,11 @@ namespace VRCharacters
                 for (int i = 0; i < c.nodes.Length; i++)
                 {
                     var n = c.nodes[i];
+                    if (!n.bone) { c.nodes = null; break; }   // a bone was destroyed: drop the chain until Build() runs again
                     if (n.bone.localRotation != n.writtenLocal) n.poseLocal = n.bone.localRotation;
                 }
+
+                if (c.nodes == null) continue;
 
                 // 2) simulate root -> tip
                 for (int i = 0; i < c.nodes.Length; i++)
@@ -197,7 +202,7 @@ namespace VRCharacters
             Gizmos.color = new Color(1f, 0.6f, 0.1f, 0.8f);
             foreach (var c in chains)
             {
-                if (c.nodes == null) continue;
+                if (c?.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
                     if (n.bone == null) continue;
