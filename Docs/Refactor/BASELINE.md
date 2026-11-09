@@ -44,7 +44,24 @@ Where it comes from (bytes/frame; idle / coaster / pouring):
 
 The whole frame (including the editor and TMP text-mesh rebuilds outside our script samples) allocated roughly 1.6 KB idle, 3.1 KB with a glass on the coaster and 56–96 KB while pouring. The whole-frame figure is approximate: it's sampled once per editor update. The jump while pouring probably comes from TMP rebuilding the labels whose text changes on each pour. It isn't attributed to a script here, so check it on a Quest Development build in Phase 7.
 
+## After the refactor (Phase 7, 9 Nov 2026)
+
+Same measurement, on the same machine, after Phases 1–7. Each cell is the range over two runs. The "characters in view" column is an estimate: the measured "nobody in view" time plus the solver's earlier 1 ms.
+
+| State | GC per frame: start | before Phase 7 | after | Time per frame: start | after, characters in view | after, nobody in view |
+|---|---|---|---|---|---|---|
+| Idle | 1221 B | 627–878 B | 458–713 B | 1.33 ms | about 1.25 ms | 0.22–0.26 ms |
+| Glass on the coaster | 1822 B | 1190–1225 B | 495–505 B | 1.40 ms | about 1.25 ms | 0.23–0.27 ms |
+| Pouring | 1546 B | 947–950 B | 508–516 B | 1.45 ms | about 1.3 ms | 0.30–0.32 ms |
+
+- **No script allocates every frame any more.** What's left (about 500 B/frame on average) is text built when something happens: an order arrives, a customer speaks, a pour lands. All of it shows under `DrinkGame`, because it now redraws the changed containers once per frame.
+- `ServeStation`: 446 B/frame with a glass on the coaster, now about 3 B. `Pourer`: 500 B/frame while pouring, now about 29 B.
+- **`SpringBoneSystem` still costs about 1 ms on desktop while a character is in view.** It's skipped only while no camera sees the character. In batch mode nothing is drawn to the Game view, so these runs measure the "nobody in view" case; the "in view" column is the earlier figure, since that code path didn't change. The next steps from the plan (a fixed 30–45 Hz step, fewer collider checks, a Burst job) need a profile on a Quest Development build first.
+- The whole-frame figure (editor included) jumps between 1 KB and over 1 MB per frame from run to run, with and without these changes, so it isn't used here.
+
 ## Runtime layout (for the Phase 4 Editor work)
+
+The layout dump was removed from the tool once the panel, the reset button and the signs became scene objects (Phase 4). The copy from before is still in [`runtime-baseline.json`](runtime-baseline.json).
 
 `runtime-baseline.json` → `layout` has the full hierarchy of everything built at runtime, with world and local position, rotation and scale of every object, plus text, font size, alignment, rect size and colour for each TMP text, and mesh and colour for each primitive:
 - `Serve Panel` (34 objects, at (0.28, 1.246, −0.83))

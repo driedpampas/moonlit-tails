@@ -5,23 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using MoonlitTails.Gameplay;
-using TMPro;
 using Unity.Profiling;
-using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.EditorTools
 {
     /// <summary>
-    /// Records what the refactor must keep the same and what it should improve, in one Play session:
-    /// - the layout of everything the game builds at runtime (serve panel, reset button, rules signs, labels) and where
-    ///   the characters end up after they're seated, so the hand-built versions can match it;
-    /// - per-script garbage (GC bytes) and time per frame for our own scripts, read from the Profiler, while idle,
-    ///   with a glass on the coaster, and while pouring.
+    /// Measures our own scripts in one Play session: garbage (GC bytes) and time per frame, read from the Profiler,
+    /// while idle, with a glass on the coaster, and while pouring. Run it before and after performance work.
     /// Writes Unity/Captures/runtime-baseline.json (git-ignored) and logs a summary. Never saves a scene or an asset.
     /// Tools > Moonlit Tails > Automation > Record Runtime Baseline, or from the command line:
     /// Unity -batchmode -projectPath Unity -executeMethod MoonlitTails.EditorTools.RuntimeBaseline.RunBatch
@@ -90,7 +84,6 @@ namespace MoonlitTails.EditorTools
         static int windowFirstFrame;
         static int previousFps = int.MinValue;   // MinValue = not changed yet
         static bool finishing;
-        static string layoutJson;
         static readonly List<string> windows = new List<string>();
         static readonly StringBuilder summary = new StringBuilder();
         static ProfilerRecorder gcInFrame;
@@ -122,7 +115,6 @@ namespace MoonlitTails.EditorTools
                             throw new TimeoutException($"the drink game didn't start within {SettleTimeoutSeconds} s");
                         return;
                     }
-                    layoutJson = DumpLayout();
                     previousFps = Application.targetFrameRate;
                     Application.targetFrameRate = MeasureFps;   // play mode only; not saved
                     ProfilerDriver.ClearAllFrames();
@@ -263,7 +255,7 @@ namespace MoonlitTails.EditorTools
                 string dir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Captures"));
                 Directory.CreateDirectory(dir);
                 string path = Path.Combine(dir, ok ? "runtime-baseline.json" : "runtime-baseline.failed.json");
-                File.WriteAllText(path, "{\n\"layout\":" + (layoutJson ?? "null") + ",\n\"performance\":[\n" + string.Join(",\n", windows) + "\n]\n}\n");
+                File.WriteAllText(path, "{\n\"performance\":[\n" + string.Join(",\n", windows) + "\n]\n}\n");
                 if (ok) Debug.Log($"[Moonlit] Runtime baseline -> {path}\n{summary}");
                 else Debug.LogError($"[Moonlit] Runtime baseline FAILED (partial data in {path})\n{summary}");
             }
@@ -274,71 +266,13 @@ namespace MoonlitTails.EditorTools
             }
             finally
             {
-                phase = Phase.Settle; windows.Clear(); summary.Clear(); layoutJson = null;
+                phase = Phase.Settle; windows.Clear(); summary.Clear();
                 previousFps = int.MinValue; finishing = false;
                 HeadlessRun.End(SessionState.GetBool(BatchKey, false), ok);
             }
         }
 
-        // ------------------------------------------------------------------ layout
-        static string DumpLayout()
-        {
-            var sb = new StringBuilder("{");
-            var game = UnityEngine.Object.FindFirstObjectByType<DrinkGame>();
-            var roots = new List<Transform>();
-            if (game)
-            {
-                if (game.Station) roots.Add(game.Station.Panel);
-                var reset = game.ResetButtonObject;
-                if (reset) roots.Add(reset.parent ? reset.parent : reset);   // the whole button: base, dome, caption
-                roots.Add(game.RulesSign);
-                roots.Add(game.MenuBoardText);
-            }
-            sb.Append("\"built\":[").Append(string.Join(",", roots.Where(r => r).Select(r => Node(r)))).Append("],");
-
-            var chars = game ? game.Seats.Where(c => c.Body).Select(c =>
-                $"{{\"id\":{Str(c.Body.name)},\"name\":{Str(c.DisplayName)},\"transform\":{Pose(c.Body)}}}") : Enumerable.Empty<string>();
-            sb.Append("\"characters\":[").Append(string.Join(",", chars)).Append("],");
-            var origin = UnityEngine.Object.FindFirstObjectByType<XROrigin>();
-            sb.Append("\"xrOrigin\":").Append(origin ? Pose(origin.transform) : "null").Append(',');
-
-            var labels = UnityEngine.Object.FindObjectsByType<FloatingLabel>(FindObjectsSortMode.None)
-                .Where(l => l.target).OrderBy(l => l.target.name)
-                .Select(l => $"{{\"target\":{Str(l.target.name)},\"height\":{Num(l.height)},\"showWithin\":{Num(l.showWithin)}}}");
-            sb.Append("\"labels\":[").Append(string.Join(",", labels)).Append("]}");
-            return sb.ToString();
-        }
-
-        /// <summary>One object and its children: pose, and what a person needs to rebuild it (text, size, colour, button).</summary>
-        static string Node(Transform t)
-        {
-            var sb = new StringBuilder("{");
-            sb.Append($"\"name\":{Str(t.name)},\"transform\":{Pose(t)}");
-            var tmp = t.GetComponent<TMP_Text>();
-            if (tmp)
-                sb.Append($",\"text\":{Str(tmp.text)},\"fontSize\":{Num(tmp.fontSize)},\"autoSize\":{(tmp.enableAutoSizing ? "true" : "false")}," +
-                          $"\"alignment\":{Str(tmp.alignment.ToString())},\"rectSize\":{Vec(tmp.rectTransform.sizeDelta)},\"color\":{Str("#" + ColorUtility.ToHtmlStringRGBA(tmp.color))}");
-            var mf = t.GetComponent<MeshFilter>();
-            if (mf && mf.sharedMesh) sb.Append($",\"mesh\":{Str(mf.sharedMesh.name)}");
-            var r = t.GetComponent<MeshRenderer>();
-            if (!tmp && r && r.sharedMaterial) sb.Append($",\"color\":{Str("#" + ColorUtility.ToHtmlStringRGBA(r.sharedMaterial.color))}");
-            var button = t.GetComponent<XRBaseInteractable>();
-            if (button) sb.Append($",\"button\":{Str(button.GetType().Name)}");
-            if (t.childCount > 0)
-            {
-                sb.Append(",\"children\":[");
-                sb.Append(string.Join(",", Enumerable.Range(0, t.childCount).Select(i => Node(t.GetChild(i)))));
-                sb.Append(']');
-            }
-            return sb.Append('}').ToString();
-        }
-
-        static string Pose(Transform t) =>
-            $"{{\"worldPosition\":{Vec(t.position)},\"worldEuler\":{Vec(t.eulerAngles)},\"lossyScale\":{Vec(t.lossyScale)}," +
-            $"\"localPosition\":{Vec(t.localPosition)},\"localEuler\":{Vec(t.localEulerAngles)},\"localScale\":{Vec(t.localScale)}}}";
-
-        static string Vec(Vector3 v) => $"[{Num(v.x)},{Num(v.y)},{Num(v.z)}]";
-        static string Vec(Vector2 v) => $"[{Num(v.x)},{Num(v.y)}]";
+        // ------------------------------------------------------------------ JSON
         static string Num(double d) => d.ToString("0.#####", CultureInfo.InvariantCulture);
 
         static string Str(string s)

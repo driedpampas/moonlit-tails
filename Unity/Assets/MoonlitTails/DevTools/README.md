@@ -9,7 +9,7 @@ These scripts run the game without a headset: for desk checks, the drink smoke t
 | `Editor/DrinkPlaySmokeTest.cs` | Play Smoke Test | Plays the scene and makes drinks by moving the props. Exit code 0 = passed. See `Docs/DRINK_GAME.md`. |
 | `Editor/DemoVideoRecorder.cs` + `DemoDirector.cs` | Record Demo Video | Films the weekly progress video into `Unity/Captures/Demo/` (needs ffmpeg). |
 | `Editor/SceneCheck.cs` | Check Scene | Checks the bar pieces (prefabs, materials, colliders, grabbing), lists which props the drink game uses, and checks that the Drink Game object and the serve panel have every reference set. Changes nothing. Exit code 0 = no problems. |
-| `Editor/RuntimeBaseline.cs` | Record Runtime Baseline | Plays the scene and writes `Unity/Captures/runtime-baseline.json`. It holds the layout of everything the game builds at runtime, plus per-script garbage and time per frame from the Profiler (idle, glass on the coaster, pouring). Use it before and after performance work. |
+| `Editor/RuntimeBaseline.cs` | Record Runtime Baseline | Plays the scene and writes `Unity/Captures/runtime-baseline.json`. It holds per-script garbage and time per frame from the Profiler (idle, glass on the coaster, pouring). Use it before and after performance work, and compare several runs. |
 | `Editor/AndroidBuild.cs` | Build Android APK | Builds the Quest APK from the scenes in Build Settings into `Unity/Captures/Build/`. Optional `-apkPath`, `-jdk`, `-sdk`, `-ndk` on the command line (tool paths only go into your editor preferences). Exit code 0 = built. |
 | `Editor/HeadlessRun.cs` | | What they share: opening the scene, batch-mode workarounds, exiting. |
 
