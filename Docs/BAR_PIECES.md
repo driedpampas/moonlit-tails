@@ -13,7 +13,7 @@ The bar used to be one FBX with 248 objects in it. Now every piece is its own fi
 | `Environment/Bar/<Group>/*.fbx` | The pieces: 141 files for 166 objects. Identical shapes, like the two copies of each glass, share one file. |
 | `Environment/Bar/Prefabs/<Group>/*.prefab` | One prefab per piece, with its colliders. Props also get physics, grabbing and respawn. |
 | `Environment/Bar/MoonlitBar.prefab` | The whole bar, built from the piece prefabs. The scene holds one copy of it. |
-| `Environment/Bar/bar_split.json` | Which object uses which file. The Unity tools read it. |
+| `Environment/Bar/bar_split.json` | Which object uses which file. `split_bar.py` writes it; nothing in Unity reads it any more. |
 | `Environment/RemadeModels/` | The remade pieces, each with a prefab in `RemadeModels/Prefabs` (colliders and materials included). |
 
 ## Inside `MoonlitBar`

@@ -23,8 +23,13 @@ Branch `devtools-separation`, 9 Nov 2026. The step-by-step plan and the two audi
 | 62 props each with their own `Update` | Drink Game checks them once per frame |
 | Automation mixed in with the game | `DevTools/`, in its own editor-only assemblies. The game never references it. See [its README](../../Unity/Assets/MoonlitTails/DevTools/README.md) |
 | The XR Interaction Simulator shipped in builds | Tagged `EditorOnly` in the scene |
+| Labels, liquid, ice and the pour stream were built in code | Four small prefabs in `Resources/Moonlit` that the game copies |
+| HDR, camera post-processing and a forced extra buffer, for a bloom volume with an empty profile | All off, and the volume removed |
+| The Quest ran the "Very Low" quality level (1 bone per vertex, half-size textures) | One level, *Standard* |
+| No foveated rendering; physics at 90 Hz whatever the headset's rate | A `Headset Display` object in the scene sets both |
+| Ingredients had an enum id and a string id | The enum only |
 
-Also: null checks with clear error messages where a reference can be missing, no script allocates every frame any more, and the demo recorder frees what it creates. Numbers are in [BASELINE.md](BASELINE.md).
+Also: a clear error message where a reference can be missing (and no checks for parts that always exist), no script allocates every frame any more, and the demo recorder frees what it creates. Numbers are in [BASELINE.md](BASELINE.md).
 
 ## Rules to keep
 
@@ -53,9 +58,16 @@ None of this can be tested from a desk:
 | Scene | Characters seated right, each ticket by its customer, the rules sign readable from behind the bar |
 | Spring bones | Look away from a character and back: the tail and ears restart from their pose without a jump |
 | Performance | 72/90 Hz without GC spikes, on a Development build with the Profiler |
+| Headset Display | The log line `Headset display: … Hz, foveation …` appears. The edges of the view don't look blocky (lower *Foveation* if they do). Held props move smoothly |
+| Characters | Joints and hair deform better than before (4 bones per vertex) |
 
 ## Not done
 
 - **Quest APK build** after the refactor (`Automation > Build Android APK`), which also tests the `EditorOnly` tag.
 - **Spring bones** still cost about 1 ms a frame on desktop for three characters in view. Profile on a Quest Development build before going further (fixed 30–45 Hz step, fewer collider checks, a Burst job).
+- **Baked lighting.** The bar has 20 realtime point and spot lights plus the moonlight, nothing is marked static, and the renderer is Forward+ because of it. This is the biggest cost left on a Quest. Someone needs to mark the fixed pieces static in the Editor, set the lights to Baked, bake, and check the look. The models already have lightmap UVs. After that the renderer can go to Forward.
+- **Held props trail the hand.** All 42 grabbable props use *Velocity Tracking* with continuous collision detection. Try *Instantaneous* on one prop in a headset and compare.
+- **GPU skinning** is off, and the toon outline draws each character twice. Test both on a Development build before changing them.
+- **Colliders.** The bar's fixed pieces use 178 mesh colliders. Box colliders would be cheaper for walls, counters and shelves.
+- **Prop shape is measured, not authored.** The up axis, mouth and radius of a glass or bottle come from its mesh bounds at startup. A "Mouth" child in each prefab would replace that, but the measurement works for every prop today.
 - **Customer writing** in `Data/Customers/` is placeholder: replace it with the characters in [Docs/Characters](../Characters/).
