@@ -251,7 +251,7 @@ static class Program
         Eq(pinned.Length, Enum.GetValues(typeof(IngredientId)).Length, "every IngredientId has a pinned number");
         Check(Get(IngredientId.None) == null, "IngredientId.None is no ingredient");
         var all = Bases.Concat(Modifiers).ToList();
-        foreach (var i in all) Check(Enum.TryParse<IngredientId>(i.Id, out var id) && Get(id) == i, $"{i.Id} has an IngredientId that maps back to it");
+        foreach (var i in all) Check(i.Id != IngredientId.None && Get(i.Id) == i, $"{i.Id} has an IngredientId that maps back to it");
         Eq(all.Count, pinned.Length - 1, "one IngredientId per ingredient");
 
         // ---- no glasses: no order, no exception
