@@ -86,7 +86,6 @@ namespace MoonlitTails.EditorTools
             cam.nearClipPlane = 0.02f; cam.farClipPlane = 80f;
             cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.05f, 0.06f, 0.14f);
             var data = cam.GetUniversalAdditionalCameraData();
-            data.renderPostProcessing = true;
             data.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
             data.antialiasingQuality = AntialiasingQuality.High;
             rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);

@@ -55,7 +55,7 @@ Props' "home" positions are stored relative to the bar, so a rescaled bar still 
 
 The scene and these settings are edited by hand in the Editor. No script rebuilds them.
 
-- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, HDR, shadow distance 12 m), set as the default pipeline and on every quality level. Colour space: Linear.
+- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, no HDR and no post-processing, so the Quest draws straight to the headset), set as the default pipeline and on every quality level. Colour space: Linear.
 - **XR Plug-in Management:** OpenXR for PC and Android, *Initialize XR on Startup* on.
 - **OpenXR features (PC and Android):** Hand Tracking Subsystem, Meta Hand Tracking Aim, Hand Interaction Profile, Oculus Touch and Meta Quest Touch Plus controller profiles. On Android also **Meta Quest Support**.
 - **Player:** *Run In Background* on (Play keeps running when the headset takes focus). Android: IL2CPP, ARM64, minimum API level 29.
@@ -83,7 +83,6 @@ Unity -batchmode -quit -projectPath Unity -executeMethod MoonlitTails.EditorTool
 
 On the Quest itself, keep an eye on performance:
 - **Lights:** the bar uses about 20 realtime lights. Baking the lighting is the next step for a standalone build.
-- **Bloom:** turn off the `PostProcess (Bloom)` object if the frame rate drops.
 
 ## What the desk check showed (no headset)
 

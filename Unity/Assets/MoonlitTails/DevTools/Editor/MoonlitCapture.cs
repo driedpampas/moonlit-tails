@@ -7,7 +7,6 @@ using MoonlitTails.Gameplay;
 using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace MoonlitTails.EditorTools
 {
@@ -95,7 +94,6 @@ namespace MoonlitTails.EditorTools
             var cam = go.AddComponent<Camera>();
             cam.nearClipPlane = 0.02f; cam.farClipPlane = 60f; cam.fieldOfView = 90f;
             cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.08f, 0.09f, 0.2f);
-            cam.GetUniversalAdditionalCameraData().renderPostProcessing = true;
 
             // (name, yaw, pitch) relative to the way the player faces; +pitch looks down
             var views = new (string, float, float)[]
