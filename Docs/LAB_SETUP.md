@@ -36,7 +36,7 @@ Link lets you change sizes in the Inspector while someone is wearing the headset
 If grabbing feels off, tune it on the XR rig in the scene, not in code:
 - **Grab triggers too late, or a fist doesn't grab:** on `Left Hand` / `Right Hand` > `Select Input` (Release Threshold Button Reader), lower **Press Threshold** (default 1) and **Release Threshold** (default 0.9), e.g. to 0.8 / 0.6.
 - **Throws too weak or too strong:** **Throw Velocity Scale** / **Throw Angular Velocity Scale** on the prop prefabs' XR Grab Interactable.
-- **Physics rate:** Project Settings > Time > Fixed Timestep is 0.0111111 (90 Hz). Match the headset refresh rate (72/90/120 Hz) so held props move smoothly.
+- **Physics rate:** Project Settings > Time > Fixed Timestep is 0.0111111 (90 Hz). In a headset the scene's `Headset Display` object sets it to the headset's own refresh rate (72/90/120 Hz), so held props move once per drawn frame. It also turns on foveated rendering (the *Foveation* slider: 0 = off, lower it if the edges of the view look blocky).
 - **Props pass through your body:** the XR Origin's CharacterController is disabled (walking and teleporting are off), so leaning over the counter doesn't knock glasses away. Enable it again if locomotion comes back.
 
 ## Moving and resizing things
@@ -55,9 +55,10 @@ Props' "home" positions are stored relative to the bar, so a rescaled bar still 
 
 The scene and these settings are edited by hand in the Editor. No script rebuilds them.
 
-- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, no HDR and no post-processing, so the Quest draws straight to the headset), set as the default pipeline and on every quality level. Colour space: Linear.
+- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, no HDR and no post-processing, so the Quest draws straight to the headset), set as the default pipeline. Colour space: Linear.
+- **Quality:** one level, *Standard*, on every platform: 4 bones per vertex and full-size textures. Realtime shadows are off in the URP asset (no light in the bar casts any).
 - **XR Plug-in Management:** OpenXR for PC and Android, *Initialize XR on Startup* on.
-- **OpenXR features (PC and Android):** Hand Tracking Subsystem, Meta Hand Tracking Aim, Hand Interaction Profile, Oculus Touch and Meta Quest Touch Plus controller profiles. On Android also **Meta Quest Support**.
+- **OpenXR features (PC and Android):** Hand Tracking Subsystem, Meta Hand Tracking Aim, Hand Interaction Profile, Oculus Touch and Meta Quest Touch Plus controller profiles. On Android also **Meta Quest Support** and **Foveated Rendering**.
 - **Player:** *Run In Background* on (Play keeps running when the headset takes focus). Android: IL2CPP, ARM64, minimum API level 29.
 - **Samples** (Package Manager): XR Interaction Toolkit *Starter Assets*, *Hands Interaction Demo* and *XR Interaction Simulator*; XR Hands *HandVisualizer*.
 - **Sitting animation** (`Animations/Sitting Idle.fbx`): Rig = Humanoid, create the avatar from this model; clip renamed `Sitting_Idle`, Loop Time + Loop Pose, root rotation, height and XZ baked into the pose.
