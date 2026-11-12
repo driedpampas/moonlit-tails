@@ -93,7 +93,7 @@ Two choices aren't in the guide yet. Check them with the designers:
 | Grapefruit Acid | Melon Liqueur bottle |
 | Sour Mix | Blue Curaçao bottle |
 
-The label over each prop shows the ingredient's name. To change what a prop pours, open its prefab and pick another **Ingredient** on its *Ingredient Source*.
+The label over each prop shows the ingredient's name. How the labels, the liquid in a glass, the ice cubes and the pour stream look is set in four small prefabs in `Unity/Assets/MoonlitTails/Resources/Moonlit/` (`FloatingLabel`, `Liquid`, `Ice`, `PourStream`); the game makes copies of them as it needs them. To change what a prop pours, open its prefab and pick another **Ingredient** on its *Ingredient Source*.
 
 **Adding a prop to the game:** open its prefab (it needs a collider, a Rigidbody, an XR Grab Interactable and a Prop Respawn, like the others) and add one component:
 - a bottle or carton: **Ingredient Source**, then pick the ingredient;

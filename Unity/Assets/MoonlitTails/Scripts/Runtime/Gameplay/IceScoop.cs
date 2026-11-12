@@ -67,16 +67,12 @@ namespace MoonlitTails.Gameplay
             if (label) label.SetTitle(on ? "<b>Ice Scoop</b> <size=75%>full: bring it to a glass</size>" : "<b>Ice Scoop</b> <size=75%>dip it in the ice well</size>");
             if (on && !cubes && self)
             {
-                cubes = new GameObject("Scooped Ice");
-                cubes.transform.SetParent(transform, false);
-                cubes.transform.localPosition = transform.InverseTransformPoint(self.bounds.center);
-                for (int i = 0; i < 3; i++)
-                {
-                    var c = GameVisuals.Primitive(PrimitiveType.Cube, cubes.transform, "Ice", new Color(0.85f, 0.95f, 1f));
-                    c.transform.localPosition = new Vector3((i - 1) * 0.012f, 0.008f, 0) / Mathf.Max(transform.lossyScale.x, 1e-4f);
-                    c.transform.localRotation = Quaternion.Euler(15 * i, 30 * i, 0);
-                    c.transform.localScale = Vector3.one * 0.014f / Mathf.Max(transform.lossyScale.x, 1e-4f);
-                }
+                // the Ice prefab is three cubes 0.55 wide: shrink it so each is about 1.4 cm, whatever the scoop's own scale
+                float scale = 0.025f / Mathf.Max(transform.lossyScale.x, 1e-4f);
+                cubes = GameVisuals.Spawn<GameObject>("Ice", transform);
+                cubes.name = "Scooped Ice";
+                cubes.transform.localPosition = transform.InverseTransformPoint(self.bounds.center + Vector3.up * 0.008f);
+                cubes.transform.localScale = Vector3.one * scale;
             }
             if (cubes) cubes.SetActive(on);
         }

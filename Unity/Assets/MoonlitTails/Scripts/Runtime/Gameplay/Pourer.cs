@@ -45,13 +45,7 @@ namespace MoonlitTails.Gameplay
             upAxis = GameVisuals.LocalUpAxis(transform);
             bounds = GameVisuals.LocalBounds(gameObject);
 
-            stream = new GameObject("Pour Stream").AddComponent<LineRenderer>();
-            stream.transform.SetParent(transform, false);
-            stream.useWorldSpace = true;
-            stream.positionCount = 2;
-            stream.widthMultiplier = 0.008f;
-            stream.numCapVertices = 2;
-            stream.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            stream = GameVisuals.Spawn<LineRenderer>("PourStream", transform);
             stream.enabled = false;
         }
 

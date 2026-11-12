@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using MoonlitTails.Drinks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace MoonlitTails.Gameplay
 {
-    /// <summary>Small helpers for the procedural visuals: flat-colour materials, primitives without colliders, text.</summary>
+    /// <summary>Small helpers for the visuals: the taste colours, flat-colour materials, copies of the small prefabs, and measuring props.</summary>
     public static class GameVisuals
     {
         static readonly Dictionary<int, Material> materials = new Dictionary<int, Material>();
@@ -56,82 +55,15 @@ namespace MoonlitTails.Gameplay
             materials.Clear();
         }
 
-        /// <summary>A primitive with its collider removed straight away, so it never pushes props around.</summary>
-        public static GameObject Primitive(PrimitiveType type, Transform parent, string name, Color color)
-        {
-            var go = GameObject.CreatePrimitive(type);
-            go.name = name;
-            var col = go.GetComponent<Collider>();
-            if (col)
-            {
-                col.enabled = false;   // off at once so it never pushes anything; removed at the end of the frame
-                Object.Destroy(col);
-            }
-            go.transform.SetParent(parent, false);
-            var r = go.GetComponent<MeshRenderer>();
-            r.sharedMaterial = Flat(color);
-            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            r.receiveShadows = false;
-            return go;
-        }
-
-        public static TextMeshPro Text(Transform parent, string name, float size, TextAlignmentOptions align = TextAlignmentOptions.Center)
-        {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            var t = go.AddComponent<TextMeshPro>();
-            t.fontSize = size;
-            t.alignment = align;
-            t.textWrappingMode = TextWrappingModes.NoWrap;
-            t.overflowMode = TextOverflowModes.Overflow;
-            t.color = Ink;   // no outline: it needs a material per label (bad for Quest) and fails on hidden labels
-            t.rectTransform.sizeDelta = new Vector2(0.5f, 0.1f);
-            t.richText = true;
-            return t;
-        }
-
         /// <summary>
-        /// Builds a set of taste bars under <paramref name="parent"/>: per taste a background, a fill, a zero tick, a name
-        /// and a value, plus a caption. Used by floating labels; the serve panel has its own in its prefab.
+        /// A copy of one of the small prefabs in <c>Resources/Moonlit</c> (FloatingLabel, Liquid, Ice, PourStream),
+        /// placed under <paramref name="parent"/>. Their look is edited in those prefabs.
         /// </summary>
-        public static StatBarsView BuildStatBars(Transform parent, float width)
+        public static T Spawn<T>(string prefab, Transform parent) where T : Object
         {
-            var root = new GameObject("Taste Bars");
-            root.transform.SetParent(parent, false);
-            var view = new StatBarsView { root = root, width = width };
-            Color[] colors = { BitterColor, SweetColor, SourColor };
-            string[] names = { "Bitter", "Sweet", "Sour" };
-            const float row = 0.018f, barH = 0.011f;
-            var t = root.transform;
-            for (int i = 0; i < 3; i++)
-            {
-                float y = -i * row;
-                var bg = Primitive(PrimitiveType.Quad, t, names[i] + " Bar", new Color(0.12f, 0.1f, 0.22f));
-                bg.transform.localPosition = new Vector3(0, y, 0);
-                bg.transform.localScale = new Vector3(width, barH, 1);
-
-                var fill = Primitive(PrimitiveType.Quad, t, names[i] + " Fill", colors[i]);
-                fill.transform.localPosition = new Vector3(0, y, -0.001f);
-                fill.transform.localScale = new Vector3(0, barH * 0.8f, 1);
-                view.fills[i] = fill.transform;
-
-                var tick = Primitive(PrimitiveType.Quad, t, names[i] + " Zero", Color.white);
-                tick.transform.localPosition = new Vector3(0, y, -0.002f);
-                tick.transform.localScale = new Vector3(0.0012f, barH * 1.3f, 1);
-
-                var label = Text(t, names[i] + " Name", 0.09f, TextAlignmentOptions.Right);
-                label.text = names[i];
-                label.rectTransform.sizeDelta = new Vector2(0.05f, 0.012f);
-                label.transform.localPosition = new Vector3(-width * 0.5f - 0.03f, y, -0.002f);
-
-                var value = Text(t, names[i] + " Value", 0.1f, TextAlignmentOptions.Left);
-                value.rectTransform.sizeDelta = new Vector2(0.03f, 0.012f);
-                value.transform.localPosition = new Vector3(width * 0.5f + 0.02f, y, -0.002f);
-                view.values[i] = value;
-            }
-            view.caption = Text(t, "Caption", 0.1f);
-            view.caption.transform.localPosition = new Vector3(0, 0.017f, -0.002f);
-            return view;
+            var source = Resources.Load<T>("Moonlit/" + prefab);
+            if (!source) Debug.LogError($"GameVisuals: Resources/Moonlit/{prefab}.prefab is missing or has no {typeof(T).Name}.");
+            return Object.Instantiate(source, parent, false);
         }
 
         /// <summary>A colour for a liquid, from its tastes (liquids don't change the order's colour; this is just to see them).</summary>
@@ -154,11 +86,6 @@ namespace MoonlitTails.Gameplay
             if (v < -SignedRange || v > SignedRange) return v > 0 ? "+" + v : v.ToString();
             return signed[v + SignedRange] ??= v > 0 ? "+" + v : v.ToString();
         }
-
-        public static string StatsLine(Taste t) =>
-            $"<color=#{ColorUtility.ToHtmlStringRGB(BitterColor * 1.5f)}>Bitter {Signed(t.Bitter)}</color>  " +
-            $"<color=#{ColorUtility.ToHtmlStringRGB(SweetColor)}>Sweet {Signed(t.Sweet)}</color>  " +
-            $"<color=#{ColorUtility.ToHtmlStringRGB(SourColor)}>Sour {Signed(t.Sour)}</color>";
 
         /// <summary>The local axis of an object that points most nearly up right now (props are modelled upright).</summary>
         public static Vector3 LocalUpAxis(Transform t)

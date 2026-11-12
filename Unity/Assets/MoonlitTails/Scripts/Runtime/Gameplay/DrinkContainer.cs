@@ -61,7 +61,7 @@ namespace MoonlitTails.Gameplay
         PropRespawn home;
         Transform liquidRoot;
         readonly List<MeshRenderer> liquidBits = new List<MeshRenderer>();   // a pool: reused, never destroyed
-        GameObject iceBits;
+        GameObject iceBits;   // a copy of the Ice prefab, made the first time the glass gets ice
 
         // refreshes are batched: a change marks the container, and DrinkGame's LateUpdate redraws each one once
         static readonly HashSet<DrinkContainer> dirty = new HashSet<DrinkContainer>();
@@ -445,7 +445,7 @@ namespace MoonlitTails.Gameplay
             {
                 float h = usable * units / Capacity;
                 if (used == liquidBits.Count)
-                    liquidBits.Add(GameVisuals.Primitive(PrimitiveType.Cylinder, liquidRoot, "Liquid", c).GetComponent<MeshRenderer>());
+                    liquidBits.Add(GameVisuals.Spawn<MeshRenderer>("Liquid", liquidRoot));
                 var cyl = liquidBits[used++];
                 cyl.sharedMaterial = GameVisuals.Flat(c);
                 cyl.transform.localScale = new Vector3(radius * 2f, h * 0.5f, radius * 2f);
@@ -470,16 +470,10 @@ namespace MoonlitTails.Gameplay
 
             if (IsGlass && Cold && !iceBits)
             {
-                iceBits = new GameObject("Ice");
-                iceBits.transform.SetParent(liquidRoot, false);
-                for (int i = 0; i < 3; i++)
-                {
-                    var cube = GameVisuals.Primitive(PrimitiveType.Cube, iceBits.transform, "Ice Cube", new Color(0.85f, 0.95f, 1f));
-                    float a = i * 2.1f;
-                    cube.transform.localPosition = new Vector3(Mathf.Cos(a) * radius * 0.45f, half * 0.55f, Mathf.Sin(a) * radius * 0.45f);
-                    cube.transform.localRotation = Quaternion.Euler(20 * i, 35 * i, 10);
-                    cube.transform.localScale = Vector3.one * radius * 0.55f;
-                }
+                // the Ice prefab is three cubes sized for a glass of radius 1
+                iceBits = GameVisuals.Spawn<GameObject>("Ice", liquidRoot);
+                iceBits.transform.localPosition = new Vector3(0, half * 0.55f, 0);
+                iceBits.transform.localScale = Vector3.one * radius;
             }
             if (iceBits && iceBits.activeSelf != Cold) iceBits.SetActive(Cold);
         }
