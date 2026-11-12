@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using MoonlitTails.Drinks;
-using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MoonlitTails.Gameplay
 {
-    /// <summary>Small helpers for the procedural visuals: flat-colour materials, primitives without colliders, text.</summary>
+    /// <summary>Small helpers for the visuals: the taste colours, flat-colour materials, copies of the small prefabs, and measuring props.</summary>
     public static class GameVisuals
     {
-        static readonly Dictionary<Color, Material> materials = new Dictionary<Color, Material>();
-        static Shader unlit;
+        static readonly Dictionary<int, Material> materials = new Dictionary<int, Material>();
+        static Material flatBase;
+        static bool clearsOnUnload;
 
         public static readonly Color BitterColor = new Color(0.55f, 0.34f, 0.18f);
         public static readonly Color SweetColor = new Color(0.96f, 0.47f, 0.68f);
@@ -18,46 +19,51 @@ namespace MoonlitTails.Gameplay
         public static readonly Color Bad = new Color(1f, 0.55f, 0.5f);
         public static readonly Color Ink = new Color(1f, 0.97f, 0.9f);
 
-        /// <summary>A shared unlit material in one colour (URP Unlit; it's already used by the sky, so it ships in builds).</summary>
+        /// <summary>
+        /// A shared unlit material in one colour: a copy of <c>Resources/Moonlit/FlatUnlit.mat</c> (URP Unlit), so the
+        /// shader is always in builds. One material per colour, rounded to 1/32 per channel so near-equal liquid colours
+        /// share one. They're destroyed when a scene unloads.
+        /// </summary>
         public static Material Flat(Color c)
         {
-            if (materials.TryGetValue(c, out var m) && m) return m;
-            if (!unlit) unlit = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Sprites/Default");
-            m = new Material(unlit) { name = "Flat " + ColorUtility.ToHtmlStringRGB(c), enableInstancing = true };
-            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
+            int key = Step(c.r) | Step(c.g) << 6 | Step(c.b) << 12 | Step(c.a) << 18;
+            if (materials.TryGetValue(key, out var m) && m) return m;
+            if (!flatBase) flatBase = Resources.Load<Material>("Moonlit/FlatUnlit");
+            if (!flatBase)
+            {
+                Debug.LogError("GameVisuals: Resources/Moonlit/FlatUnlit.mat is missing, so liquids and pour streams have no material.");
+                return null;
+            }
+            if (!clearsOnUnload)
+            {
+                clearsOnUnload = true;
+                SceneManager.sceneUnloaded += _ => ClearMaterials();
+            }
+            c = new Color(Step(c.r) / 32f, Step(c.g) / 32f, Step(c.b) / 32f, Step(c.a) / 32f);
+            m = new Material(flatBase) { name = "Flat " + ColorUtility.ToHtmlStringRGB(c) };
+            m.SetColor("_BaseColor", c);
             m.color = c;
-            materials[c] = m;
+            materials[key] = m;
             return m;
         }
 
-        /// <summary>A primitive with its collider removed straight away, so it never pushes props around.</summary>
-        public static GameObject Primitive(PrimitiveType type, Transform parent, string name, Color color)
+        static int Step(float v) => Mathf.RoundToInt(Mathf.Clamp01(v) * 32f);
+
+        static void ClearMaterials()
         {
-            var go = GameObject.CreatePrimitive(type);
-            go.name = name;
-            var col = go.GetComponent<Collider>();
-            if (col) Object.DestroyImmediate(col);
-            go.transform.SetParent(parent, false);
-            var r = go.GetComponent<MeshRenderer>();
-            r.sharedMaterial = Flat(color);
-            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            r.receiveShadows = false;
-            return go;
+            foreach (var m in materials.Values) if (m) Object.Destroy(m);
+            materials.Clear();
         }
 
-        public static TextMeshPro Text(Transform parent, string name, float size, TextAlignmentOptions align = TextAlignmentOptions.Center)
+        /// <summary>
+        /// A copy of one of the small prefabs in <c>Resources/Moonlit</c> (FloatingLabel, Liquid, Ice, PourStream),
+        /// placed under <paramref name="parent"/>. Their look is edited in those prefabs.
+        /// </summary>
+        public static T Spawn<T>(string prefab, Transform parent) where T : Object
         {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            var t = go.AddComponent<TextMeshPro>();
-            t.fontSize = size;
-            t.alignment = align;
-            t.textWrappingMode = TextWrappingModes.NoWrap;
-            t.overflowMode = TextOverflowModes.Overflow;
-            t.color = Ink;   // no outline: it needs a material per label (bad for Quest) and fails on hidden labels
-            t.rectTransform.sizeDelta = new Vector2(0.5f, 0.1f);
-            t.richText = true;
-            return t;
+            var source = Resources.Load<T>("Moonlit/" + prefab);
+            if (!source) Debug.LogError($"GameVisuals: Resources/Moonlit/{prefab}.prefab is missing or has no {typeof(T).Name}.");
+            return Object.Instantiate(source, parent, false);
         }
 
         /// <summary>A colour for a liquid, from its tastes (liquids don't change the order's colour; this is just to see them).</summary>
@@ -71,12 +77,15 @@ namespace MoonlitTails.Gameplay
             return Color.Lerp(c, Color.white, 0.15f);
         }
 
-        public static string Signed(int v) => v > 0 ? "+" + v : v.ToString();
+        const int SignedRange = 20;
+        static readonly string[] signed = new string[SignedRange * 2 + 1];
 
-        public static string StatsLine(Taste t) =>
-            $"<color=#{ColorUtility.ToHtmlStringRGB(BitterColor * 1.5f)}>Bitter {Signed(t.Bitter)}</color>  " +
-            $"<color=#{ColorUtility.ToHtmlStringRGB(SweetColor)}>Sweet {Signed(t.Sweet)}</color>  " +
-            $"<color=#{ColorUtility.ToHtmlStringRGB(SourColor)}>Sour {Signed(t.Sour)}</color>";
+        /// <summary>"+2", "0", "-1". The usual range comes from a table, so showing a taste makes no new strings.</summary>
+        public static string Signed(int v)
+        {
+            if (v < -SignedRange || v > SignedRange) return v > 0 ? "+" + v : v.ToString();
+            return signed[v + SignedRange] ??= v > 0 ? "+" + v : v.ToString();
+        }
 
         /// <summary>The local axis of an object that points most nearly up right now (props are modelled upright).</summary>
         public static Vector3 LocalUpAxis(Transform t)

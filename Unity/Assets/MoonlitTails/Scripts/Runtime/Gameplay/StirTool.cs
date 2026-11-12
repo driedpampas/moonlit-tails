@@ -1,21 +1,24 @@
 using MoonlitTails.Drinks;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails.Gameplay
 {
     /// <summary>The bar spoon. Swirl its tip around inside the Stir Cup or Shake Mixer to stir.</summary>
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class StirTool : MonoBehaviour
     {
         [Tooltip("How far the tip has to travel inside a vessel (metres) to count as a stir.")]
         public float stirDistance = 0.35f;
 
         Vector3 axis;
+        Vector3 center;
         float half;
         DrinkContainer current;
         Vector3 lastTip;
         float travelled;
 
-        public void Init()
+        void Awake()
         {
             var b = GameVisuals.LocalBounds(gameObject);
             Vector3 e = b.extents;
@@ -23,8 +26,6 @@ namespace MoonlitTails.Gameplay
             half = GameVisuals.Extent(b, axis);
             center = b.center;
         }
-
-        Vector3 center;
 
         Vector3 Tip()
         {

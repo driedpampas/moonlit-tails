@@ -68,6 +68,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5ad43152358719a688b552e3fa6f131, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7758466772316816505}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5ad43152358719a688b552e3fa6f131, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1841830776076712175}
   m_SourcePrefab: {fileID: 100100000, guid: e5ad43152358719a688b552e3fa6f131, type: 3}
 --- !u!1 &7204390909576913082 stripped
 GameObject:
@@ -268,3 +271,23 @@ MonoBehaviour:
   space: {fileID: 0}
   homePosition: {x: 0, y: 0, z: 0}
   homeRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &1841830776076712175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7204390909576913082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c4f0464a85211369a35dde847f83c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.DrinkContainer
+  pourAngle: 100
+  rearmAngle: 60
+  pourSeconds: 0.5
+  dumpSeconds: 1.2
+  kind: 0
+  variant: Shot
+  length: 3
+  showWithin: -1

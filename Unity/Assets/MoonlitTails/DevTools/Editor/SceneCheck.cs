@@ -1,0 +1,279 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using MoonlitTails.Drinks;
+using MoonlitTails.Gameplay;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+
+namespace MoonlitTails.EditorTools
+{
+    /// <summary>
+    /// Tools > Moonlit Tails > Automation > Check Scene: checks the open bar scene. Changes nothing, saves nothing.
+    /// Bar pieces:
+    /// - every mesh in the bar belongs to a piece prefab (no loose meshes)
+    /// - every material is one of the shared bar materials (no missing or default ones)
+    /// - room pieces have colliders, props have collider + rigidbody + grab + respawn
+    /// - no missing scripts, no duplicate names
+    /// Drink setup: which props the drink game will use and for what, and anything it can't find.
+    /// Command line (exit code 0 = no problems):
+    /// Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.SceneCheck.RunBatch
+    /// </summary>
+    public static class SceneCheck
+    {
+        [MenuItem("Tools/Moonlit Tails/Automation/Check Scene")]
+        public static void Run() => Check(out _);
+
+        public static void RunBatch()
+        {
+            if (!GameObject.Find("MoonlitBar")) EditorSceneManager.OpenScene(HeadlessRun.ScenePath);
+            Check(out int problems);
+            EditorApplication.Exit(problems == 0 ? 0 : 1);
+        }
+
+        /// <summary>Both sections. <paramref name="problems"/> counts bar problems plus drink-setup warnings.</summary>
+        public static bool Check(out int problems)
+        {
+            bool barOk = CheckBar(out int barProblems);
+            CheckDrinkSetup(out int drinkWarnings);
+            problems = barProblems + drinkWarnings;
+            return barOk && drinkWarnings == 0;
+        }
+
+        static readonly string[] Groups = { "Architecture", "BarCounters", "Decor", "NightSky", "Stools", "Props", "Markers", "Lights", "RemadeModels" };
+        static readonly string[] FixedProps = { "PROP_TapHandle", "PROP_DispenserLever", "PROP_OrderTicket", "PROP_ServiceBell" };
+        static readonly string[] NoCollider = { "StringLights", "Neon", "Pendant", "Lantern", "WallStars", "Sconces", "Noren", "IceCubes", "Picture", "Medallion", "Straw", "SKY_" };
+
+        static bool CheckBar(out int problems)
+        {
+            var bar = GameObject.Find("MoonlitBar");
+            var issues = new List<string>();
+            var sb = new StringBuilder("[Moonlit] Bar piece check\n");
+            if (!bar) { Debug.LogError("[Moonlit] No MoonlitBar in the open scene."); problems = 1; return false; }
+
+            var barAsset = PrefabUtility.GetCorrespondingObjectFromSource(bar);
+            sb.AppendLine($"MoonlitBar is a prefab instance: {(barAsset ? AssetDatabase.GetAssetPath(barAsset) : "NO")}");
+            if (!barAsset) issues.Add("MoonlitBar isn't an instance of MoonlitBar.prefab");
+
+            // ---- what's directly in each group
+            var pieces = new List<GameObject>();
+            int markers = 0, lights = 0, remade = 0;
+            var pieceAssets = new HashSet<string>();
+            foreach (Transform child in bar.transform)
+            {
+                if (!Groups.Contains(child.name)) { issues.Add($"unexpected object directly under MoonlitBar: {child.name}"); continue; }
+                foreach (var t in Members(child))
+                {
+                    var go = t.gameObject;
+                    if (child.name == "Markers")
+                    {
+                        markers++;
+                        if (go.GetComponents<Component>().Length > 1 || t.childCount > 0) issues.Add($"marker {go.name} has components or children");
+                        continue;
+                    }
+                    if (child.name == "Lights")
+                    {
+                        lights++;
+                        if (!go.GetComponent<Light>()) issues.Add($"{go.name} in Lights has no Light");
+                        continue;
+                    }
+                    if (!PrefabUtility.IsAnyPrefabInstanceRoot(go)) { issues.Add($"{child.name}/{go.name} is not a prefab instance"); continue; }
+                    string asset = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
+                    if (child.name == "RemadeModels") remade++; else pieces.Add(go);
+                    pieceAssets.Add(asset);
+                    if (!asset.EndsWith(".prefab")) issues.Add($"{go.name} is an instance of a model ({asset}), not of a piece prefab");
+                }
+            }
+            sb.AppendLine($"Pieces: {pieces.Count} (from {pieceAssets.Count} prefab files), remade models: {remade}, markers: {markers}, lights: {lights}");
+
+            // ---- every renderer in the bar must belong to a prefab instance, with real materials
+            var shared = new HashSet<Material>(AssetDatabase.FindAssets("t:Material", new[] { HeadlessRun.Root + "/Environment/Materials" })
+                .Select(g => AssetDatabase.LoadAssetAtPath<Material>(AssetDatabase.GUIDToAssetPath(g))));
+            int renderers = 0;
+            foreach (var r in bar.GetComponentsInChildren<Renderer>(true))
+            {
+                if (r is LineRenderer) continue;
+                renderers++;
+                if (!PrefabUtility.IsPartOfPrefabInstance(r) || PrefabUtility.IsAddedComponentOverride(r))
+                    issues.Add($"loose mesh (not in a piece prefab): {Path(r.transform, bar.transform)}");
+                foreach (var m in r.sharedMaterials)
+                {
+                    if (!m) { issues.Add($"missing material on {Path(r.transform, bar.transform)}"); continue; }
+                    bool remadeMat = Path(r.transform, bar.transform).StartsWith("RemadeModels/");
+                    if (!remadeMat && !shared.Contains(m)) issues.Add($"{Path(r.transform, bar.transform)} uses '{m.name}' ({AssetDatabase.GetAssetPath(m)}), not a shared bar material");
+                }
+            }
+
+            // ---- physics and grabbing
+            int props = 0, fixedProps = 0;
+            foreach (var p in pieces)
+            {
+                string n = p.name;
+                bool isProp = n.StartsWith("PROP_");
+                if (isProp && FixedProps.Any(n.StartsWith))
+                {
+                    fixedProps++;
+                    if (!p.GetComponent<Collider>()) issues.Add($"{n}: no collider");
+                    continue;
+                }
+                if (isProp)
+                {
+                    props++;
+                    var col = p.GetComponent<MeshCollider>();
+                    if (!col || !col.convex) issues.Add($"{n}: needs a convex collider");
+                    if (!p.GetComponent<Rigidbody>()) issues.Add($"{n}: no rigidbody");
+                    if (!p.GetComponent<XRGrabInteractable>()) issues.Add($"{n}: not grabbable");
+                    var home = p.GetComponent<PropRespawn>();
+                    if (!home) issues.Add($"{n}: no PropRespawn");
+                    else if (home.space != bar.transform) issues.Add($"{n}: PropRespawn space isn't the bar");
+                    continue;
+                }
+                bool wantCollider = !NoCollider.Any(n.Contains);
+                foreach (var mf in p.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    bool has = mf.GetComponent<MeshCollider>();
+                    if (wantCollider && !has) issues.Add($"{Path(mf.transform, bar.transform)}: no collider");
+                    if (!wantCollider && has) issues.Add($"{Path(mf.transform, bar.transform)}: has a collider but shouldn't");
+                }
+            }
+            sb.AppendLine($"Grabbable props: {props}, fixed props (taps, levers, tickets): {fixedProps}, renderers: {renderers}");
+
+            // ---- missing scripts, names
+            foreach (var t in bar.GetComponentsInChildren<Transform>(true))
+                if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject) > 0) issues.Add($"missing script on {Path(t, bar.transform)}");
+            foreach (var g in pieces.GroupBy(p => p.name).Where(g => g.Count() > 1))
+                issues.Add($"{g.Count()} pieces called {g.Key}");
+
+            // ---- overrides the scene keeps on top of the prefab (they're fine, but good to know)
+            var mods = PrefabUtility.GetPropertyModifications(bar) ?? new PropertyModification[0];
+            var added = PrefabUtility.GetAddedGameObjects(bar);
+            var removed = PrefabUtility.GetRemovedGameObjects(bar);
+            sb.AppendLine($"Scene overrides on the bar prefab: {mods.Length} property changes, {added.Count} added objects, {removed.Count} removed objects");
+
+            foreach (var i in issues) sb.AppendLine("  PROBLEM: " + i);
+            sb.AppendLine(issues.Count == 0 ? "No problems." : $"{issues.Count} problems.");
+            problems = issues.Count;
+            if (problems == 0) Debug.Log(sb.ToString()); else Debug.LogError(sb.ToString());
+            return problems == 0;
+        }
+
+        // ------------------------------------------------------------------ drink setup
+        /// <summary>
+        /// What the drink game will use: the gameplay components on the bar's props, and the Drink Game object's
+        /// references. Warns about props that look like they should have a role but don't, and about empty settings.
+        /// </summary>
+        static bool CheckDrinkSetup(out int warnings)
+        {
+            var issues = new List<string>();
+            var bar = GameObject.Find("MoonlitBar");
+            if (!bar) { Debug.LogError("[Moonlit] Open MoonlitBar_VR.unity first (no MoonlitBar object)."); warnings = 1; return false; }
+            var sb = new StringBuilder("[Moonlit] Drink setup\n");
+
+            var sources = bar.GetComponentsInChildren<IngredientSource>(true);
+            sb.AppendLine($"Ingredients ({sources.Length}):");
+            foreach (var g in sources.GroupBy(s => s.Id).OrderBy(g => (int)g.Key))
+                sb.AppendLine($"  {g.Key,-16} <- {string.Join(", ", g.Select(s => s.name))}");
+            foreach (var s in sources.Where(s => s.Id == IngredientId.None)) issues.Add($"{s.name}: IngredientSource has no ingredient");
+
+            var containers = bar.GetComponentsInChildren<DrinkContainer>(true);
+            var glasses = containers.Where(c => c.IsGlass).ToList();
+            sb.AppendLine($"Glasses ({glasses.Count}):");
+            foreach (var g in glasses.GroupBy(c => (c.variant, c.length)).OrderBy(g => g.Key.variant))
+                sb.AppendLine($"  {g.Key.variant,-9} {g.Key.length,-6} x{g.Count()}");
+            foreach (var c in containers.Where(c => string.IsNullOrEmpty(c.variant))) issues.Add($"{c.name}: DrinkContainer has no variant name");
+            string Vessel(ContainerKind k) => string.Join(", ", containers.Where(c => c.kind == k).Select(c => c.name).DefaultIfEmpty("MISSING"));
+            sb.AppendLine($"Stir Cup: {Vessel(ContainerKind.StirCup)}   Shake Mixer: {Vessel(ContainerKind.ShakeMixer)}");
+            if (!containers.Any(c => c.kind == ContainerKind.StirCup)) issues.Add("no Stir Cup (a DrinkContainer of kind StirCup)");
+            if (!containers.Any(c => c.kind == ContainerKind.ShakeMixer)) issues.Add("no Shake Mixer (a DrinkContainer of kind ShakeMixer)");
+
+            var garnishes = bar.GetComponentsInChildren<Garnish>(true);
+            sb.AppendLine($"Garnishes ({garnishes.Length}): {string.Join(", ", garnishes.Select(g => g.color).Distinct().OrderBy(c => c))}");
+            foreach (var g in garnishes.Where(g => string.IsNullOrEmpty(g.color))) issues.Add($"{g.name}: Garnish has no colour");
+
+            var spoons = bar.GetComponentsInChildren<StirTool>(true);
+            var scoops = bar.GetComponentsInChildren<IceScoop>(true);
+            sb.AppendLine($"Spoon: {string.Join(", ", spoons.Select(s => s.name).DefaultIfEmpty("MISSING"))}   " +
+                          $"Ice: {string.Join(", ", scoops.Select(s => s.name + " + " + Name(s.IceWell)).DefaultIfEmpty("MISSING"))}");
+            if (spoons.Length == 0) issues.Add("no bar spoon (StirTool)");
+            if (scoops.Length == 0) issues.Add("no ice scoop (IceScoop)");
+            foreach (var s in scoops.Where(s => !s.IceWell)) issues.Add($"{s.name}: IceScoop has no ice well");
+
+            // props named like a bottle, carton or glass that have no gameplay component
+            foreach (var t in bar.GetComponentsInChildren<Transform>(true))
+            {
+                if (!t.GetComponent<XRGrabInteractable>()) continue;
+                string n = t.name;
+                if ((n.StartsWith("PROP_Bottle_") || n.StartsWith("PROP_Fridge_")) && !t.GetComponent<IngredientSource>()) issues.Add($"{n}: a bottle or carton with no IngredientSource");
+                if (n.StartsWith("PROP_Glass_") && !t.GetComponent<DrinkContainer>()) issues.Add($"{n}: a glass with no DrinkContainer");
+                if (n.StartsWith("PROP_Garnish_") && !t.GetComponent<Garnish>()) issues.Add($"{n}: a garnish with no Garnish");
+            }
+
+            CheckDrinkGame(sb, issues);
+
+            foreach (var w in issues) sb.AppendLine("  WARNING: " + w);
+            warnings = issues.Count;
+            if (warnings == 0) Debug.Log(sb.ToString()); else Debug.LogWarning(sb.ToString());
+            return warnings == 0;
+        }
+
+        static string Name(Transform t) => t ? t.name : "MISSING";
+
+        /// <summary>The Drink Game object: its customer seats and scene references.</summary>
+        static void CheckDrinkGame(StringBuilder sb, List<string> issues)
+        {
+            var games = Object.FindObjectsByType<DrinkGame>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            if (games.Length == 0) { issues.Add("no Drink Game object in the scene"); return; }
+            if (games.Length > 1) issues.Add($"{games.Length} Drink Game objects in the scene (want 1)");
+            var game = games[0];
+            var so = new SerializedObject(game);
+
+            var seats = so.FindProperty("seats");
+            sb.AppendLine($"Drink Game: {game.name}, {seats.arraySize} customers:");
+            for (int i = 0; i < seats.arraySize; i++)
+            {
+                var seat = seats.GetArrayElementAtIndex(i);
+                var profile = seat.FindPropertyRelative("profile").objectReferenceValue as CustomerProfile;
+                var body = seat.FindPropertyRelative("body").objectReferenceValue as Transform;
+                var ticket = seat.FindPropertyRelative("ticketSpot").objectReferenceValue as Transform;
+                sb.AppendLine($"  {i + 1}. {(profile ? profile.displayName : "MISSING profile")} on {Name(body)}, ticket {Name(ticket)}");
+                if (!profile) issues.Add($"Drink Game seat {i + 1}: no customer profile");
+                if (!body) issues.Add($"Drink Game seat {i + 1}: no character");
+                if (!ticket) issues.Add($"Drink Game seat {i + 1}: no ticket");
+            }
+            if (seats.arraySize == 0) issues.Add("Drink Game has no customer seats");
+
+            foreach (var field in new[] { "serve", "playerSpot", "iceScoop", "resetButton", "menuBoardText" })
+                if (!so.FindProperty(field).objectReferenceValue) issues.Add($"Drink Game: {field} isn't set");
+
+            if (so.FindProperty("serve").objectReferenceValue is ServeStation station)
+            {
+                var sso = new SerializedObject(station);
+                foreach (var field in new[] { "serveSpot", "game", "bell", "title", "info" })
+                    if (!sso.FindProperty(field).objectReferenceValue) issues.Add($"Serve Panel: {field} isn't set");
+                if (sso.FindProperty("game").objectReferenceValue != game) issues.Add("Serve Panel: its Drink Game isn't this one");
+            }
+        }
+
+        // ------------------------------------------------------------------ helpers
+        /// <summary>The objects in a group: direct children, and the children of sub-groups (Props/Glasses).</summary>
+        static IEnumerable<Transform> Members(Transform group)
+        {
+            foreach (Transform c in group)
+            {
+                bool subGroup = !PrefabUtility.IsAnyPrefabInstanceRoot(c.gameObject) && !c.GetComponent<Renderer>() && !c.GetComponent<Light>()
+                                && !c.name.StartsWith("MK_") && c.childCount > 0;
+                if (subGroup) foreach (Transform cc in c) yield return cc;
+                else yield return c;
+            }
+        }
+
+        static string Path(Transform t, Transform root)
+        {
+            var s = t.name;
+            while (t.parent && t.parent != root) { t = t.parent; s = t.name + "/" + s; }
+            return s;
+        }
+    }
+}

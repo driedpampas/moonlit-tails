@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using MoonlitTails.Drinks;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -27,14 +26,16 @@ namespace MoonlitTails.Gameplay
     /// Glasses hold either one mixed drink or up to their capacity of layers, plus ice, a garnish and the
     /// end-of-drink stat adjustment. Tip anything out over nothing to empty it.
     /// </summary>
-    public class DrinkContainer : MonoBehaviour, IPourer
+    public class DrinkContainer : Pourer
     {
         public static readonly List<DrinkContainer> All = new List<DrinkContainer>();
         public const int VesselCapacity = 5;
 
         public ContainerKind kind;
-        [Tooltip("For glasses: the variant customers ask for, e.g. Highball.")] public string variant;
+        [Tooltip("For glasses: the variant customers ask for, e.g. Highball. For the vessels: Stir Cup / Shake Mixer.")] public string variant;
         public GlassLength length = GlassLength.Medium;
+        [Tooltip("The label shows when the player's head is closer than this (m). 0 = always.")]
+        [SerializeField] float showWithin = -1f;   // -1 = default: 0.9 m for glasses, always for the vessels
 
         // mixing vessels
         readonly List<Liquid> parts = new List<Liquid>();
@@ -44,35 +45,42 @@ namespace MoonlitTails.Gameplay
         // glasses
         Liquid mixed;
         readonly List<Liquid> layers = new List<Liquid>();
+        LayerResult? layered;   // Layering.Resolve(layers), kept until a layer is added or the glass is cleared
+        LayerResult Layered => layered ??= Layering.Resolve(layers, length);
         Taste adjust;
         public bool Cold { get; private set; }
         public Garnish Garnish { get; private set; }
 
         public FloatingLabel Label { get; private set; }
         public bool IsGlass => kind == ContainerKind.Glass;
-        public bool IsHeld => grab && grab.isSelected;
+        public bool IsHeld => grab.isSelected;
         public int Capacity => IsGlass ? Glass.Capacity(length) : VesselCapacity;
 
-        Vector3 upAxis;
-        Bounds bounds;
         XRGrabInteractable grab;
         PropRespawn home;
         Transform liquidRoot;
-        readonly List<GameObject> liquidBits = new List<GameObject>();
-        GameObject iceBits;
+        readonly List<MeshRenderer> liquidBits = new List<MeshRenderer>();   // a pool: reused, never destroyed
+        GameObject iceBits;   // a copy of the Ice prefab, made the first time the glass gets ice
+
+        // refreshes are batched: a change marks the container, and DrinkGame's LateUpdate redraws each one once
+        static readonly HashSet<DrinkContainer> dirty = new HashSet<DrinkContainer>();
+        static readonly List<DrinkContainer> refreshing = new List<DrinkContainer>();
 
         // shake detection
         Vector3 lastPos, lastDir;
         readonly Queue<float> reversals = new Queue<float>();
 
-        public void Init(ContainerKind k, string variantName, GlassLength len)
+        void Awake()
         {
-            kind = k; variant = variantName; length = len;
-            upAxis = GameVisuals.LocalUpAxis(transform);
-            bounds = GameVisuals.LocalBounds(gameObject);
+            if (string.IsNullOrEmpty(variant))
+            {
+                Debug.LogError($"[Moonlit] {name}: DrinkContainer has no variant name set", this);
+                enabled = false;   // never enabled, so it's never in All and nothing below is reached
+                return;
+            }
+            MeasureShape();
             grab = GetComponent<XRGrabInteractable>();
             home = GetComponent<PropRespawn>();
-            gameObject.AddComponent<PourSpout>().Init(this, true);
 
             liquidRoot = new GameObject("Liquid").transform;
             liquidRoot.SetParent(transform, false);
@@ -80,12 +88,12 @@ namespace MoonlitTails.Gameplay
             liquidRoot.localPosition = bounds.center;
 
             Label = FloatingLabel.Create(transform, OpeningWorld.y - transform.position.y + 0.05f, IsGlass ? 0.22f : 0.26f);
-            if (IsGlass) Label.showWithin = 0.9f;
+            Label.showWithin = showWithin >= 0f ? showWithin : IsGlass ? 0.9f : 0f;
             lastPos = transform.position;
-            Refresh();
+            RefreshNow();
         }
 
-        void OnEnable() { if (!All.Contains(this)) All.Add(this); }
+        void OnEnable() => All.Add(this);
         void OnDisable() => All.Remove(this);
 
         // ------------------------------------------------------------------ geometry
@@ -93,8 +101,6 @@ namespace MoonlitTails.Gameplay
         public Vector3 OpeningWorld => transform.TransformPoint(bounds.center + upAxis * HalfHeight);
         public Vector3 BottomWorld => transform.TransformPoint(bounds.center - upAxis * HalfHeight);
         public Vector3 CenterWorld => transform.TransformPoint(bounds.center);
-        /// <summary>The direction the glass's opening points, in world space.</summary>
-        public Vector3 UpWorld => transform.TransformDirection(upAxis);
         public float OpeningRadiusWorld => GameVisuals.Radius(bounds, upAxis) * transform.lossyScale.x;
         bool Upright => Vector3.Angle(transform.TransformDirection(upAxis), Vector3.up) < 45f;
 
@@ -147,7 +153,16 @@ namespace MoonlitTails.Gameplay
         /// <summary>Unmixed parts in a Stir Cup / Shake Mixer (0, 1 or 2).</summary>
         public int PartCount => parts.Count;
         public bool IsEmpty => IsGlass ? mixed == null && layers.Count == 0 : parts.Count == 0;
-        public int Units => IsGlass ? (mixed != null ? mixed.Units : layers.Count) : parts.Sum(p => p.Units) - layersPoured;
+        public int Units
+        {
+            get
+            {
+                if (IsGlass) return mixed != null ? mixed.Units : layers.Count;
+                int units = -layersPoured;
+                foreach (var p in parts) units += p.Units;
+                return units;
+            }
+        }
         public PrepMethod Method => mixed != null ? PrepMethod.Mixed : PrepMethod.Layered;
         public int AdjustmentLeft => IsEmpty ? 0 : Finishing.AdjustmentPoints(Method) - adjust.AbsTotal;
 
@@ -157,7 +172,7 @@ namespace MoonlitTails.Gameplay
             get
             {
                 if (mixed != null) return mixed.Stats;
-                if (layers.Count > 0) return Layering.Resolve(layers, length).Stats;
+                if (layers.Count > 0) return Layered.Stats;
                 return Taste.Zero;
             }
         }
@@ -184,7 +199,7 @@ namespace MoonlitTails.Gameplay
         {
             if (parts.Count >= 2) { message = "Mix what's in here first"; return false; }
             if (layersPoured > 0) { message = "Finish pouring this drink (or tip it out) first"; return false; }
-            if (parts.Any(p => p.SharesIngredientWith(l))) { message = "Already in here (no self-mixing)"; return false; }
+            if (parts.Count == 1 && parts[0].SharesIngredientWith(l)) { message = "Already in here (no self-mixing)"; return false; }
             if (Units + l.Units > VesselCapacity) { message = "Too full"; return false; }
             parts.Add(l);
             message = parts.Count == 2 ? $"+ {what}: now stir or shake" : $"+ {what}";
@@ -210,12 +225,20 @@ namespace MoonlitTails.Gameplay
             if (!l.IsPrepared) { message = "Layers must be prepared drinks (base + modifier)"; return false; }
             if (mixed != null) { message = "This glass already has a mixed drink"; return false; }
             if (layers.Count >= Capacity) { message = "The glass is full"; return false; }
-            int collapsedBefore = layers.Count > 0 ? Layering.Resolve(layers, length).Collapsed.Count(c => c) : 0;
+            int collapsedBefore = layers.Count > 0 ? CollapsedCount() : 0;
             layers.Add(l);
-            collapsed = Layering.Resolve(layers, length).Collapsed.Count(c => c) > collapsedBefore;
+            layered = null;
+            collapsed = CollapsedCount() > collapsedBefore;
             message = collapsed ? "The layers collapsed!" : $"Layer {layers.Count} poured";
             Refresh();
             return true;
+        }
+
+        int CollapsedCount()
+        {
+            int n = 0;
+            foreach (bool c in Layered.Collapsed) if (c) n++;
+            return n;
         }
 
         public bool AddIce(out string message)
@@ -279,8 +302,9 @@ namespace MoonlitTails.Gameplay
             Refresh();
         }
 
-        void Update()
+        protected override void Update()
         {
+            base.Update();   // pouring
             if (IsGlass) return;
             // hand shaking: quick back-and-forth while held
             Vector3 p = transform.position;
@@ -308,10 +332,11 @@ namespace MoonlitTails.Gameplay
         }
 
         // ------------------------------------------------------------------ pouring out
-        public bool HasSomethingToPour => !IsEmpty;
-        public Color StreamColor => IsGlass ? GameVisuals.LiquidColor(RawStats) : GameVisuals.LiquidColor(parts.Count > 0 ? parts[0].Stats : Taste.Zero);
+        public override bool HasSomethingToPour => !IsEmpty;
+        protected override bool CanDump => true;
+        public override Color StreamColor => IsGlass ? GameVisuals.LiquidColor(RawStats) : GameVisuals.LiquidColor(parts.Count > 0 ? parts[0].Stats : Taste.Zero);
 
-        public bool PourInto(DrinkContainer target, out string message)
+        public override bool PourInto(DrinkContainer target, out string message)
         {
             if (IsGlass) { message = "Serve the glass at the serve spot"; return false; }
             if (parts.Count != 1) { message = "Mix it first"; return false; }
@@ -339,7 +364,7 @@ namespace MoonlitTails.Gameplay
             return landed && !collapsed;
         }
 
-        public void Dump()
+        public override void Dump()
         {
             if (IsEmpty && !Cold && !Garnish) return;
             Clear();
@@ -352,6 +377,7 @@ namespace MoonlitTails.Gameplay
             layersPoured = 0;
             mixed = null;
             layers.Clear();
+            layered = null;
             adjust = Taste.Zero;
             if (IsGlass)
             {
@@ -370,10 +396,22 @@ namespace MoonlitTails.Gameplay
         }
 
         // ------------------------------------------------------------------ visuals
-        void Refresh()
+        /// <summary>Marks the label and liquid for redrawing at the end of the frame (several changes, one redraw).</summary>
+        void Refresh() => dirty.Add(this);
+
+        /// <summary>Redraws every container that changed this frame. Called once per frame by the Drink Game.</summary>
+        public static void RefreshChanged()
+        {
+            if (dirty.Count == 0) return;
+            refreshing.AddRange(dirty);
+            dirty.Clear();
+            for (int i = 0; i < refreshing.Count; i++) if (refreshing[i]) refreshing[i].RefreshNow();
+            refreshing.Clear();
+        }
+
+        void RefreshNow()
         {
             RebuildLiquid();
-            if (!Label) return;
 
             if (IsGlass)
             {
@@ -405,22 +443,22 @@ namespace MoonlitTails.Gameplay
 
         void RebuildLiquid()
         {
-            foreach (var b in liquidBits) if (b) Destroy(b);
-            liquidBits.Clear();
-            if (!liquidRoot) return;
-
             float half = HalfHeight * 0.9f;
             float radius = GameVisuals.Radius(bounds, upAxis) * 0.78f;
             float usable = half * 2f * 0.9f;
             float y = -half;
+            int used = 0;
 
             void Add(float units, Color c)
             {
                 float h = usable * units / Capacity;
-                var cyl = GameVisuals.Primitive(PrimitiveType.Cylinder, liquidRoot, "Liquid", c);
+                if (used == liquidBits.Count)
+                    liquidBits.Add(GameVisuals.Spawn<MeshRenderer>("Liquid", liquidRoot));
+                var cyl = liquidBits[used++];
+                cyl.sharedMaterial = GameVisuals.Flat(c);
                 cyl.transform.localScale = new Vector3(radius * 2f, h * 0.5f, radius * 2f);
                 cyl.transform.localPosition = new Vector3(0, y + h * 0.5f, 0);
-                liquidBits.Add(cyl);
+                if (!cyl.gameObject.activeSelf) cyl.gameObject.SetActive(true);
                 y += h;
             }
 
@@ -429,27 +467,23 @@ namespace MoonlitTails.Gameplay
                 if (mixed != null) Add(mixed.Units, GameVisuals.LiquidColor(mixed.Stats));
                 else if (layers.Count > 0)
                 {
-                    var collapsed = Layering.Resolve(layers, length).Collapsed;
+                    var collapsed = Layered.Collapsed;
                     for (int i = 0; i < layers.Count; i++)
                         Add(1, collapsed[i] ? new Color(0.45f, 0.45f, 0.5f) : GameVisuals.LiquidColor(layers[i].Stats));
                 }
             }
             else for (int i = 0; i < parts.Count; i++) Add(parts[i].Units - (i == 0 ? layersPoured : 0), GameVisuals.LiquidColor(parts[i].Stats));
+            for (int i = used; i < liquidBits.Count; i++)
+                if (liquidBits[i].gameObject.activeSelf) liquidBits[i].gameObject.SetActive(false);
 
             if (IsGlass && Cold && !iceBits)
             {
-                iceBits = new GameObject("Ice");
-                iceBits.transform.SetParent(liquidRoot, false);
-                for (int i = 0; i < 3; i++)
-                {
-                    var cube = GameVisuals.Primitive(PrimitiveType.Cube, iceBits.transform, "Ice Cube", new Color(0.85f, 0.95f, 1f));
-                    float a = i * 2.1f;
-                    cube.transform.localPosition = new Vector3(Mathf.Cos(a) * radius * 0.45f, half * 0.55f, Mathf.Sin(a) * radius * 0.45f);
-                    cube.transform.localRotation = Quaternion.Euler(20 * i, 35 * i, 10);
-                    cube.transform.localScale = Vector3.one * radius * 0.55f;
-                }
+                // the Ice prefab is three cubes sized for a glass of radius 1
+                iceBits = GameVisuals.Spawn<GameObject>("Ice", liquidRoot);
+                iceBits.transform.localPosition = new Vector3(0, half * 0.55f, 0);
+                iceBits.transform.localScale = Vector3.one * radius;
             }
-            if (iceBits && !Cold) { Destroy(iceBits); iceBits = null; }
+            if (iceBits && iceBits.activeSelf != Cold) iceBits.SetActive(Cold);
         }
     }
 }

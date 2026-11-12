@@ -28,63 +28,46 @@ Link lets you change sizes in the Inspector while someone is wearing the headset
 
 **Linux (no headset):** OpenXR can't start in the Linux editor, so on Linux Play skips XR startup and the scene's XR Interaction Simulator drives the rig with mouse and keyboard. The XR setting comes back when you stop Play and is never saved, so the Quest build doesn't change. To turn this off (for example to try a Linux OpenXR runtime), use **Tools > Moonlit Tails > Linux: Skip OpenXR in Play Mode**.
 
-**Hands:**
-- **Hold something:** close your hand around it, like a real glass. Your palm must be within about 7 cm of it. It stays in your palm exactly where you touched it, and opening your hand lets go.
-- **Small things** (cherries, garnish, mint): pinch them between thumb and index, and they're held at your fingertips.
-- **Throw:** let go while your hand is moving. The prop leaves at the fastest speed your hand reached in the last 0.12 s, with your hand's spin. A slow toss lands softly and a fast flick flies.
+**Hands** (the stock XR Interaction Toolkit hand rig, no custom grab script):
+- **Hold something:** close your hand around it (grasp) or pinch it between thumb and index. Opening your hand lets go. It's held where your hand touched it.
+- **Throw:** let go while your hand is moving. The XR Grab Interactable on each prop throws it with your hand's speed (Throw Velocity Scale 1.1, smoothed over 0.25 s).
 - **Reset:** press **R** on the PC keyboard to send every prop back to where it started. Anything that leaves the room (out of a window, through the floor) comes back by itself.
 
-If grabbing feels off:
-1. In Play mode, select `Near-Far Interactor` under the left or right hand in the XR rig.
-2. Watch **Finger Curl** and **Pinch Distance** on its `HandGrab` component while you hold a glass.
-3. Set **Grab Curl** / **Release Curl** (and the pinch distances) in `BarTuning` to match what you see.
+If grabbing feels off, tune it on the XR rig in the scene, not in code:
+- **Grab triggers too late, or a fist doesn't grab:** on `Left Hand` / `Right Hand` > `Select Input` (Release Threshold Button Reader), lower **Press Threshold** (default 1) and **Release Threshold** (default 0.9), e.g. to 0.8 / 0.6.
+- **Throws too weak or too strong:** **Throw Velocity Scale** / **Throw Angular Velocity Scale** on the prop prefabs' XR Grab Interactable.
+- **Physics rate:** Project Settings > Time > Fixed Timestep is 0.0111111 (90 Hz). In a headset the scene's `Headset Display` object sets it to the headset's own refresh rate (72/90/120 Hz), so held props move once per drawn frame. It also turns on foveated rendering (the *Foveation* slider: 0 = off, lower it if the edges of the view look blocky).
+- **Props pass through your body:** the XR Origin's CharacterController is disabled (walking and teleporting are off), so leaning over the counter doesn't knock glasses away. Enable it again if locomotion comes back.
 
-## Changing sizes (nothing is hardcoded)
+## Moving and resizing things
 
-All sizes live in one asset: **`Assets/MoonlitTails/BarTuning.asset`**. Select it and drag the sliders. The scene updates immediately, in Play mode too.
+Everything is placed by hand in the scene, like any Unity object. No script moves anything when you open the scene or press Play.
 
-Because it's an asset, changes you make while playing in the headset are **kept when you stop Play**. That's different from normal Inspector changes on scene objects, which Unity throws away.
-
-| Setting | What it does |
-|---|---|
-| Environment Scale | Scales the whole bar uniformly: room, counters, furniture, props, and the spots where characters stand and sit. |
-| Player Floor Offset | Raises or lowers the floor you stand on. Use it to make the counter feel lower or higher without rescaling the room. |
-| Prop Scale | Scales every grabbable prop, on top of the room scale. |
-| Prop Scale Rules | Extra scale for props whose name contains some text (`Glass_`, `Bottle_`, `Garnish_`...). Add rules for anything else, e.g. `Jigger`. |
-| Characters > Height | Each customer's standing height in metres. They are all modelled 1.0 m tall. |
-| Characters > Height Offset | Moves a customer up or down, e.g. to sit deeper in a seat. |
-| Characters > Turn | Turns a customer left or right from facing their target. |
-| Grab With Whole Hand | Hold props by closing your hand around them. |
-| Grab Curl / Release Curl | How closed the hand must be to grab (0 = flat, 1 = fist), and how far it must open to let go. |
-| Allow Pinch Grab, Pinch Distance / Pinch Release Distance | Thumb-index pinch for small things, in metres between the fingertips. |
-| Grab Reach | How far around the palm (m) a prop can be and still get grabbed. |
-| Palm Grab Offset | How far in front of the palm (m) a held prop sits. |
-| Allow Distance Grab | Off: you have to touch a prop to grab it. On: the hand ray can grab from a distance too. |
-| Throw Strength | 1 = a released prop flies exactly as fast as your hand was moving. Raise it if throws feel weak. |
-| Throw Spin / Throw Window | How much of the hand's spin the prop keeps, and how far back (s) to look for the throwing speed. |
-| Physics Rate | Physics steps per second. Match the headset refresh (72/90/120) so held props move smoothly. |
-| Player Body Pushes Props *(dev option)* | Off (default): props pass through the player's body, the capsule on the XR Origin that follows your head, so leaning over the counter doesn't knock glasses away. Turn it on if walking or teleporting comes back and the body should bump into things again. |
-
-Seated customers measure their own hip height from the sitting animation, so they stay on the seat at any height you give them.
-
-**Moving things:**
-- **A customer:** move their marker in `MoonlitBar/Markers` (`MK_CustomerSpot_C`, `MK_StoolSeat_R`, `MK_ChairSeat_L1`). The character follows.
-- **Swapping who sits where:** change the **Spot** of each entry on the `BarLayout` object.
-- **The player:** move `MK_PlayerStart`.
+- **A customer:** select the character (`Kintsu`, `Character03`, `Character02`) and move, turn or scale it. Seated customers are posed on their seats as saved; if you change a seat's height, lower or raise the character to match.
+- **Who sits where, and whose ticket is whose:** the **Seats** list on the `Drink Game` object. Each seat has a customer profile, the character model and their ticket on the rail.
+- **What a customer says:** their profile asset in `Assets/MoonlitTails/Data/Customers` (placeholder writing for now).
+- **The player:** move the `XR Origin Hands (XR Rig)` object. It starts behind the bar at `MK_PlayerStart`, facing the serve spot.
+- **The bar or a prop:** edit its prefab in `Environment/Bar` (see [BAR_PIECES.md](BAR_PIECES.md)), so the change doesn't touch the scene.
 
 Props' "home" positions are stored relative to the bar, so a rescaled bar still resets props onto the right counter.
 
-## Rebuilding
+## Project settings (already set; check them by hand if something breaks)
 
-Run these from **Tools > Moonlit Tails**:
+The scene and these settings are edited by hand in the Editor. No script rebuilds them.
 
-1. **Configure Project**: URP, OpenXR + hand tracking (PC and Android), XR Interaction Toolkit samples, and the character prefabs. Safe to run again.
-2. **Rebuild VR Scene**: builds the scene from scratch: the bar prefab, the XR rig and the customers.
-   - It replaces manual scene edits, so agree who runs it. You rarely need it: bar changes go into the piece prefabs (see [BAR_PIECES.md](BAR_PIECES.md)).
-   - Your sizes in `BarTuning.asset` are kept.
-3. **Capture Player Views**: a desk check without a headset. It renders what a standing player sees in every direction, throws a glass and resets it. Output goes to `Captures/` with a `report.txt`.
-4. **Check Drink Setup** and 5. **Play Smoke Test**: see [DRINK_GAME.md](DRINK_GAME.md).
-6. **Assemble Split Bar**, 7. **Refresh Bar Pieces** and 8. **Check Bar Pieces**: see [BAR_PIECES.md](BAR_PIECES.md).
+- **Rendering:** URP with `Settings/MoonlitURP.asset` (Forward+, MSAA 4x, no HDR and no post-processing, so the Quest draws straight to the headset), set as the default pipeline. Colour space: Linear.
+- **Quality:** one level, *Standard*, on every platform: 4 bones per vertex and full-size textures. Realtime shadows are off in the URP asset (no light in the bar casts any).
+- **XR Plug-in Management:** OpenXR for PC and Android, *Initialize XR on Startup* on.
+- **OpenXR features (PC and Android):** Hand Tracking Subsystem, Meta Hand Tracking Aim, Hand Interaction Profile, Oculus Touch and Meta Quest Touch Plus controller profiles. On Android also **Meta Quest Support** and **Foveated Rendering**.
+- **Player:** *Run In Background* on (Play keeps running when the headset takes focus). Android: IL2CPP, ARM64, minimum API level 29.
+- **Samples** (Package Manager): XR Interaction Toolkit *Starter Assets*, *Hands Interaction Demo* and *XR Interaction Simulator*; XR Hands *HandVisualizer*.
+- **Sitting animation** (`Animations/Sitting Idle.fbx`): Rig = Humanoid, create the avatar from this model; clip renamed `Sitting_Idle`, Loop Time + Loop Pose, root rotation, height and XZ baked into the pose.
+
+## Checking the scene
+
+**Tools > Moonlit Tails > Automation > Check Scene** checks the bar pieces (see [BAR_PIECES.md](BAR_PIECES.md)) and lists which props the drink game uses (see [DRINK_GAME.md](DRINK_GAME.md)). It changes nothing.
+
+**Automation** (Check Scene, Capture Player Views, Play Smoke Test, Record Demo Video) runs the game without a headset for desk checks, tests and the demo video. You don't need it to work on the game, and it never saves the scene. It lives in `Assets/MoonlitTails/DevTools` (see the README there).
 
 ## Building an APK instead of Link
 
@@ -94,9 +77,13 @@ The Android settings are already filled in:
 
 To build: **File > Build Profiles > Android > Switch Platform**, then Build And Run with the Quest plugged in.
 
+Or without opening the build window: **Tools > Moonlit Tails > Automation > Build Android APK**, or from a terminal (the APK goes to `Unity/Captures/Build/`):
+```
+Unity -batchmode -quit -projectPath Unity -executeMethod MoonlitTails.EditorTools.AndroidBuild.Build
+```
+
 On the Quest itself, keep an eye on performance:
 - **Lights:** the bar uses about 20 realtime lights. Baking the lighting is the next step for a standalone build.
-- **Bloom:** turn off the `PostProcess (Bloom)` object if the frame rate drops.
 
 ## What the desk check showed (no headset)
 

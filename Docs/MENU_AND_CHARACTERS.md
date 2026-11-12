@@ -113,7 +113,7 @@ Each quest is answered with the next drink you serve after the question. Its hig
 
 ### In the game right now
 
-The scene still has the three old **placeholder** customers, with made-up lines in `Scripts/Runtime/Gameplay/CustomerScripts.cs`: Kintsu, "Fox" (model `Character03`) and "Guest" (model `Character02`). They aren't part of the game any more and will be replaced by the characters above. Until then:
+The scene still has the three old **placeholder** customers, with made-up lines in their profile assets (`Assets/MoonlitTails/Data/Customers`): Kintsu, "Fox" (model `Character03`) and "Guest" (model `Character02`). They aren't part of the game any more and will be replaced by the characters above. Until then:
 
 - Which 3D model belongs to which character isn't decided yet.
 - Customers order random drinks from the recipes above, not their usual.

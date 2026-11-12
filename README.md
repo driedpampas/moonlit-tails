@@ -46,11 +46,11 @@ AI was used for:
 | Folder | What |
 |---|---|
 | `Unity/` | The Unity project (Unity **6000.3.25f1**, URP, OpenXR hand tracking). Open this folder in Unity Hub. |
-| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, change sizes, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. `BAR_PIECES.md`: how the bar is split into pieces and how to change them. `MENU_AND_CHARACTERS.md`: all ingredients, recipes and characters. `Characters/`: one page per character, and the blank character sheet. |
+| `Docs/` | `LAB_SETUP.md`: how to run the scene on the Quest 2 over Link, move things, and rebuild. `DRINK_GAME.md`: how drinks are made, the rules, and how to test them. `BAR_PIECES.md`: how the bar is split into pieces and how to change them. `MENU_AND_CHARACTERS.md`: all ingredients, recipes and characters. `Characters/`: one page per character, and the blank character sheet. |
 | `Tests/` | Tests for the drink rules (`dotnet run` in `Tests/DrinkRules.Tests`). |
 | `Art/` | Blender sources. `Art/Bar/` has the bar `.blend`, the scripts that built it, and `split_bar.py`, which exports it as separate pieces. See `Docs/BAR_PIECES.md`. |
 
-The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with three placeholder customers and grabbable, throwable props, for testing scale and hand grabbing in VR. All sizes live in `Unity/Assets/MoonlitTails/BarTuning.asset`.
+The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with three placeholder customers and grabbable, throwable props, and the drink game. Everything in it is placed by hand in the Editor.
 
 ## Getting the project (first time)
 1. Install **Git LFS** once, if you don't have it: https://git-lfs.com, then run `git lfs install`. Models and textures are stored with LFS, so without it they arrive as tiny text files.
@@ -69,8 +69,8 @@ The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It'
 ## Working together
 - **Pull before opening Unity**, and close Unity before switching branches that change scenes.
 - **Always commit `.meta` files together with their assets.** Move or rename assets *inside Unity*, never in Explorer, or references break.
-- **One person edits `MoonlitBar_VR.unity` at a time.** Scene merges are painful. Size tweaks go in `BarTuning.asset` instead, a small text file that merges fine. Changes to the bar itself go in its prefabs (`Environment/Bar`), so they don't touch the scene.
-- The scene can be regenerated with **Tools > Moonlit Tails > 2. Rebuild VR Scene**. Agree who runs it, because it replaces manual scene edits.
+- **One person edits `MoonlitBar_VR.unity` at a time.** Scene merges are painful. Changes to the bar itself go in its prefabs (`Environment/Bar`), so they don't touch the scene.
+- **Tools > Moonlit Tails > Automation** and `Assets/MoonlitTails/DevTools` are the headless desk checks, smoke test and demo recorder. You can ignore them: they never save the scene or change project settings.
 - **Before editing a `.blend` file, lock it** so nobody edits it at the same time: `git lfs lock path/to/file.blend`. Unlock it when you're done: `git lfs unlock path/to/file.blend`.
 - Work on a branch and open a pull request into `main`.
 

@@ -65,6 +65,8 @@ namespace VRCharacters
 
         Vector3 lastRootPos;
         bool built;
+        Renderer[] renderers;
+        bool wasVisible = true;
 
         void OnEnable()
         {
@@ -103,6 +105,8 @@ namespace VRCharacters
                 }
                 c.nodes = list.ToArray();
             }
+            renderers = GetComponentsInChildren<Renderer>();
+            wasVisible = true;
             built = true;
             ResetSimulation();
         }
@@ -116,11 +120,21 @@ namespace VRCharacters
                 if (c.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
+                    if (!n.bone) continue;
                     Vector3 tip = n.bone.position + n.bone.rotation * n.localAxis * n.length;
                     n.prevTip = tip; n.currTip = tip;
                 }
             }
             lastRootPos = transform.position;
+        }
+
+        /// <summary>True if any camera sees one of the character's renderers. A character with no renderers always counts.</summary>
+        bool Visible()
+        {
+            if (renderers == null || renderers.Length == 0) return true;
+            for (int i = 0; i < renderers.Length; i++)
+                if (renderers[i] && renderers[i].isVisible) return true;
+            return false;
         }
 
         Vector3 Wind(float time)
@@ -142,6 +156,11 @@ namespace VRCharacters
             float dt = Time.deltaTime;
             if (dt <= 0f) return;
 
+            // Nobody sees this character: skip the solve (the biggest cost of our scripts), and start from the pose when it's seen again.
+            bool visible = Visible();
+            if (!visible) { wasVisible = false; return; }
+            if (!wasVisible) { wasVisible = true; ResetSimulation(); }
+
             if ((transform.position - lastRootPos).sqrMagnitude > resetDistance * resetDistance) ResetSimulation();
             lastRootPos = transform.position;
 
@@ -151,7 +170,7 @@ namespace VRCharacters
             for (int ci = 0; ci < chains.Count; ci++)
             {
                 var c = chains[ci];
-                if (c.nodes == null || c.root == null) continue;
+                if (c.nodes == null) continue;
                 float keep = Mathf.Pow(1f - c.drag, steps);
                 float pull = 1f - Mathf.Pow(1f - c.stiffness, steps);
                 Vector3 accel = (c.gravity + wind * c.windInfluence) * dt * dt;
@@ -160,8 +179,11 @@ namespace VRCharacters
                 for (int i = 0; i < c.nodes.Length; i++)
                 {
                     var n = c.nodes[i];
+                    if (!n.bone) { c.nodes = null; break; }   // a bone was destroyed: drop the chain until Build() runs again
                     if (n.bone.localRotation != n.writtenLocal) n.poseLocal = n.bone.localRotation;
                 }
+
+                if (c.nodes == null) continue;
 
                 // 2) simulate root -> tip
                 for (int i = 0; i < c.nodes.Length; i++)

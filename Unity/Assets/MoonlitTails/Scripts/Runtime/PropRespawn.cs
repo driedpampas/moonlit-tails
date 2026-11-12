@@ -1,19 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace MoonlitTails
 {
     /// <summary>
-    /// Puts a prop back where it started when it leaves the bar (thrown out of a window, through the floor).
-    /// <see cref="ResetAll"/> sends every prop home at once: the red reset button on the counter, or R on the keyboard.
-    /// Home is stored relative to the bar, so it follows any rescale.
+    /// Where a prop lives, so it can be put back: when it leaves the bar (thrown out of a window, through the floor),
+    /// when the red reset button is pressed, or with R on the keyboard. Home is stored relative to the bar, so it
+    /// follows any rescale. A prop with no parent stores it in world space.
+    ///
+    /// This holds the data only. The Drink Game checks every prop once per frame (<see cref="CheckLost"/>) instead of
+    /// each prop running its own Update.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class PropRespawn : MonoBehaviour
     {
-        [Tooltip("The bar root. Home is stored in its space.")] public Transform space;
+        [Tooltip("The bar root. Home is stored in its space (empty = the prop's parent, or the world).")] public Transform space;
         [SerializeField] Vector3 homePosition;
         [SerializeField] Quaternion homeRotation = Quaternion.identity;
 
@@ -24,16 +26,19 @@ namespace MoonlitTails
         XRBaseInteractable grab;
         bool homeNextStep;
 
-        public Vector3 HomePosition => space.TransformPoint(homePosition);
+        public Vector3 HomePosition => ToWorld(homePosition);
 
         /// <summary>Stuck to something else right now (a fruit slice on a glass's rim): it moves with that, not on its own.</summary>
         bool Attached => grab && !grab.enabled;
 
+        Vector3 ToWorld(Vector3 p) => space ? space.TransformPoint(p) : p;
+        Quaternion ToWorld(Quaternion r) => space ? space.rotation * r : r;
+
         public void RememberHome()
         {
             if (!space) space = transform.parent;
-            homePosition = space.InverseTransformPoint(transform.position);
-            homeRotation = Quaternion.Inverse(space.rotation) * transform.rotation;
+            homePosition = space ? space.InverseTransformPoint(transform.position) : transform.position;
+            homeRotation = space ? Quaternion.Inverse(space.rotation) * transform.rotation : transform.rotation;
         }
 
         void Awake()
@@ -46,15 +51,17 @@ namespace MoonlitTails
         void OnEnable() { if (!All.Contains(this)) All.Add(this); }
         void OnDisable() => All.Remove(this);
 
-        void Update()
+        /// <summary>Called once per frame by the Drink Game: sends the prop home if it has left the bar.</summary>
+        public void CheckLost()
         {
-            if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ResetAll();
-            bool held = grab && grab.isSelected;
-            bool lost = transform.position.y < space.position.y - 1f || (transform.position - space.position).sqrMagnitude > 30f * 30f;
-            if (!held && !Attached && lost) SendHome();
+            if ((grab && grab.isSelected) || Attached) return;
+            Vector3 origin = space ? space.position : Vector3.zero;
+            Vector3 p = transform.position;
+            if (p.y < origin.y - 1f || (p - origin).sqrMagnitude > 30f * 30f) SendHome();
         }
 
-        void FixedUpdate()
+        /// <summary>Called once per physics step by the Drink Game: finishes a reset that had to wait for a hand to let go.</summary>
+        public void ApplyPendingHome()
         {
             if (!homeNextStep) return;
             homeNextStep = false;
@@ -64,12 +71,13 @@ namespace MoonlitTails
         /// <summary>Every prop back where it started, even ones in a hand (the hand lets go).</summary>
         public static void ResetAll()
         {
-            if (lastResetFrame == Time.frameCount) return;   // R reaches every prop's Update in the same frame
+            if (lastResetFrame == Time.frameCount) return;   // a button and a key can both fire in one frame
             lastResetFrame = Time.frameCount;
             foreach (var p in All.ToArray()) p.ResetToHome();
         }
 
-        void ResetToHome()
+        /// <summary>Back home. If something is holding it (a hand, a socket), it lets go first.</summary>
+        public void ResetToHome()
         {
             if (Attached) return;
             if (grab && grab.isSelected && grab.interactionManager)
@@ -85,8 +93,8 @@ namespace MoonlitTails
 
         public void SendHome()
         {
-            Vector3 p = space.TransformPoint(homePosition);
-            Quaternion r = space.rotation * homeRotation;
+            Vector3 p = ToWorld(homePosition);
+            Quaternion r = ToWorld(homeRotation);
             // teleport the body too: with interpolation on, moving only the transform gets overwritten
             body.position = p; body.rotation = r;
             transform.SetPositionAndRotation(p, r);

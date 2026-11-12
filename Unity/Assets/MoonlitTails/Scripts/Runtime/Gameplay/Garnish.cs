@@ -6,9 +6,12 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MoonlitTails.Gameplay
 {
     /// <summary>A fruit slice. Let go of it near a glass's rim and it sticks there, giving the drink its colour.</summary>
+    [RequireComponent(typeof(XRGrabInteractable))]
     public class Garnish : MonoBehaviour
     {
+        [Tooltip("The colour this garnish gives a drink, e.g. Lime. Customers ask for it by this name.")]
         public string color;
+        [Tooltip("How close to a glass's rim (m) it has to be let go to stick.")]
         public float reach = 0.07f;
 
         XRGrabInteractable grab;
@@ -18,15 +21,20 @@ namespace MoonlitTails.Gameplay
         DrinkContainer glass;
         Transform originalParent;
 
-        public void Init(string garnishColor)
+        void Awake()
         {
-            color = garnishColor;
+            if (string.IsNullOrEmpty(color))
+            {
+                Debug.LogError($"[Moonlit] {name}: Garnish has no colour set", this);
+                enabled = false;
+                return;
+            }
             originalParent = transform.parent;
             grab = GetComponent<XRGrabInteractable>();
-            body = GetComponent<Rigidbody>();
+            body = GetComponent<Rigidbody>();   // the grab component requires one
             colliders = GetComponentsInChildren<Collider>();
             home = GetComponent<PropRespawn>();
-            if (grab) grab.selectExited.AddListener(OnReleased);
+            grab.selectExited.AddListener(OnReleased);
         }
 
         void OnDestroy() { if (grab) grab.selectExited.RemoveListener(OnReleased); }
@@ -48,9 +56,9 @@ namespace MoonlitTails.Gameplay
         public void AttachTo(DrinkContainer target, Vector3 rimPoint)
         {
             glass = target;
-            if (body) { body.isKinematic = true; body.detectCollisions = false; }
+            body.isKinematic = true; body.detectCollisions = false;
             foreach (var c in colliders) c.enabled = false;
-            if (grab) grab.enabled = false;
+            grab.enabled = false;
             transform.SetParent(target.transform, true);
             transform.position = rimPoint;
         }
@@ -62,8 +70,8 @@ namespace MoonlitTails.Gameplay
             glass = null;
             transform.SetParent(originalParent, true);
             foreach (var c in colliders) c.enabled = true;
-            if (body) { body.isKinematic = false; body.detectCollisions = true; }
-            if (grab) grab.enabled = true;
+            body.isKinematic = false; body.detectCollisions = true;
+            grab.enabled = true;
             if (from) from.ForgetGarnish(this);
             if (sendHome && home) home.SendHome();
         }

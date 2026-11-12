@@ -1,9 +1,0 @@
-{
-    "name": "MoonlitTails.RoomBuilder",
-    "references": ["Unity.ProBuilder", "Unity.ProBuilder.Editor"],
-    "includePlatforms": ["Editor"],
-    "versionDefines": [
-        { "name": "com.unity.probuilder", "expression": "", "define": "HAS_PROBUILDER" }
-    ],
-    "autoReferenced": true
-}

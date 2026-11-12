@@ -5,24 +5,34 @@ using UnityEngine;
 namespace MoonlitTails.Gameplay
 {
     /// <summary>A bottle or carton of one ingredient. Tip it over the Stir Cup or Shake Mixer to pour 1 unit.</summary>
-    public class IngredientSource : MonoBehaviour, IPourer
+    public class IngredientSource : Pourer
     {
-        [SerializeField] string ingredientId;
+        [Tooltip("What this bottle or carton pours.")]
+        [SerializeField] IngredientId ingredient;
+        [Tooltip("How far above the top of the bottle (m) its label floats.")]
+        [SerializeField] float labelHeight = 0.04f;
+        [SerializeField] float labelSize = 0.22f;
+        [Tooltip("The label shows when the player's head is closer than this (m).")]
+        [SerializeField] float showWithin = 1.2f;
+
         public Ingredient Ingredient { get; private set; }
+        public IngredientId Id => ingredient;
         FloatingLabel label;
 
-        public void Init(Ingredient ingredient)
+        void Awake()
         {
-            Ingredient = ingredient;
-            ingredientId = ingredient.Id;
-            gameObject.AddComponent<PourSpout>().Init(this, false);
+            Ingredient = Ingredients.Get(ingredient);
+            if (Ingredient == null)
+            {
+                Debug.LogError($"[Moonlit] {name}: IngredientSource has no ingredient set", this);
+                enabled = false;
+                return;
+            }
+            MeasureShape();
 
-            var b = GameVisuals.LocalBounds(gameObject);
-            var up = GameVisuals.LocalUpAxis(transform);
-            float top = transform.TransformPoint(b.center + up * GameVisuals.Extent(b, up)).y - transform.position.y;
-            label = FloatingLabel.Create(transform, top + 0.04f, 0.22f);
-            label.showWithin = 1.2f;
-            label.SetTitle(Title(ingredient));
+            label = FloatingLabel.Create(transform, SpoutWorld.y - transform.position.y + labelHeight, labelSize);
+            label.showWithin = showWithin;
+            label.SetTitle(Title(Ingredient));
         }
 
         public static string Title(Ingredient i)
@@ -36,9 +46,8 @@ namespace MoonlitTails.Gameplay
             return $"<b>{i.DisplayName}</b>{kind} <size=80%>{string.Join(" ", parts)}</size>";
         }
 
-        public bool HasSomethingToPour => Ingredient != null;
-        public Color StreamColor => GameVisuals.LiquidColor(Ingredient.Taste);
-        public bool PourInto(DrinkContainer target, out string message) => target.ReceiveIngredient(Ingredient, out message);
-        public void Dump() { }
+        public override bool HasSomethingToPour => true;
+        public override Color StreamColor => GameVisuals.LiquidColor(Ingredient.Taste);
+        public override bool PourInto(DrinkContainer target, out string message) => target.ReceiveIngredient(Ingredient, out message);
     }
 }

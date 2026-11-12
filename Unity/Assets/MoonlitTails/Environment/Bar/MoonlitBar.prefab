@@ -9752,22 +9752,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5429569331767519266, guid: 17d01d901871fee17bc3701a96c7f58d, type: 3}
-      propertyPath: space
-      value: 
-      objectReference: {fileID: 2210503008986012679}
-    - target: {fileID: 5429569331767519266, guid: 17d01d901871fee17bc3701a96c7f58d, type: 3}
-      propertyPath: homePosition.x
-      value: -1.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 5429569331767519266, guid: 17d01d901871fee17bc3701a96c7f58d, type: 3}
-      propertyPath: homePosition.y
-      value: 1.02
-      objectReference: {fileID: 0}
-    - target: {fileID: 5429569331767519266, guid: 17d01d901871fee17bc3701a96c7f58d, type: 3}
-      propertyPath: homePosition.z
-      value: -0.75
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18649,6 +18633,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7951197968437855507, guid: 84953a6b2bbe454e08e1bccb7e3c819b, type: 3}
+      propertyPath: iceWell
+      value: 
+      objectReference: {fileID: 7588460534066376612}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
