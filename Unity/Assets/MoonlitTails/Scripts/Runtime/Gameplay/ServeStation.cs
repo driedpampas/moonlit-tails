@@ -49,7 +49,7 @@ namespace MoonlitTails.Gameplay
         Rigidbody glassBody;
         RigidbodyConstraints constraintsBefore;
         readonly List<XRGrabInteractable> watched = new List<XRGrabInteractable>();
-        bool started, bellHooked;
+        bool bellHooked;
         int shownState = int.MinValue;   // what the panel shows, as a hash: it's redrawn only when this changes
         float serveCooldownUntil;
 
@@ -67,7 +67,6 @@ namespace MoonlitTails.Gameplay
                 enabled = false;
                 return;
             }
-            started = true;
             panel = title.transform.parent;
             HookBell(true);
             foreach (var c in DrinkContainer.All)
@@ -102,7 +101,6 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ the panel
         void Update()
         {
-            if (!started) return;
             glass = FindGlass();
             int state = PanelState();
             if (state == shownState) return;
@@ -151,13 +149,14 @@ namespace MoonlitTails.Gameplay
         void Adjust(Taste d)
         {
             if (!glass) return;
-            if (!glass.TryAdjust(d, out var msg) && msg != null && glass.Label) glass.Label.Flash(msg, GameVisuals.Bad);
+            if (!glass.TryAdjust(d, out var msg) && msg != null) glass.Label.Flash(msg, GameVisuals.Bad);
         }
 
         /// <summary>Hands the glass on the coaster to the customers. The bell and the Serve button call this.</summary>
         public void Serve()
         {
-            if (!started || Time.time < serveCooldownUntil) return;   // one ring = one serve, even if two inputs fire
+            // not while switched off (Start does that when a reference is missing); one ring = one serve, even if two inputs fire
+            if (!isActiveAndEnabled || Time.time < serveCooldownUntil) return;
             serveCooldownUntil = Time.time + 0.5f;
             glass = FindGlass();
             if (!glass || glass.IsEmpty)
@@ -166,29 +165,27 @@ namespace MoonlitTails.Gameplay
                 return;
             }
             bool ok = game.TryServe(glass.ToServed(), out string summary);
-            if (glass.Label) glass.Label.Flash(summary, ok ? GameVisuals.Good : GameVisuals.Bad);
+            glass.Label.Flash(summary, ok ? GameVisuals.Good : GameVisuals.Bad);
             if (ok) glass.ServedAndReturned();
         }
 
         // ------------------------------------------------------------------ the coaster
         void OnGlassGrabbed(SelectEnterEventArgs args)
         {
-            var g = args.interactableObject.transform.GetComponent<DrinkContainer>();
-            if (g && g == CoasterGlass) Release();
+            if (CoasterGlass && args.interactableObject.transform == CoasterGlass.transform) Release();
         }
 
         void OnGlassReleased(SelectExitEventArgs args)
         {
             // a cancelled release (e.g. the reset button taking the glass away) isn't the player putting it down
             if (args.isCanceled) return;
-            var g = args.interactableObject.transform.GetComponent<DrinkContainer>();
-            if (g && InReach(g)) StartCoroutine(SnapAfterRelease(g));
+            var g = args.interactableObject.transform.GetComponent<DrinkContainer>();   // only glasses are watched
+            if (InReach(g)) StartCoroutine(SnapAfterRelease(g));
         }
 
         /// <summary>Is the glass close enough to the coaster to snap onto it?</summary>
         public bool InReach(DrinkContainer g)
         {
-            if (!g || !serveSpot) return false;
             Vector3 p = serveSpot.position;
             float low = Mathf.Min(g.BottomWorld.y, g.CenterWorld.y) - p.y;
             if (low < -0.05f || low > snapHeight) return false;
@@ -206,7 +203,6 @@ namespace MoonlitTails.Gameplay
         /// <summary>Stand the glass upright in the middle of the coaster. False if another glass is already there.</summary>
         public bool TrySnap(DrinkContainer g)
         {
-            if (!g || !serveSpot) return false;
             if (CoasterGlass && CoasterGlass != g)
             {
                 if (OnCoaster(CoasterGlass)) return false;
@@ -237,7 +233,7 @@ namespace MoonlitTails.Gameplay
 
         bool OnCoaster(DrinkContainer g)
         {
-            if (!g || g.IsHeld || !serveSpot) return false;
+            if (!g || g.IsHeld) return false;   // it can be destroyed while it stands here
             Vector3 d = g.CenterWorld - serveSpot.position; d.y = 0;
             return d.magnitude < 0.03f && Mathf.Abs(g.BottomWorld.y - serveSpot.position.y) < 0.05f;
         }

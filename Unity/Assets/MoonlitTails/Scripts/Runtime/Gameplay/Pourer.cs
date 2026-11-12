@@ -23,7 +23,6 @@ namespace MoonlitTails.Gameplay
 
         protected Vector3 upAxis;
         protected Bounds bounds;
-        bool geometryReady;
         LineRenderer stream;
         Color streamColor;
         bool armed = true;
@@ -37,11 +36,9 @@ namespace MoonlitTails.Gameplay
         public virtual void Dump() { }
         protected virtual bool CanDump => false;
 
-        /// <summary>Works out the up axis, the mouth and the pour stream. Call once from the subclass's setup.</summary>
-        protected void EnsureGeometry()
+        /// <summary>Works out the up axis and the mouth, and makes the pour stream. Call once from the subclass's Awake.</summary>
+        protected void MeasureShape()
         {
-            if (geometryReady) return;
-            geometryReady = true;
             upAxis = GameVisuals.LocalUpAxis(transform);
             bounds = GameVisuals.LocalBounds(gameObject);
 
@@ -56,7 +53,6 @@ namespace MoonlitTails.Gameplay
 
         protected virtual void Update()
         {
-            if (!geometryReady) return;
             float tilt = Tilt;
             if (tilt < rearmAngle) { armed = true; progress = 0; dumpProgress = 0; }
 
@@ -77,7 +73,7 @@ namespace MoonlitTails.Gameplay
                 {
                     armed = false;
                     bool ok = PourInto(target, out string message);
-                    if (!string.IsNullOrEmpty(message) && target.Label) target.Label.Flash(message, ok ? GameVisuals.Good : GameVisuals.Bad);
+                    if (!string.IsNullOrEmpty(message)) target.Label.Flash(message, ok ? GameVisuals.Good : GameVisuals.Bad);
                 }
             }
             else if (CanDump)

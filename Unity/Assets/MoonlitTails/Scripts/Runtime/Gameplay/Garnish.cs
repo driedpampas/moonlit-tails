@@ -16,7 +16,7 @@ namespace MoonlitTails.Gameplay
 
         XRGrabInteractable grab;
         Rigidbody body;
-        Collider[] colliders = new Collider[0];
+        Collider[] colliders;
         PropRespawn home;
         DrinkContainer glass;
         Transform originalParent;
@@ -31,10 +31,10 @@ namespace MoonlitTails.Gameplay
             }
             originalParent = transform.parent;
             grab = GetComponent<XRGrabInteractable>();
-            body = GetComponent<Rigidbody>();
+            body = GetComponent<Rigidbody>();   // the grab component requires one
             colliders = GetComponentsInChildren<Collider>();
             home = GetComponent<PropRespawn>();
-            if (grab) grab.selectExited.AddListener(OnReleased);
+            grab.selectExited.AddListener(OnReleased);
         }
 
         void OnDestroy() { if (grab) grab.selectExited.RemoveListener(OnReleased); }
@@ -56,9 +56,9 @@ namespace MoonlitTails.Gameplay
         public void AttachTo(DrinkContainer target, Vector3 rimPoint)
         {
             glass = target;
-            if (body) { body.isKinematic = true; body.detectCollisions = false; }
-            foreach (var c in colliders) if (c) c.enabled = false;
-            if (grab) grab.enabled = false;
+            body.isKinematic = true; body.detectCollisions = false;
+            foreach (var c in colliders) c.enabled = false;
+            grab.enabled = false;
             transform.SetParent(target.transform, true);
             transform.position = rimPoint;
         }
@@ -69,9 +69,9 @@ namespace MoonlitTails.Gameplay
             var from = glass;
             glass = null;
             transform.SetParent(originalParent, true);
-            foreach (var c in colliders) if (c) c.enabled = true;
-            if (body) { body.isKinematic = false; body.detectCollisions = true; }
-            if (grab) grab.enabled = true;
+            foreach (var c in colliders) c.enabled = true;
+            body.isKinematic = false; body.detectCollisions = true;
+            grab.enabled = true;
             if (from) from.ForgetGarnish(this);
             if (sendHome && home) home.SendHome();
         }

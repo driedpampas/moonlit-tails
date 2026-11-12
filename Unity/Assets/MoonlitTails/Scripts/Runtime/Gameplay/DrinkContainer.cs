@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using MoonlitTails.Drinks;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -54,7 +53,7 @@ namespace MoonlitTails.Gameplay
 
         public FloatingLabel Label { get; private set; }
         public bool IsGlass => kind == ContainerKind.Glass;
-        public bool IsHeld => grab && grab.isSelected;
+        public bool IsHeld => grab.isSelected;
         public int Capacity => IsGlass ? Glass.Capacity(length) : VesselCapacity;
 
         XRGrabInteractable grab;
@@ -71,18 +70,15 @@ namespace MoonlitTails.Gameplay
         Vector3 lastPos, lastDir;
         readonly Queue<float> reversals = new Queue<float>();
 
-        bool setUp;
-
         void Awake()
         {
             if (string.IsNullOrEmpty(variant))
             {
                 Debug.LogError($"[Moonlit] {name}: DrinkContainer has no variant name set", this);
-                enabled = false;
+                enabled = false;   // never enabled, so it's never in All and nothing below is reached
                 return;
             }
-            setUp = true;
-            EnsureGeometry();
+            MeasureShape();
             grab = GetComponent<XRGrabInteractable>();
             home = GetComponent<PropRespawn>();
 
@@ -94,11 +90,10 @@ namespace MoonlitTails.Gameplay
             Label = FloatingLabel.Create(transform, OpeningWorld.y - transform.position.y + 0.05f, IsGlass ? 0.22f : 0.26f);
             Label.showWithin = showWithin >= 0f ? showWithin : IsGlass ? 0.9f : 0f;
             lastPos = transform.position;
-            if (isActiveAndEnabled && !All.Contains(this)) All.Add(this);
             RefreshNow();
         }
 
-        void OnEnable() { if (setUp && !All.Contains(this)) All.Add(this); }
+        void OnEnable() => All.Add(this);
         void OnDisable() => All.Remove(this);
 
         // ------------------------------------------------------------------ geometry
@@ -158,7 +153,16 @@ namespace MoonlitTails.Gameplay
         /// <summary>Unmixed parts in a Stir Cup / Shake Mixer (0, 1 or 2).</summary>
         public int PartCount => parts.Count;
         public bool IsEmpty => IsGlass ? mixed == null && layers.Count == 0 : parts.Count == 0;
-        public int Units => IsGlass ? (mixed != null ? mixed.Units : layers.Count) : parts.Sum(p => p.Units) - layersPoured;
+        public int Units
+        {
+            get
+            {
+                if (IsGlass) return mixed != null ? mixed.Units : layers.Count;
+                int units = -layersPoured;
+                foreach (var p in parts) units += p.Units;
+                return units;
+            }
+        }
         public PrepMethod Method => mixed != null ? PrepMethod.Mixed : PrepMethod.Layered;
         public int AdjustmentLeft => IsEmpty ? 0 : Finishing.AdjustmentPoints(Method) - adjust.AbsTotal;
 
@@ -195,7 +199,7 @@ namespace MoonlitTails.Gameplay
         {
             if (parts.Count >= 2) { message = "Mix what's in here first"; return false; }
             if (layersPoured > 0) { message = "Finish pouring this drink (or tip it out) first"; return false; }
-            if (parts.Any(p => p.SharesIngredientWith(l))) { message = "Already in here (no self-mixing)"; return false; }
+            if (parts.Count == 1 && parts[0].SharesIngredientWith(l)) { message = "Already in here (no self-mixing)"; return false; }
             if (Units + l.Units > VesselCapacity) { message = "Too full"; return false; }
             parts.Add(l);
             message = parts.Count == 2 ? $"+ {what}: now stir or shake" : $"+ {what}";
@@ -221,13 +225,20 @@ namespace MoonlitTails.Gameplay
             if (!l.IsPrepared) { message = "Layers must be prepared drinks (base + modifier)"; return false; }
             if (mixed != null) { message = "This glass already has a mixed drink"; return false; }
             if (layers.Count >= Capacity) { message = "The glass is full"; return false; }
-            int collapsedBefore = layers.Count > 0 ? Layered.Collapsed.Count(c => c) : 0;
+            int collapsedBefore = layers.Count > 0 ? CollapsedCount() : 0;
             layers.Add(l);
             layered = null;
-            collapsed = Layered.Collapsed.Count(c => c) > collapsedBefore;
+            collapsed = CollapsedCount() > collapsedBefore;
             message = collapsed ? "The layers collapsed!" : $"Layer {layers.Count} poured";
             Refresh();
             return true;
+        }
+
+        int CollapsedCount()
+        {
+            int n = 0;
+            foreach (bool c in Layered.Collapsed) if (c) n++;
+            return n;
         }
 
         public bool AddIce(out string message)
@@ -247,7 +258,7 @@ namespace MoonlitTails.Gameplay
             Vector3 side = Vector3.Cross(Vector3.up, transform.right).normalized;
             if (side.sqrMagnitude < 0.01f) side = Vector3.forward;
             g.AttachTo(this, OpeningWorld + side * OpeningRadiusWorld * 0.9f);
-            if (Label) Label.Flash($"Garnish: {g.color}", GameVisuals.Good);
+            Label.Flash($"Garnish: {g.color}", GameVisuals.Good);
             Refresh();
         }
 
@@ -268,7 +279,7 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ mixing
         public void TryMix(MixMethod method)
         {
-            if (IsGlass || parts.Count < 2 || !setUp) return;
+            if (IsGlass || parts.Count < 2) return;
             var result = Mixing.Combine(parts[0], parts[1], method);
             switch (result.Outcome)
             {
@@ -294,7 +305,7 @@ namespace MoonlitTails.Gameplay
         protected override void Update()
         {
             base.Update();   // pouring
-            if (IsGlass || !setUp) return;
+            if (IsGlass) return;
             // hand shaking: quick back-and-forth while held
             Vector3 p = transform.position;
             float dt = Time.deltaTime;
@@ -357,7 +368,7 @@ namespace MoonlitTails.Gameplay
         {
             if (IsEmpty && !Cold && !Garnish) return;
             Clear();
-            if (Label) Label.Flash("Emptied", GameVisuals.Ink, 1.5f);
+            Label.Flash("Emptied", GameVisuals.Ink, 1.5f);
         }
 
         public void Clear()
@@ -401,7 +412,6 @@ namespace MoonlitTails.Gameplay
         void RefreshNow()
         {
             RebuildLiquid();
-            if (!Label) return;
 
             if (IsGlass)
             {
@@ -433,8 +443,6 @@ namespace MoonlitTails.Gameplay
 
         void RebuildLiquid()
         {
-            if (!liquidRoot) return;
-
             float half = HalfHeight * 0.9f;
             float radius = GameVisuals.Radius(bounds, upAxis) * 0.78f;
             float usable = half * 2f * 0.9f;

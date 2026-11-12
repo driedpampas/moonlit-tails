@@ -24,8 +24,13 @@ namespace MoonlitTails.Gameplay
 
         void Awake()
         {
-            if (!iceWell) Debug.LogError($"[Moonlit] {name}: IceScoop has no ice well set", this);
             self = GetComponent<Renderer>();
+            if (!iceWell || !self)
+            {
+                Debug.LogError($"[Moonlit] {name}: IceScoop needs its ice well set and a Renderer on the same object", this);
+                enabled = false;
+                return;
+            }
             label = FloatingLabel.Create(transform, 0.12f, 0.22f);
             label.showWithin = 1.0f;
             SetLoaded(false);
@@ -45,18 +50,17 @@ namespace MoonlitTails.Gameplay
 
         void Update()
         {
-            if (!self) return;
             Vector3 p = self.bounds.center;
             if (!loaded)
             {
-                if (iceWell && WellBounds().Contains(p)) { SetLoaded(true); label.Flash("Got ice", GameVisuals.Good, 1.5f); }
+                if (WellBounds().Contains(p)) { SetLoaded(true); label.Flash("Got ice", GameVisuals.Good, 1.5f); }
                 return;
             }
             var glass = DrinkContainer.FindGlassNear(p, reach);
             if (!glass || p.y <= glass.OpeningWorld.y - 0.02f) { refused = null; return; }
             if (glass == refused) return;
             bool ok = glass.AddIce(out string msg);
-            if (glass.Label) glass.Label.Flash(msg, ok ? GameVisuals.Good : GameVisuals.Bad, 2f);
+            glass.Label.Flash(msg, ok ? GameVisuals.Good : GameVisuals.Bad, 2f);
             if (ok) { SetLoaded(false); refused = null; }
             else refused = glass;
         }
@@ -64,8 +68,8 @@ namespace MoonlitTails.Gameplay
         void SetLoaded(bool on)
         {
             loaded = on;
-            if (label) label.SetTitle(on ? "<b>Ice Scoop</b> <size=75%>full: bring it to a glass</size>" : "<b>Ice Scoop</b> <size=75%>dip it in the ice well</size>");
-            if (on && !cubes && self)
+            label.SetTitle(on ? "<b>Ice Scoop</b> <size=75%>full: bring it to a glass</size>" : "<b>Ice Scoop</b> <size=75%>dip it in the ice well</size>");
+            if (on && !cubes)
             {
                 // the Ice prefab is three cubes 0.55 wide: shrink it so each is about 1.4 cm, whatever the scoop's own scale
                 float scale = 0.025f / Mathf.Max(transform.lossyScale.x, 1e-4f);

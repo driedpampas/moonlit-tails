@@ -78,7 +78,6 @@ namespace VRCharacters
         {
             foreach (var c in chains)
             {
-                if (c == null) continue;
                 var list = new List<Node>();
                 var t = c.root;
                 while (t != null && !t.name.EndsWith("_end"))
@@ -118,7 +117,7 @@ namespace VRCharacters
             if (!built) return;
             foreach (var c in chains)
             {
-                if (c?.nodes == null) continue;
+                if (c.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
                     if (!n.bone) continue;
@@ -171,7 +170,7 @@ namespace VRCharacters
             for (int ci = 0; ci < chains.Count; ci++)
             {
                 var c = chains[ci];
-                if (c == null || c.nodes == null || c.root == null) continue;
+                if (c.nodes == null) continue;
                 float keep = Mathf.Pow(1f - c.drag, steps);
                 float pull = 1f - Mathf.Pow(1f - c.stiffness, steps);
                 Vector3 accel = (c.gravity + wind * c.windInfluence) * dt * dt;
@@ -220,7 +219,7 @@ namespace VRCharacters
             Gizmos.color = new Color(1f, 0.6f, 0.1f, 0.8f);
             foreach (var c in chains)
             {
-                if (c?.nodes == null) continue;
+                if (c.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
                     if (n.bone == null) continue;

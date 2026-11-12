@@ -96,9 +96,9 @@ namespace MoonlitTails
             Vector3 p = ToWorld(homePosition);
             Quaternion r = ToWorld(homeRotation);
             // teleport the body too: with interpolation on, moving only the transform gets overwritten
-            if (body) { body.position = p; body.rotation = r; }
+            body.position = p; body.rotation = r;
             transform.SetPositionAndRotation(p, r);
-            if (!body || body.isKinematic) return;
+            if (body.isKinematic) return;
             body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
         }

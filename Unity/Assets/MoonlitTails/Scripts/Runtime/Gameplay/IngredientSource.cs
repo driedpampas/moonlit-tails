@@ -28,12 +28,9 @@ namespace MoonlitTails.Gameplay
                 enabled = false;
                 return;
             }
-            EnsureGeometry();
+            MeasureShape();
 
-            var b = GameVisuals.LocalBounds(gameObject);
-            var up = GameVisuals.LocalUpAxis(transform);
-            float top = transform.TransformPoint(b.center + up * GameVisuals.Extent(b, up)).y - transform.position.y;
-            label = FloatingLabel.Create(transform, top + labelHeight, labelSize);
+            label = FloatingLabel.Create(transform, SpoutWorld.y - transform.position.y + labelHeight, labelSize);
             label.showWithin = showWithin;
             label.SetTitle(Title(Ingredient));
         }
@@ -49,7 +46,7 @@ namespace MoonlitTails.Gameplay
             return $"<b>{i.DisplayName}</b>{kind} <size=80%>{string.Join(" ", parts)}</size>";
         }
 
-        public override bool HasSomethingToPour => Ingredient != null;
+        public override bool HasSomethingToPour => true;
         public override Color StreamColor => GameVisuals.LiquidColor(Ingredient.Taste);
         public override bool PourInto(DrinkContainer target, out string message) => target.ReceiveIngredient(Ingredient, out message);
     }

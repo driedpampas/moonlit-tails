@@ -32,7 +32,7 @@ namespace MoonlitTails.Gameplay
         public sealed class SeatState
         {
             public CustomerProfile Profile { get; internal set; }
-            public string DisplayName => Profile ? Profile.displayName : "Customer";
+            public string DisplayName => Profile.displayName;
             public Transform Body { get; internal set; }
             public Transform TicketSpot { get; internal set; }
             public FloatingLabel Bubble { get; internal set; }
@@ -193,10 +193,7 @@ namespace MoonlitTails.Gameplay
         /// <summary>Shows a line in a customer's speech bubble.</summary>
         public void Say(int seat, string text, Color color, float seconds)
         {
-            var c = states[seat];
-            if (!c.Bubble) return;
-            c.Bubble.SetTitle("");
-            c.Bubble.Flash(text, color, seconds);
+            states[seat].Bubble.Flash(text, color, seconds);
         }
 
         /// <summary>Hands a drink over. Picks the open order it matches best and says how it went.</summary>
@@ -216,7 +213,7 @@ namespace MoonlitTails.Gameplay
             if (miss == Mismatch.None)
             {
                 ServedCount++;
-                var story = c.Profile.story ?? new string[0];
+                var story = c.Profile.story;
                 string line = c.StoryIndex < story.Length ? story[c.StoryIndex++] : c.Profile.storyDone;
                 Say(best, Pick(c.Profile.thanks) + "\n<size=85%>" + line + "</size>", GameVisuals.Good, 10f);
                 c.Order = null;
@@ -260,6 +257,6 @@ namespace MoonlitTails.Gameplay
             return "(" + string.Join(", ", bits) + ")";
         }
 
-        string Pick(string[] lines) => lines == null || lines.Length == 0 ? "" : lines[rng.Next(lines.Length)];
+        string Pick(string[] lines) => lines.Length == 0 ? "" : lines[rng.Next(lines.Length)];
     }
 }
