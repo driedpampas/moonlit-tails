@@ -168,6 +168,7 @@ namespace MoonlitTails.EditorTools
             var tonic = Source(Ingredients.TonicWater);
             var away = work + Vector3.up * 1.5f;
             int first = -1;   // the customer served first
+            var cap = UnityEngine.Object.FindFirstObjectByType<ContainerCap>();
 
             return new List<(float, string, Action)>
             {
@@ -200,7 +201,20 @@ namespace MoonlitTails.EditorTools
                     shaker.TryMix(MixMethod.Stir);
                     Expect(shaker.PartCount == 2, "stirring a shake-only pair does nothing");
                     shaker.TryMix(MixMethod.Shake);
-                    Expect(shaker.PartCount == 1 && shaker.Units == 2, "shaking combines them (2 units)");
+                    Expect(shaker.PartCount == 2, "shaking without the cap on does nothing");
+                    cap.PutOn(shaker);
+                    Expect(shaker.Capped && Vector3.Distance(GameVisuals.WorldBounds(cap.transform).center, shaker.OpeningWorld) < 0.1f, "the cap snaps onto the Shake Mixer");
+                    shaker.TryMix(MixMethod.Shake);
+                    Expect(shaker.PartCount == 1 && shaker.Units == 2, "shaking with the cap on combines them (2 units)");
+                }),
+                (0.2f, "capped pour", () => TipOver(shaker, highball)),
+                (0.9f, "cap off", () =>
+                {
+                    Expect(highball.IsEmpty && !shaker.IsEmpty, "a capped shaker doesn't pour");
+                    cap.TakeOff();
+                    Expect(!shaker.Capped, "the cap comes off");
+                    Place(cap, away - right * 2f);
+                    Place(shaker, work);
                 }),
                 (0.2f, "shaker into highball", () => TipOver(shaker, highball)),
                 (0.9f, "check mixed glass", () =>

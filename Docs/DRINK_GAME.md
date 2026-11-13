@@ -21,7 +21,7 @@ Press Play in `MoonlitBar_VR.unity`. The game runs from the `Drink Game` object 
 2. **Pour ingredients.** Tip a bottle or carton over the **Stir Cup** (the blender jar) or the **Shake Mixer** (the shaker tin). One tip is 1 unit. Tilt it back up to pour again.
 3. **Mix.** With two things in, combine them:
    - if their densities are the same, **stir** by swirling the bar spoon inside;
-   - if they differ, **shake** by holding the cup and shaking it back and forth.
+   - if they differ, **shake** by holding the cup and shaking it back and forth. The Shake Mixer needs its **cap** on first: let go of the cap near its mouth and it snaps on. Grab the cap to take it off again before you pour. While the cap is on, nothing pours in or out.
 
    The wrong method does nothing. The same ingredient can't go in twice.
 4. **Fill the glass.**
@@ -105,7 +105,8 @@ The label over each prop shows the ingredient's name. How the labels, the liquid
 **Adding a prop to the game:** open its prefab (it needs a collider, a Rigidbody, an XR Grab Interactable and a Prop Respawn, like the others) and add one component:
 - a bottle or carton: **Ingredient Source**, then pick the ingredient;
 - a glass: **Drink Container**, Kind *Glass*, a Variant name (what customers ask for, e.g. *Highball*) and a Length (Short holds 3 units, Medium 4, Long 5);
-- a fruit slice: **Garnish**, with its colour name (e.g. *Lime*).
+- a fruit slice: **Garnish**, with its colour name (e.g. *Lime*);
+- a cap: **Container Cap**. It snaps onto any Stir Cup or Shake Mixer that has **Needs Cap** ticked on its *Drink Container*. That vessel then can't be shaken without it.
 
 Then run **Tools > Moonlit Tails > Automation > Check Scene** to see it listed.
 
@@ -117,7 +118,7 @@ Then run **Tools > Moonlit Tails > Automation > Check Scene** to see it listed.
 
 - **Rules:** `cd Tests/DrinkRules.Tests && dotnet run`. If the .NET workload resolver is broken on your machine, run `MSBuildEnableWorkloadResolver=false dotnet run` instead.
 - **Tools > Moonlit Tails > Automation > Check Scene:** lists which prop got which role, warns about anything missing, checks the bar pieces, and checks that the Drink Game object and the serve panel are fully wired.
-- **Tools > Moonlit Tails > Automation > Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button. It also checks the customer loop: one walks in and orders, leaves after a right drink, the next comes in, and a wrong drink doesn't send them away. It presses the panel buttons, the bell and the reset button through their XR Interaction Toolkit events.
+- **Tools > Moonlit Tails > Automation > Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, the shaker cap, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button. It also checks the customer loop: one walks in and orders, leaves after a right drink, the next comes in, and a wrong drink doesn't send them away. It presses the panel buttons, the bell and the reset button through their XR Interaction Toolkit events.
 - **Headless:** run the smoke test from a terminal. Exit code 0 means it passed.
   ```
   Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkPlaySmokeTest.RunBatch -logFile -

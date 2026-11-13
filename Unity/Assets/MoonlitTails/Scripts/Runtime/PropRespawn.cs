@@ -28,8 +28,11 @@ namespace MoonlitTails
 
         public Vector3 HomePosition => ToWorld(homePosition);
 
-        /// <summary>Stuck to something else right now (a fruit slice on a glass's rim): it moves with that, not on its own.</summary>
-        bool Attached => grab && !grab.enabled;
+        /// <summary>
+        /// Stuck to something else right now (a fruit slice on a glass's rim, a cap on the shaker): it moves with that,
+        /// not on its own, so a reset leaves it there. Set by whatever sticks it on and takes it off.
+        /// </summary>
+        public bool Attached { get; set; }
 
         Vector3 ToWorld(Vector3 p) => space ? space.TransformPoint(p) : p;
         Quaternion ToWorld(Quaternion r) => space ? space.rotation * r : r;

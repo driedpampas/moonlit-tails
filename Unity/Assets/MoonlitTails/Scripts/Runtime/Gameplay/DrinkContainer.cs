@@ -36,6 +36,8 @@ namespace MoonlitTails.Gameplay
         public GlassLength length = GlassLength.Medium;
         [Tooltip("The label shows when the player's head is closer than this (m). 0 = always.")]
         [SerializeField] float showWithin = -1f;   // -1 = default: 0.9 m for glasses, always for the vessels
+        [Tooltip("A vessel that has to be closed with its cap (a Container Cap) before it can be shaken.")]
+        [SerializeField] bool needsCap;
 
         // mixing vessels
         readonly List<Liquid> parts = new List<Liquid>();
@@ -53,6 +55,10 @@ namespace MoonlitTails.Gameplay
 
         public FloatingLabel Label { get; private set; }
         public bool IsGlass => kind == ContainerKind.Glass;
+        public bool NeedsCap => needsCap;
+        /// <summary>The cap on this vessel, or null. While it's on, nothing pours in or out.</summary>
+        public ContainerCap Cap { get; private set; }
+        public bool Capped => Cap;
         public bool IsHeld => grab.isSelected;
         public int Capacity => IsGlass ? Glass.Capacity(length) : VesselCapacity;
 
@@ -111,7 +117,7 @@ namespace MoonlitTails.Gameplay
             DrinkContainer best = null; float bestD = float.MaxValue;
             foreach (var c in All)
             {
-                if (c == except || !c.Upright) continue;
+                if (c == except || !c.Upright || c.Capped) continue;
                 Vector3 o = c.OpeningWorld;
                 float dy = spout.y - o.y;
                 if (dy < -0.03f || dy > 0.6f) continue;
@@ -137,12 +143,25 @@ namespace MoonlitTails.Gameplay
             return best;
         }
 
+        /// <summary>The closest open vessel that needs a cap, with its mouth within <paramref name="reach"/> of a point.</summary>
+        public static DrinkContainer FindNeedingCap(Vector3 p, float reach)
+        {
+            DrinkContainer best = null; float bestD = reach;
+            foreach (var c in All)
+            {
+                if (!c.needsCap || c.Capped) continue;
+                float d = Vector3.Distance(p, c.OpeningWorld);
+                if (d < bestD) { bestD = d; best = c; }
+            }
+            return best;
+        }
+
         /// <summary>The mixing vessel a point (a spoon tip) is inside.</summary>
         public static DrinkContainer FindVesselContaining(Vector3 p)
         {
             foreach (var c in All)
             {
-                if (c.IsGlass || !c.Upright) continue;
+                if (c.IsGlass || !c.Upright || c.Capped) continue;
                 Vector3 o = c.OpeningWorld, b = c.BottomWorld;
                 if (p.y < b.y - 0.01f || p.y > o.y + 0.03f) continue;
                 if (new Vector2(p.x - o.x, p.z - o.z).magnitude <= c.OpeningRadiusWorld * 1.15f + 0.01f) return c;
@@ -265,6 +284,14 @@ namespace MoonlitTails.Gameplay
 
         public void ForgetGarnish(Garnish g) { if (Garnish == g) { Garnish = null; Refresh(); } }
 
+        /// <summary>Called by the cap when it snaps on (the cap) or is taken off (null).</summary>
+        public void SetCap(ContainerCap cap)
+        {
+            Cap = cap;
+            if (cap) Label.Flash(parts.Count == 2 ? "Cap on: shake it!" : "Cap on", GameVisuals.Good);
+            else Label.Flash("Cap off", GameVisuals.Ink, 1.5f);
+        }
+
         public bool TryAdjust(Taste delta, out string message)
         {
             if (!IsGlass || IsEmpty) { message = "Nothing to adjust"; return false; }
@@ -281,6 +308,11 @@ namespace MoonlitTails.Gameplay
         public void TryMix(MixMethod method)
         {
             if (IsGlass || parts.Count < 2) return;
+            if (method == MixMethod.Shake && needsCap && !Capped)
+            {
+                Label.Flash("Put the cap on before you shake", GameVisuals.Bad);
+                return;
+            }
             var result = Mixing.Combine(parts[0], parts[1], method);
             switch (result.Outcome)
             {
@@ -333,7 +365,7 @@ namespace MoonlitTails.Gameplay
         }
 
         // ------------------------------------------------------------------ pouring out
-        public override bool HasSomethingToPour => !IsEmpty;
+        public override bool HasSomethingToPour => !IsEmpty && !Capped;
         protected override bool CanDump => true;
         public override Color StreamColor => IsGlass ? GameVisuals.LiquidColor(RawStats) : GameVisuals.LiquidColor(parts.Count > 0 ? parts[0].Stats : Taste.Zero);
 
