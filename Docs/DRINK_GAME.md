@@ -6,14 +6,14 @@ How drinks are made in Moonlit Tails, the rules as the team agreed them, and whe
 
 Press Play in `MoonlitBar_VR.unity`. The game runs from the `Drink Game` object in the scene.
 
-**Customers come one at a time.** One walks in from the door to the bar and orders. They stay until they get a drink that matches. Then they tell the next line of their story and walk out, and the next customer comes in. A wrong drink never sends them away: they say what's off and keep waiting.
+**Customers come one at a time, in a random order** (never the same one twice in a row). One walks in from the door to the bar and orders. They stay until they get a drink that matches. Then they tell the next line of their story and walk out, and the next customer comes in. A wrong drink never sends them away: they say what's off and keep waiting.
 
 **Everything is within arm's reach.** You stand at the front counter and don't need to step:
 - in front of you: the Shake Mixer, the Stir Cup, the bar spoon, the serve coaster with its panel, and the bell;
 - front left: the ice well and the scoop; front right: the garnish tray;
 - on your left: the glasses; on your right: the ingredients, cartons in front of the taller bottles.
 
-1. **Read the ticket** on the ticket rail (above the glasses). Each customer has their own ticket, filled in while they're at the bar. It shows:
+1. **Read the ticket** on the ticket rail (above the glasses). It's blank until a customer orders, then it shows their name and:
    - the three taste bars to hit;
    - Mixed or Layered;
    - the glass;
@@ -73,7 +73,7 @@ Two choices aren't in the guide yet. Check them with the designers:
 |---|---|
 | `Unity/Assets/MoonlitTails/Scripts/Drinks/` | The rules as plain C# with no Unity dependency: ingredients, mixing, layering, glasses, adjustments, order checking and the order generator. |
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
-| `Gameplay/DrinkGame.cs` | The night at the bar: customers coming and going, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customers (in the order they come in), their **Walk Path**, the serve panel, the reset button and the chalkboard text are set. The walk path is a list of markers from the door to the bar (`MK_Spawn_L`, `MK_Queue_L1`, `MK_CustomerApproach`, `MK_CustomerSpot_C`): move a marker or add one to change the way in. Walk speed, the bob, and the waits are fields next to it. The rules sign on the back wall is just a prefab in the scene; no script uses it. |
+| `Gameplay/DrinkGame.cs` | The night at the bar: customers coming and going, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customers, their **Walk Path**, the serve panel, the reset button and the chalkboard text are set. The walk path is a list of markers from the door to the bar (`MK_Spawn_L`, `MK_Queue_L1`, `MK_CustomerApproach`, `MK_CustomerSpot_C`): move a marker or add one to change the way in. Walk speed, the bob, and the waits are fields next to it. The rules sign on the back wall is just a prefab in the scene; no script uses it. |
 | `Gameplay/ServeStation.cs` | The serve coaster and its panel (`Prefabs/UI/ServePanel.prefab`): the coaster snap, the taste readout, the adjustment buttons, Serve and the bell. |
 | `Prefabs/UI/` | The serve panel and the rules sign, and their flat-colour materials. The reset button and the chalkboard text are plain objects under `Drink Game` in the scene. |
 | The prop prefabs (`Environment/Bar/Prefabs/Props`) | **What each prop is**: the ingredient on each bottle's *Ingredient Source*, the kind, name and length on each glass's *Drink Container*, the colour on each *Garnish*. |
