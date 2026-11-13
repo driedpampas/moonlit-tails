@@ -10,22 +10,26 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MoonlitTails.Gameplay
 {
     /// <summary>
-    /// The night at the bar: the customers and their orders (one ticket per customer on the ticket rail, a speech
+    /// The night at the bar: the customers and their orders (shown on a ticket on the ticket rail, a speech
     /// bubble over each customer, the check when a drink is served), the reset button, and putting props back when
-    /// they leave the bar. A correct drink tells the next line of that customer's story.
+    /// they leave the bar.
+    ///
+    /// Customers come one at a time, in a random order: one walks in from the door to the bar, orders, and waits until they get a drink
+    /// that matches. Then they tell the next line of their story, walk out, and the next customer comes in.
+    /// Only the customer in the bar is switched on, so the others cost nothing to draw or animate.
     ///
     /// It lives on the "Drink Game" object in the scene; the customers, their tickets, the serve panel and the reset
     /// button are set on it in the Inspector. The props carry their own gameplay components, set in their prefabs.
     /// </summary>
     public class DrinkGame : MonoBehaviour
     {
-        /// <summary>A customer's place: who sits there and which ticket on the rail is theirs.</summary>
+        /// <summary>A customer: who they are, their character model, and which ticket on the rail is theirs.</summary>
         [Serializable]
         public class Seat
         {
             public CustomerProfile profile;
             [Tooltip("The character model.")] public Transform body;
-            [Tooltip("Their ticket on the ticket rail.")] public Transform ticketSpot;
+            [Tooltip("The ticket on the rail that shows their order. Customers can share one: it is blank unless they have an order.")] public Transform ticketSpot;
         }
 
         /// <summary>A customer during play. Read it from tools; change it only through DrinkGame's methods.</summary>
@@ -40,13 +44,25 @@ namespace MoonlitTails.Gameplay
             public DrinkOrder Order { get; internal set; }
             public int StoryIndex { get; internal set; }
             public bool Missed { get; internal set; }
-            internal float nextOrderAt;
         }
 
+        /// <summary>Where the customer whose turn it is has got to.</summary>
+        public enum Visit { Away, WalkingIn, AtBar, Served, WalkingOut }
+
         [Header("Customers")]
+        [Tooltip("They come in one at a time, in a random order, and never the same one twice in a row.")]
         [SerializeField] List<Seat> seats = new List<Seat>();
-        [Tooltip("Seconds between a served drink and that customer's next order.")]
-        public float newOrderDelay = 5f;
+        [Tooltip("The way in, from the door to the spot at the bar. Customers leave the same way back.")]
+        [SerializeField] Transform[] walkPath = new Transform[0];
+        [Tooltip("Metres per second.")]
+        public float walkSpeed = 1.2f;
+        [Tooltip("How high (m) a walking customer bobs, and how many bobs per metre.")]
+        public float hopHeight = 0.04f;
+        public float hopsPerMetre = 2.5f;
+        [Tooltip("Seconds a served customer stays to say their line before they leave.")]
+        public float leaveDelay = 5f;
+        [Tooltip("Seconds between one customer leaving and the next one coming in.")]
+        public float nextCustomerDelay = 2f;
 
         [Header("Scene")]
         [SerializeField] ServeStation serve;
@@ -62,6 +78,9 @@ namespace MoonlitTails.Gameplay
 
         public IReadOnlyList<SeatState> Seats => states;
         public int ServedCount { get; private set; }
+        /// <summary>The customer in the bar (an index into <see cref="Seats"/>), or -1 between customers.</summary>
+        public int Current { get; private set; } = -1;
+        public Visit Phase { get; private set; }
         public ServeStation Station => serve;
         public Transform PlayerSpot => playerSpot;
         public IceScoop IceScoop => iceScoop;
@@ -74,6 +93,8 @@ namespace MoonlitTails.Gameplay
         IReadOnlyList<string> garnishColors = new string[0];
         System.Random rng;
         bool ordersEnabled, resetHooked;
+        int lastCustomer = -1, pathIndex;
+        float phaseUntil, walked;
 
         // ------------------------------------------------------------------ start
         void Start()
@@ -88,8 +109,8 @@ namespace MoonlitTails.Gameplay
             if (!serve) { Debug.LogError($"[Moonlit] {name}: no ServeStation set, so drinks can't be served", this); ordersEnabled = false; }
             if (seats.Count == 0) { Debug.LogError($"[Moonlit] {name}: no customer seats set", this); ordersEnabled = false; }
             if (glasses.Count == 0) { Debug.LogError($"[Moonlit] {name}: no glasses in the scene, so customers can't order", this); ordersEnabled = false; }
+            if (walkPath.Length < 2 || walkPath.Any(p => !p)) { Debug.LogError($"[Moonlit] {name}: the walk path needs at least a door and a bar spot", this); ordersEnabled = false; }
 
-            int i = 0;
             foreach (var seat in seats)
             {
                 if (!seat.body) continue;
@@ -98,11 +119,11 @@ namespace MoonlitTails.Gameplay
                 var s = new SeatState { Profile = profile, Body = seat.body, TicketSpot = seat.ticketSpot };
                 s.Bubble = FloatingLabel.Create(seat.body, HeadHeight(seat.body) + 0.12f, 0.28f);
                 if (seat.ticketSpot) s.Ticket = FloatingLabel.Create(seat.ticketSpot, 0.06f, 0.2f);
-                s.nextOrderAt = Time.time + 1.5f + i * 2.5f;   // customers order one after another
                 states.Add(s);
                 ShowTicket(states.Count - 1);
-                i++;
+                if (ordersEnabled) seat.body.gameObject.SetActive(false);   // away until it's their turn
             }
+            phaseUntil = Time.time + nextCustomerDelay;
             HookReset(true);
 
             Debug.Log($"[Moonlit] DrinkGame ready: {FindObjectsByType<IngredientSource>(FindObjectsSortMode.None).Length} ingredient props, " +
@@ -145,18 +166,73 @@ namespace MoonlitTails.Gameplay
             if (keyboardReset && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ResetAllProps();
             for (int i = 0; i < PropRespawn.All.Count; i++) PropRespawn.All[i].CheckLost();
 
-            if (!ordersEnabled) return;
-            for (int i = 0; i < states.Count; i++)
+            if (!ordersEnabled || states.Count == 0) return;
+            switch (Phase)
             {
-                var c = states[i];
-                if (c.Order != null || Time.time < c.nextOrderAt) continue;
-                if (!OrderGenerator.TryGenerate(rng, glasses, garnishColors, out var order)) continue;
-                c.Order = order;
-                c.Missed = false;
-                Say(i, Pick(c.Profile.greetings), GameVisuals.Ink, 6f);
-                ShowTicket(i);
+                case Visit.Away: if (Time.time >= phaseUntil) ComeIn(); break;
+                case Visit.WalkingIn: if (Walk(+1)) Order(); break;
+                case Visit.Served: if (Time.time >= phaseUntil) { Phase = Visit.WalkingOut; pathIndex = walkPath.Length - 2; } break;
+                case Visit.WalkingOut: if (Walk(-1)) GoAway(); break;
             }
         }
+
+        // ------------------------------------------------------------------ a customer's visit
+        void ComeIn()
+        {
+            do Current = rng.Next(states.Count); while (Current == lastCustomer && states.Count > 1);
+            lastCustomer = Current;
+            var body = states[Current].Body;
+            body.SetPositionAndRotation(walkPath[0].position, Quaternion.LookRotation(Flat(walkPath[1].position - walkPath[0].position)));
+            body.gameObject.SetActive(true);
+            pathIndex = 1;
+            walked = 0f;
+            Phase = Visit.WalkingIn;
+        }
+
+        /// <summary>Moves the customer along the walk path, bobbing. True once they're past its end (+1) or its start (-1).</summary>
+        bool Walk(int direction)
+        {
+            var body = states[Current].Body;
+            Vector3 target = walkPath[pathIndex].position;
+            Vector3 at = body.position; at.y = target.y;
+            Vector3 to = target - at;
+            float step = walkSpeed * Time.deltaTime;
+            if (to.magnitude <= step) { at = target; pathIndex += direction; }
+            else
+            {
+                at += to.normalized * step;
+                body.rotation = Quaternion.RotateTowards(body.rotation, Quaternion.LookRotation(Flat(to)), 360f * Time.deltaTime);
+            }
+            walked += step;
+            bool done = pathIndex < 0 || pathIndex >= walkPath.Length;
+            float hop = done ? 0f : Mathf.Abs(Mathf.Sin(walked * hopsPerMetre * Mathf.PI)) * hopHeight;
+            body.position = at + Vector3.up * hop;
+            return done;
+        }
+
+        void Order()
+        {
+            var c = states[Current];
+            if (playerSpot) c.Body.rotation = Quaternion.LookRotation(Flat(playerSpot.position - c.Body.position));
+            Phase = Visit.AtBar;
+            if (!OrderGenerator.TryGenerate(rng, glasses, garnishColors, out var order)) return;
+            c.Order = order;
+            c.Missed = false;
+            Say(Current, Pick(c.Profile.greetings), GameVisuals.Ink, 6f);
+            ShowTicket(Current);
+        }
+
+        void GoAway()
+        {
+            var c = states[Current];
+            c.Bubble.Flash("", GameVisuals.Ink, 0f);
+            c.Body.gameObject.SetActive(false);
+            Current = -1;
+            Phase = Visit.Away;
+            phaseUntil = Time.time + nextCustomerDelay;
+        }
+
+        static Vector3 Flat(Vector3 v) { v.y = 0f; return v.sqrMagnitude > 1e-6f ? v : Vector3.forward; }
 
         void LateUpdate() => DrinkContainer.RefreshChanged();
 
@@ -180,7 +256,7 @@ namespace MoonlitTails.Gameplay
         {
             var c = states[seat];
             if (!c.Ticket) return;
-            if (c.Order == null) { c.Ticket.SetTitle($"<b>{c.DisplayName}</b>\n<size=75%>...</size>"); c.Ticket.ShowBars(null); return; }
+            if (c.Order == null) { c.Ticket.SetTitle(""); c.Ticket.ShowBars(null); return; }   // blank, so customers can share one ticket
             var o = c.Order;
             var extras = new List<string> { o.Method.ToString(), o.GlassVariant };
             if (o.Cold) extras.Add("Cold");
@@ -217,7 +293,7 @@ namespace MoonlitTails.Gameplay
                 string line = c.StoryIndex < story.Length ? story[c.StoryIndex++] : c.Profile.storyDone;
                 Say(best, Pick(c.Profile.thanks) + "\n<size=85%>" + line + "</size>", GameVisuals.Good, 10f);
                 c.Order = null;
-                c.nextOrderAt = Time.time + newOrderDelay + 8f;
+                if (best == Current && Phase == Visit.AtBar) { Phase = Visit.Served; phaseUntil = Time.time + leaveDelay; }
                 ShowTicket(best);
                 summary = $"{c.DisplayName} loved it!";
                 return true;

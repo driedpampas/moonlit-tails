@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ad2b472319a818b8931a861dd5a52f, type: 3}
+  m_Name: Skunk
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.CustomerProfile
+  displayName: Skunk
+  greetings:
+  - Hey. Surprise me... no, wait, don't.
+  - Rough day. Fix it with a drink?
+  story:
+  - I painted the alley wall behind the bakery. Nobody's noticed yet.
+  - Someone left flowers under my painting. Weird. Nice, but weird.
+  - The baker asked me to paint her shop sign. I said I'd think about it. I'm doing
+    it.
+  thanks:
+  - Okay, that's actually good.
+  - Not bad at all.
+  wrong:
+  - Nope. Try again.
+  - That's not what I asked for.
+  storyDone: That's all the gossip I've got. See you.
