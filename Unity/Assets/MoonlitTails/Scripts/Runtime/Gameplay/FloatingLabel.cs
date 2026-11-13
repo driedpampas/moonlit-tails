@@ -25,6 +25,8 @@ namespace MoonlitTails.Gameplay
         public float height = 0.12f;
         [Tooltip("Hide when the player's head is further away than this (0 = always show).")]
         public float showWithin = 0f;
+        [Tooltip("Hide unless the player looks within this many degrees of it (0 = any direction). Fewer labels on screen is fewer things to draw.")]
+        public float showLookAngle = 0f;
 
         float messageUntil;
         Camera cam;
@@ -71,7 +73,8 @@ namespace MoonlitTails.Gameplay
             {
                 Vector3 away = transform.position - cam.transform.position;
                 if (away.sqrMagnitude > 1e-6f) transform.rotation = Quaternion.LookRotation(away, Vector3.up);
-                bool show = showWithin <= 0f || away.sqrMagnitude < showWithin * showWithin;
+                bool show = (showWithin <= 0f || away.sqrMagnitude < showWithin * showWithin)
+                            && (showLookAngle <= 0f || Vector3.Angle(cam.transform.forward, away) < showLookAngle);
                 if (content.gameObject.activeSelf != show) content.gameObject.SetActive(show);
             }
             if (messageUntil > 0 && Time.time > messageUntil) { message.text = ""; messageUntil = 0; }

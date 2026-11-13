@@ -14,6 +14,8 @@ namespace MoonlitTails.Gameplay
         [SerializeField] float labelSize = 0.22f;
         [Tooltip("The label shows when the player's head is closer than this (m).")]
         [SerializeField] float showWithin = 1.2f;
+        [Tooltip("...and looks within this many degrees of it (0 = any direction).")]
+        [SerializeField] float showLookAngle = 30f;
 
         public Ingredient Ingredient { get; private set; }
         public IngredientId Id => ingredient;
@@ -32,6 +34,7 @@ namespace MoonlitTails.Gameplay
 
             label = FloatingLabel.Create(transform, SpoutWorld.y - transform.position.y + labelHeight, labelSize);
             label.showWithin = showWithin;
+            label.showLookAngle = showLookAngle;
             label.SetTitle(Title(Ingredient));
         }
 

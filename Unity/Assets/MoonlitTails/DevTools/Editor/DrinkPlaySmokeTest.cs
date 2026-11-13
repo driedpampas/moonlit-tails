@@ -167,6 +167,7 @@ namespace MoonlitTails.EditorTools
             var cola = Source(Ingredients.Cola);
             var tonic = Source(Ingredients.TonicWater);
             var away = work + Vector3.up * 1.5f;
+            int first = -1;   // the customer served first
 
             return new List<(float, string, Action)>
             {
@@ -230,10 +231,16 @@ namespace MoonlitTails.EditorTools
                     highball.AttachGarnish(lime);
                     Expect(highball.Garnish == lime, "a lime garnish sits on the rim");
                 }),
+                (3f, "customer at the bar", () =>
+                {
+                    first = game.Current;
+                    Expect(first >= 0 && game.Phase == DrinkGame.Visit.AtBar && game.Seats[first].Order != null, "a customer walked in and ordered");
+                    Expect(game.Seats.Count(c => c.Body.gameObject.activeSelf) == 1, "only the customer in the bar is switched on");
+                }),
                 (0.2f, "serve", () =>
                 {
                     Place(highball, serve + Vector3.up * 0.01f);
-                    game.SetOrder(0, new DrinkOrder { Target = new Taste(2, 3, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" });
+                    game.SetOrder(first, new DrinkOrder { Target = new Taste(2, 3, 0), Method = PrepMethod.Mixed, GlassVariant = "Highball", Cold = true, Color = "Lime", Hint = "test" });
                 }),
                 (0.3f, "adjust by the panel", () =>
                 {
@@ -246,7 +253,8 @@ namespace MoonlitTails.EditorTools
                     Expect(Press(station.Bell), "the bell is a button");
                     Expect(game.ServedCount == before + 1, "a correct drink is accepted");
                     Expect(highball.IsEmpty && !highball.Cold && highball.Garnish == null, "the served glass is emptied and sent home");
-                    Expect(game.Seats[0].Order == null && game.Seats[0].StoryIndex == 1, "the customer tells the next story line");
+                    Expect(game.Seats[first].Order == null && game.Seats[first].StoryIndex == 1, "the customer tells the next story line");
+                    Expect(game.Phase == DrinkGame.Visit.Served, "the served customer gets ready to leave");
                 }),
                 (0.2f, "stir cup: whiskey", () => { Place(whiskey, away); TipOver(whiskey, cup); }),
                 (0.9f, "stir cup: tonic", () => { Place(whiskey, away); TipOver(tonic, cup); }),
@@ -279,11 +287,15 @@ namespace MoonlitTails.EditorTools
                     Expect(!rocks.TryAdjust(new Taste(1, 0, 0), out _), "a third point is refused");
                     Expect(rocks.FinalStats == new Taste(3, 1, 1), "adjusted stats");
                 }),
+                (15f, "next customer", () =>
+                {
+                    Expect(!game.Seats[first].Body.gameObject.activeSelf, "the served customer walked out");
+                    Expect(game.Current >= 0 && game.Current != first && game.Phase == DrinkGame.Visit.AtBar, "the next customer came in and ordered");
+                }),
                 (0.1f, "wrong serve", () =>
                 {
                     Place(rocks, serve + Vector3.up * 0.01f);
-                    for (int i = 0; i < game.Seats.Count; i++)
-                        if (game.Seats[i].Order == null) game.SetOrder(i, new DrinkOrder { Target = new Taste(9, 9, 9), Method = PrepMethod.Mixed, GlassVariant = "Wine", Hint = "test" });
+                    game.SetOrder(game.Current, new DrinkOrder { Target = new Taste(9, 9, 9), Method = PrepMethod.Mixed, GlassVariant = "Wine", Hint = "test" });
                 }),
                 (0.3f, "ring wrong", () =>
                 {
@@ -292,6 +304,7 @@ namespace MoonlitTails.EditorTools
                     Expect(game.ServedCount == before, "a wrong drink isn't accepted");
                     Expect(game.Seats.Any(c => c.Missed), "the customer's ticket now shows a tip");
                     Expect(!rocks.IsEmpty, "a refused drink stays in the glass");
+                    Expect(game.Phase == DrinkGame.Visit.AtBar && game.Seats[game.Current].Order != null, "the customer stays and still wants their drink");
                 }),
                 (0.1f, "dump", () => TipOverNothing(rocks, serve + Vector3.up * 0.6f + right * 2f)),
                 (1.6f, "check dump", () => Expect(rocks.IsEmpty, "tipping a glass out over nothing empties it")),
