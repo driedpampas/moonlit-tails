@@ -178,7 +178,7 @@ namespace MoonlitTails.EditorTools
                     Place(highball, work - right);
                     Place(rocks, work - right * 2f);
                     Expect(shaker.IsEmpty && cup.IsEmpty && highball.IsEmpty, "containers start empty");
-                    Expect(game.Seats.Count == 3, "three customers");
+                    Expect(game.Seats.Count == 5, "five customers");
                 }),
                 (0.2f, "pour whiskey", () => TipOver(whiskey, shaker)),
                 (0.9f, "check whiskey", () =>

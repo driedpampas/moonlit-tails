@@ -10,11 +10,11 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MoonlitTails.Gameplay
 {
     /// <summary>
-    /// The night at the bar: the customers and their orders (one ticket per customer on the ticket rail, a speech
+    /// The night at the bar: the customers and their orders (shown on a ticket on the ticket rail, a speech
     /// bubble over each customer, the check when a drink is served), the reset button, and putting props back when
     /// they leave the bar.
     ///
-    /// Customers come one at a time: one walks in from the door to the bar, orders, and waits until they get a drink
+    /// Customers come one at a time, in a random order: one walks in from the door to the bar, orders, and waits until they get a drink
     /// that matches. Then they tell the next line of their story, walk out, and the next customer comes in.
     /// Only the customer in the bar is switched on, so the others cost nothing to draw or animate.
     ///
@@ -29,7 +29,7 @@ namespace MoonlitTails.Gameplay
         {
             public CustomerProfile profile;
             [Tooltip("The character model.")] public Transform body;
-            [Tooltip("Their ticket on the ticket rail.")] public Transform ticketSpot;
+            [Tooltip("The ticket on the rail that shows their order. Customers can share one: it is blank unless they have an order.")] public Transform ticketSpot;
         }
 
         /// <summary>A customer during play. Read it from tools; change it only through DrinkGame's methods.</summary>
@@ -50,7 +50,7 @@ namespace MoonlitTails.Gameplay
         public enum Visit { Away, WalkingIn, AtBar, Served, WalkingOut }
 
         [Header("Customers")]
-        [Tooltip("They come in one at a time, in this order, and start again after the last one.")]
+        [Tooltip("They come in one at a time, in a random order, and never the same one twice in a row.")]
         [SerializeField] List<Seat> seats = new List<Seat>();
         [Tooltip("The way in, from the door to the spot at the bar. Customers leave the same way back.")]
         [SerializeField] Transform[] walkPath = new Transform[0];
@@ -93,7 +93,7 @@ namespace MoonlitTails.Gameplay
         IReadOnlyList<string> garnishColors = new string[0];
         System.Random rng;
         bool ordersEnabled, resetHooked;
-        int nextCustomer, pathIndex;
+        int lastCustomer = -1, pathIndex;
         float phaseUntil, walked;
 
         // ------------------------------------------------------------------ start
@@ -179,8 +179,8 @@ namespace MoonlitTails.Gameplay
         // ------------------------------------------------------------------ a customer's visit
         void ComeIn()
         {
-            Current = nextCustomer;
-            nextCustomer = (nextCustomer + 1) % states.Count;
+            do Current = rng.Next(states.Count); while (Current == lastCustomer && states.Count > 1);
+            lastCustomer = Current;
             var body = states[Current].Body;
             body.SetPositionAndRotation(walkPath[0].position, Quaternion.LookRotation(Flat(walkPath[1].position - walkPath[0].position)));
             body.gameObject.SetActive(true);
@@ -256,7 +256,7 @@ namespace MoonlitTails.Gameplay
         {
             var c = states[seat];
             if (!c.Ticket) return;
-            if (c.Order == null) { c.Ticket.SetTitle($"<b>{c.DisplayName}</b>\n<size=75%>...</size>"); c.Ticket.ShowBars(null); return; }
+            if (c.Order == null) { c.Ticket.SetTitle(""); c.Ticket.ShowBars(null); return; }   // blank, so customers can share one ticket
             var o = c.Order;
             var extras = new List<string> { o.Method.ToString(), o.GlassVariant };
             if (o.Cold) extras.Add("Cold");
