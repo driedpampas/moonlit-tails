@@ -43,6 +43,8 @@ The lighting is baked, so the lightmaps go stale when a fixed piece or a light m
 1. Open the scene, then **Window > Rendering > Lighting > Generate Lighting**. It takes under a minute. The settings are in `Settings/BarLighting.lighting`.
 2. Commit the files in `Scenes/MoonlitBar_VR/` with the scene.
 
+**The lightmaps in the repo were baked before the front counter was rearranged** (the ice well, the garnish tray, the bar mat and the coasters moved). Their shadows are a few centimetres out of date until someone regenerates the lighting.
+
 Props, customers and hands don't need a rebake. A new fixed piece needs lightmap UVs (*Generate Lightmap UVs* on its model) and the static flags the other pieces have, including *Batching Static* and *Contribute GI*.
 
 ## Still to do

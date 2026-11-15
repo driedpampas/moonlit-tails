@@ -9,9 +9,14 @@ Press Play in `MoonlitBar_VR.unity`. The game runs from the `Drink Game` object 
 **Customers come one at a time, in a random order** (never the same one twice in a row). One walks in from the door to the bar and orders. They stay until they get a drink that matches. Then they tell the next line of their story and walk out, and the next customer comes in. A wrong drink never sends them away: they say what's off and keep waiting.
 
 **Everything is within arm's reach.** You stand at the front counter and don't need to step:
-- in front of you: the Shake Mixer, the Stir Cup, the bar spoon, the serve coaster with its panel, and the bell;
-- front left: the ice well and the scoop; front right: the garnish tray;
-- on your left: the glasses; on your right: the ingredients, cartons in front of the taller bottles.
+The front counter is laid out in the order you work, left to right, so your hands move in one sweep:
+- **ice** on the front left: the ice well, with the scoop lying on it;
+- **mixing** in the middle, on the bar mat: the Stir Cup on its left; the Shake Mixer on its right, with its cap standing in front of it; the bar spoon along the front edge;
+- **garnish** on the front right: the garnish tray;
+- **serve** further forward, in front of the customer: the coaster, the bell and the panel;
+- on your left: the glasses, one of each kind (the spare copies are on the old stand at the far left); on your right: the ingredients, cartons in front of the taller bottles.
+
+Nothing taller than the Stir Cup (22 cm) stands between you and the customer.
 
 1. **Read the ticket** on the ticket rail (above the glasses). It's blank until a customer orders, then it shows their name and:
    - the three taste bars to hit;
