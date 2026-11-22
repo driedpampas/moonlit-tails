@@ -11,6 +11,8 @@
 *.mask       text eol=lf merge=unityyamlmerge
 *.physicMaterial text eol=lf merge=unityyamlmerge
 *.meta       text eol=lf merge=unityyamlmerge
+# baked lighting data is binary, even though it ends in .asset
+LightingData.asset filter=lfs diff=lfs merge=lfs -text
 *.cs         text diff=csharp
 *.shader     text
 *.hlsl       text

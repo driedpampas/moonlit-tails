@@ -291,3 +291,4 @@ MonoBehaviour:
   variant: Shake Mixer
   length: 5
   showWithin: -1
+  needsCap: 1

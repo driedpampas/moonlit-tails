@@ -59,6 +59,7 @@ namespace MoonlitTails.Gameplay
             body.isKinematic = true; body.detectCollisions = false;
             foreach (var c in colliders) c.enabled = false;
             grab.enabled = false;
+            if (home) home.Attached = true;
             transform.SetParent(target.transform, true);
             transform.position = rimPoint;
         }
@@ -72,6 +73,7 @@ namespace MoonlitTails.Gameplay
             foreach (var c in colliders) c.enabled = true;
             body.isKinematic = false; body.detectCollisions = true;
             grab.enabled = true;
+            if (home) home.Attached = false;
             if (from) from.ForgetGarnish(this);
             if (sendHome && home) home.SendHome();
         }
