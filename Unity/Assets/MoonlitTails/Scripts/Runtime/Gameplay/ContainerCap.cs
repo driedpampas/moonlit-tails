@@ -25,6 +25,7 @@ namespace MoonlitTails.Gameplay
         Transform originalParent;
         Vector3 upAxis;
         DrinkContainer vessel;   // the vessel it's on, or null
+        Coroutine pendingRelease;
 
         void Awake()
         {
@@ -45,18 +46,25 @@ namespace MoonlitTails.Gameplay
             grab.selectExited.RemoveListener(OnReleased);
         }
 
-        void OnGrabbed(SelectEnterEventArgs _) { if (vessel) TakeOff(); }
+        void OnGrabbed(SelectEnterEventArgs _)
+        {
+            if (pendingRelease != null) { StopCoroutine(pendingRelease); pendingRelease = null; }
+            if (vessel) TakeOff();
+        }
 
         void OnReleased(SelectExitEventArgs args)
         {
-            if (!args.isCanceled) StartCoroutine(SnapNextFrame());
+            if (pendingRelease != null) StopCoroutine(pendingRelease);
+            pendingRelease = StartCoroutine(FinishReleaseNextFrame(!args.isCanceled));
         }
 
-        // XRI restores the rigidbody after the release event, so snap a frame later
-        IEnumerator SnapNextFrame()
+        // XRI restores the rigidbody after the release event, so finish a frame later
+        IEnumerator FinishReleaseNextFrame(bool allowSnap)
         {
             yield return null;
-            var v = DrinkContainer.FindNeedingCap(GameVisuals.WorldBounds(transform).center, reach);
+            pendingRelease = null;
+            if (grab.isSelected) yield break;
+            var v = allowSnap ? DrinkContainer.FindNeedingCap(GameVisuals.WorldBounds(transform).center, reach) : null;
             if (v) PutOn(v);
             else body.isKinematic = false;   // it was grabbed off a vessel while kinematic, and XRI restored that
         }

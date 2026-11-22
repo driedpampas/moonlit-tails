@@ -95,7 +95,7 @@ namespace MoonlitTails.Gameplay
 
             Label = FloatingLabel.Create(transform, OpeningWorld.y - transform.position.y + 0.05f, IsGlass ? 0.22f : 0.26f);
             Label.showWithin = showWithin >= 0f ? showWithin : IsGlass ? 0.9f : 0f;
-            Label.showLookAngle = 30f;
+            Label.showLookAngle = IsGlass ? 30f : 0f;
             lastPos = transform.position;
             RefreshNow();
         }

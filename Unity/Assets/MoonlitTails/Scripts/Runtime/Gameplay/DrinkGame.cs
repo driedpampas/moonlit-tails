@@ -111,6 +111,7 @@ namespace MoonlitTails.Gameplay
             if (glasses.Count == 0) { Debug.LogError($"[Moonlit] {name}: no glasses in the scene, so customers can't order", this); ordersEnabled = false; }
             if (walkPath.Length < 2 || walkPath.Any(p => !p)) { Debug.LogError($"[Moonlit] {name}: the walk path needs at least a door and a bar spot", this); ordersEnabled = false; }
 
+            var tickets = new Dictionary<Transform, FloatingLabel>();
             foreach (var seat in seats)
             {
                 if (!seat.body) continue;
@@ -118,7 +119,12 @@ namespace MoonlitTails.Gameplay
                 if (!profile) { profile = CustomerProfile.Fallback(seat.body.name); runtimeProfiles.Add(profile); }
                 var s = new SeatState { Profile = profile, Body = seat.body, TicketSpot = seat.ticketSpot };
                 s.Bubble = FloatingLabel.Create(seat.body, HeadHeight(seat.body) + 0.12f, 0.28f);
-                if (seat.ticketSpot) s.Ticket = FloatingLabel.Create(seat.ticketSpot, 0.06f, 0.2f);
+                if (seat.ticketSpot)
+                {
+                    if (!tickets.TryGetValue(seat.ticketSpot, out var ticket))
+                        tickets[seat.ticketSpot] = ticket = FloatingLabel.Create(seat.ticketSpot, 0.06f, 0.2f);
+                    s.Ticket = ticket;
+                }
                 states.Add(s);
                 ShowTicket(states.Count - 1);
                 if (ordersEnabled) seat.body.gameObject.SetActive(false);   // away until it's their turn
