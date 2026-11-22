@@ -35,6 +35,9 @@ namespace MoonlitTails.Drinks
         /// <summary>Touching layers of different drinks must share at least this many positive points.</summary>
         public const int MinSharedPoints = 2;
 
+        /// <summary>Switched off for now during testing so different touching layers never collapse.</summary>
+        public static bool CollapseEnabled = false;
+
         /// <summary>Two touching layers of different drinks hold only if their Base Values differ and they share enough points.</summary>
         public static bool Holds(Taste a, Taste b)
             => a.BaseValue != b.BaseValue && Taste.SharedPositive(a, b) >= MinSharedPoints;
@@ -42,7 +45,8 @@ namespace MoonlitTails.Drinks
         /// <summary>
         /// Works out a layered drink from the pours, bottom to top. Each pour is 1 unit. The same drink poured
         /// again directly on itself just thickens that layer. Different touching drinks that don't hold collapse
-        /// (only those two layers count as 0). The score is the per-unit average of all pours, times 1.5, rounded up.
+        /// when <see cref="CollapseEnabled"/> is true (only those two layers count as 0). The score is the per-unit
+        /// average of all pours, times 1.5, rounded up.
         /// </summary>
         public static LayerResult Resolve(IReadOnlyList<Liquid> pours, GlassLength glass)
         {
@@ -62,13 +66,16 @@ namespace MoonlitTails.Drinks
 
             // Check every pair of touching, different layers.
             var layerCollapsed = new bool[layers];
-            for (int i = 1; i < pours.Count; i++)
+            if (CollapseEnabled)
             {
-                if (layerOf[i] == layerOf[i - 1]) continue;
-                if (!Holds(pours[i - 1].Stats, pours[i].Stats))
+                for (int i = 1; i < pours.Count; i++)
                 {
-                    layerCollapsed[layerOf[i - 1]] = true;
-                    layerCollapsed[layerOf[i]] = true;
+                    if (layerOf[i] == layerOf[i - 1]) continue;
+                    if (!Holds(pours[i - 1].Stats, pours[i].Stats))
+                    {
+                        layerCollapsed[layerOf[i - 1]] = true;
+                        layerCollapsed[layerOf[i]] = true;
+                    }
                 }
             }
 
