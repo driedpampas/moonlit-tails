@@ -189,6 +189,14 @@ namespace MoonlitTails.EditorTools
                     Place(rocks, work - right * 2f);
                     Expect(shaker.IsEmpty && cup.IsEmpty && highball.IsEmpty, "containers start empty");
                     Expect(game.Seats.Count == 5, "five customers");
+                    var rig = GameObject.Find("XR Origin Hands (XR Rig)");
+                    var lh = rig ? rig.transform.Find("Camera Offset/Left Controller/Left Controller Hand Visual") : null;
+                    var rh = rig ? rig.transform.Find("Camera Offset/Right Controller/Right Controller Hand Visual") : null;
+                    var lcv = rig ? rig.transform.Find("Camera Offset/Left Controller/Left Controller Visual") : null;
+                    Expect(lh && rh && lh.GetComponentInChildren<SkinnedMeshRenderer>()?.enabled == true
+                        && rh.GetComponentInChildren<SkinnedMeshRenderer>()?.enabled == true
+                        && (lcv == null || !lcv.GetComponentsInChildren<Renderer>(true).Any(r => r.enabled)),
+                        "controllers display rigged hand models instead of controller meshes");
                 }),
                 (0.2f, "pour whiskey", () => TipOver(whiskey, shaker)),
                 (0.9f, "check whiskey", () =>
