@@ -1215,7 +1215,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -1327,7 +1327,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &7618523534212241115
 MonoBehaviour:
@@ -2303,11 +2303,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &7254068355489744252
 MonoBehaviour:
@@ -2415,7 +2415,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &5213975236974545672
 MonoBehaviour:
@@ -3029,11 +3029,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &7915958606932170204
 MonoBehaviour:
@@ -3141,7 +3141,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &7760262732383783113
 MonoBehaviour:
@@ -3213,11 +3213,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &899624538294010658
 MonoBehaviour:
@@ -3325,7 +3325,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &419158932889747743
 MonoBehaviour:
@@ -4482,11 +4482,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &724585539632862049
 MonoBehaviour:
@@ -4594,7 +4594,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &1412844423946718989
 MonoBehaviour:
@@ -4937,11 +4937,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &6836325262725807710
 MonoBehaviour:
@@ -5049,7 +5049,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &8807120787623707302
 MonoBehaviour:
@@ -5619,11 +5619,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.016, y: 0.016, z: 0.0064}
+  m_Size: {x: 0.016, y: 0.016, z: 0.018}
   m_Center: {x: -0, y: -0, z: -0.004}
 --- !u!114 &7951905204122061460
 MonoBehaviour:
@@ -5731,7 +5731,7 @@ MonoBehaviour:
       m_PokeDirection: 3
       m_InteractionDepthOffset: 0
       m_EnablePokeAngleThreshold: 1
-      m_PokeAngleThreshold: 45
+      m_PokeAngleThreshold: 60
     m_Variable: {fileID: 0}
 --- !u!114 &6870644260959182296
 MonoBehaviour:
