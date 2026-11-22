@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace MoonlitTails
 {
@@ -28,6 +29,7 @@ namespace MoonlitTails
         {
             public Transform controller;
             public XRNode node;
+            public IXRSelectInteractor[] interactors;
             public FingerRig index, middle, ring, little, thumb;
             public float triggerSmooth, gripSmooth;
         }
@@ -90,6 +92,7 @@ namespace MoonlitTails
             {
                 controller = controller,
                 node = node,
+                interactors = controller.GetComponentsInChildren<IXRSelectInteractor>(true),
                 index = BuildFinger(clone.transform, bonePrefix + "Index"),
                 middle = BuildFinger(clone.transform, bonePrefix + "Middle"),
                 ring = BuildFinger(clone.transform, bonePrefix + "Ring"),
@@ -141,16 +144,25 @@ namespace MoonlitTails
                 h.triggerSmooth = Mathf.MoveTowards(h.triggerSmooth, trigger, step);
                 h.gripSmooth = Mathf.MoveTowards(h.gripSmooth, grip, step);
 
-                // Holding grip without trigger extends the index finger for natural button poking.
-                float indexCurl = h.triggerSmooth > 0.05f
-                    ? h.triggerSmooth
-                    : Mathf.Lerp(0f, -0.25f, h.gripSmooth);
+                bool holdingProp = IsHolding(h.interactors);
+                // Wrap all fingers when holding a prop; only point with the index finger when empty-handed (grip without trigger).
+                float indexCurl = holdingProp
+                    ? Mathf.Max(h.gripSmooth, h.triggerSmooth)
+                    : (h.triggerSmooth > 0.05f ? h.triggerSmooth : Mathf.Lerp(0f, -0.25f, h.gripSmooth));
                 ApplyFinger(h.index, indexCurl, 55f, 65f, 45f);
                 ApplyFinger(h.middle, h.gripSmooth, 55f, 70f, 50f);
                 ApplyFinger(h.ring, h.gripSmooth, 55f, 70f, 50f);
                 ApplyFinger(h.little, h.gripSmooth, 55f, 65f, 45f);
                 ApplyFinger(h.thumb, Mathf.Max(h.gripSmooth * 0.9f, h.triggerSmooth * 0.75f), 25f, 0f, 35f);
             }
+        }
+
+        static bool IsHolding(IXRSelectInteractor[] interactors)
+        {
+            if (interactors == null) return false;
+            for (int i = 0; i < interactors.Length; i++)
+                if (interactors[i] != null && !(interactors[i] is XRPokeInteractor) && interactors[i].hasSelection) return true;
+            return false;
         }
 
         static void ApplyFinger(FingerRig f, float curl, float proxDeg, float interDeg, float distDeg)
