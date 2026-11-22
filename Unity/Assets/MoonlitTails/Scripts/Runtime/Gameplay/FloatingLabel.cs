@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using MoonlitTails.Drinks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace MoonlitTails.Gameplay
 {
@@ -9,8 +11,9 @@ namespace MoonlitTails.Gameplay
     /// A label that floats above something and always faces the player: a title line, an optional message that fades
     /// out, and optional taste bars. It isn't parented to the prop, so it doesn't tip over when the prop does.
     ///
-    /// Its look (text, bars, colours) is the prefab <c>Resources/Moonlit/FloatingLabel.prefab</c>. Each thing that
-    /// needs one makes a copy with <see cref="Create"/> and says how high above itself it floats.
+    /// Its look (text, bars, colours, the see-through dark backdrop) is the prefab
+    /// <c>Resources/Moonlit/FloatingLabel.prefab</c>. Each thing that needs one makes a copy with <see cref="Create"/>
+    /// and says how high above itself it floats. The backdrop is resized to fit whatever is showing.
     /// </summary>
     public class FloatingLabel : MonoBehaviour
     {
@@ -19,20 +22,21 @@ namespace MoonlitTails.Gameplay
         [SerializeField] TextMeshPro title;
         [SerializeField] TextMeshPro message;
         [SerializeField] StatBarsView bars = new StatBarsView();
+        [Tooltip("A quad behind the text, resized to fit it.")]
+        [SerializeField] Transform backdrop;
 
         [Header("Set by whoever makes the label")]
         public Transform target;
         public float height = 0.12f;
-        [Tooltip("Hide when the player's head is further away than this (0 = always show).")]
-        public float showWithin = 0f;
-        [Tooltip("Hide unless the player looks within this many degrees of it (0 = any direction). Fewer labels on screen is fewer things to draw.")]
-        public float showLookAngle = 0f;
+        [Tooltip("Show only while a hand is within this many metres of the thing it labels (0 = always show). A message shows anyway while it lasts.")]
+        public float showNearHand = 0f;
 
         float messageUntil;
+        bool backdropFits;
         Camera cam;
-        GameObject backdropRoot;
-        Transform backdropFill;
-        Transform backdropBorder;
+
+        static readonly List<Transform> hands = new List<Transform>();
+        static float handsFoundAt = float.NegativeInfinity;
 
         /// <summary>The camera this label turns to face. Defaults to <see cref="Camera.main"/>; the demo recorder sets its own.</summary>
         public Camera ViewCamera { get => cam; set => cam = value; }
@@ -50,7 +54,7 @@ namespace MoonlitTails.Gameplay
             return label;
         }
 
-        /// <summary>Turns this label into a high-contrast wrapped speech bubble for NPC dialogue.</summary>
+        /// <summary>Turns this label into a wrapped speech bubble for NPC dialogue.</summary>
         public void ConfigureDialogueBubble(float fontSize = 0.48f, float maxWidth = 1.05f)
         {
             title.text = "";
@@ -60,47 +64,15 @@ namespace MoonlitTails.Gameplay
             message.alignment = TextAlignmentOptions.Center;
             message.rectTransform.sizeDelta = new Vector2(maxWidth, 0.4f);
             message.transform.localPosition = Vector3.zero;
-
-            if (!backdropRoot)
-            {
-                backdropRoot = new GameObject("Backdrop");
-                backdropRoot.transform.SetParent(content, false);
-                backdropFill = MakeQuad("Fill", backdropRoot.transform, new Vector3(0, 0, 0.008f), new Color(0.08f, 0.09f, 0.14f, 1f));
-                backdropBorder = MakeQuad("Border", backdropRoot.transform, new Vector3(0, 0, 0.012f), new Color(0.38f, 0.33f, 0.28f, 1f));
-                backdropRoot.SetActive(false);
-            }
-            UpdateBackdrop();
+            backdropFits = false;
         }
 
-        static Transform MakeQuad(string name, Transform parent, Vector3 localPos, Color color)
+        public void SetTitle(string text)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            go.name = name;
-            Destroy(go.GetComponent<Collider>());
-            go.transform.SetParent(parent, false);
-            go.transform.localPosition = localPos;
-            var r = go.GetComponent<MeshRenderer>();
-            r.sharedMaterial = GameVisuals.Flat(color);
-            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            r.receiveShadows = false;
-            return go.transform;
+            if (title.text == text) return;
+            title.text = text;
+            backdropFits = false;
         }
-
-        void UpdateBackdrop()
-        {
-            if (!backdropRoot) return;
-            bool hasText = !string.IsNullOrEmpty(message.text) && target && target.gameObject.activeInHierarchy;
-            backdropRoot.SetActive(hasText);
-            if (!hasText) return;
-            message.ForceMeshUpdate();
-            Vector2 sz = message.GetRenderedValues(true);
-            float w = Mathf.Clamp(sz.x + 0.12f, 0.28f, message.rectTransform.sizeDelta.x + 0.12f);
-            float h = Mathf.Max(0.11f, sz.y + 0.08f);
-            backdropFill.localScale = new Vector3(w, h, 1f);
-            backdropBorder.localScale = new Vector3(w + 0.018f, h + 0.018f, 1f);
-        }
-
-        public void SetTitle(string text) { if (title.text != text) title.text = text; }
 
         /// <summary>A short message under the title, shown for a few seconds.</summary>
         public void Flash(string text, Color color, float seconds = 3f)
@@ -108,12 +80,13 @@ namespace MoonlitTails.Gameplay
             message.text = text;
             message.color = color;
             messageUntil = Time.time + seconds;
-            UpdateBackdrop();
+            backdropFits = false;
         }
 
         /// <summary>Shows the taste bars with these values, or hides them with null.</summary>
         public void ShowBars(Taste? taste, string caption = null)
         {
+            if (bars.root.activeSelf != (taste != null)) backdropFits = false;
             bars.SetVisible(taste != null);
             if (taste != null) bars.Show(taste.Value, caption);
         }
@@ -127,20 +100,68 @@ namespace MoonlitTails.Gameplay
             {
                 Vector3 away = transform.position - cam.transform.position;
                 if (away.sqrMagnitude > 1e-6f) transform.rotation = Quaternion.LookRotation(away, Vector3.up);
-                bool show = (showWithin <= 0f || away.sqrMagnitude < showWithin * showWithin)
-                            && (showLookAngle <= 0f || Vector3.Angle(cam.transform.forward, away) < showLookAngle);
-                if (content.gameObject.activeSelf != show) content.gameObject.SetActive(show);
             }
             if (messageUntil > 0 && Time.time > messageUntil)
             {
                 message.text = "";
                 messageUntil = 0;
-                UpdateBackdrop();
+                backdropFits = false;
             }
-            else if (backdropRoot && backdropRoot.activeSelf && !target.gameObject.activeInHierarchy)
+            bool show = target.gameObject.activeInHierarchy
+                        && (showNearHand <= 0f || messageUntil > 0 || HandWithin(target.position + Vector3.up * (height * 0.5f), showNearHand));
+            if (content.gameObject.activeSelf != show) content.gameObject.SetActive(show);
+            if (show && !backdropFits) FitBackdrop();
+        }
+
+        /// <summary>Sizes the backdrop to cover every piece of text and bar that is showing (only when something changed).</summary>
+        void FitBackdrop()
+        {
+            backdropFits = true;
+            if (!backdrop) return;
+            var box = new Bounds();
+            bool any = false;
+            foreach (var r in content.GetComponentsInChildren<Renderer>())
             {
-                backdropRoot.SetActive(false);
+                if (r.transform == backdrop) continue;
+                Bounds local;
+                if (r.TryGetComponent<TMP_Text>(out var text))
+                {
+                    if (string.IsNullOrEmpty(text.text)) continue;
+                    text.ForceMeshUpdate();
+                    local = text.textBounds;
+                }
+                else if (r.TryGetComponent<MeshFilter>(out var mesh) && mesh.sharedMesh) local = mesh.sharedMesh.bounds;
+                else continue;
+                if (local.size.x <= 0f) continue;
+                Vector3 a = content.InverseTransformPoint(r.transform.TransformPoint(local.min));
+                Vector3 b = content.InverseTransformPoint(r.transform.TransformPoint(local.max));
+                if (!any) { box = new Bounds(a, Vector3.zero); any = true; }
+                box.Encapsulate(a);
+                box.Encapsulate(b);
             }
+            backdrop.gameObject.SetActive(any);
+            if (!any) return;
+            float pad = 0.1f * title.fontSize;
+            backdrop.localPosition = new Vector3(box.center.x, box.center.y, backdrop.localPosition.z);
+            backdrop.localScale = new Vector3(box.size.x + 2f * pad, box.size.y + 2f * pad, 1f);
+        }
+
+        /// <summary>Is a hand (the rig's near-far, direct or poke interactor) within this distance of a point?</summary>
+        static bool HandWithin(Vector3 point, float distance)
+        {
+            if (Time.unscaledTime - handsFoundAt > 2f) FindHands();   // looked up again now and then, in case the rig changes
+            for (int i = 0; i < hands.Count; i++)
+                if (hands[i] && hands[i].gameObject.activeInHierarchy && (hands[i].position - point).sqrMagnitude < distance * distance)
+                    return true;
+            return false;
+        }
+
+        static void FindHands()
+        {
+            handsFoundAt = Time.unscaledTime;
+            hands.Clear();
+            foreach (var i in FindObjectsByType<XRBaseInteractor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (i is NearFarInteractor || i is XRDirectInteractor || i is XRPokeInteractor) hands.Add(i.transform);
         }
     }
 

@@ -32,7 +32,7 @@ namespace MoonlitTails.Gameplay
                 return;
             }
             label = FloatingLabel.Create(transform, 0.12f, 0.22f);
-            label.showWithin = 1.0f;
+            label.showNearHand = 0.2f;
             SetLoaded(false);
         }
 

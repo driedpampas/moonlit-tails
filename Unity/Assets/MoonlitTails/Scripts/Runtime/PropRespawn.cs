@@ -14,6 +14,9 @@ namespace MoonlitTails
     ///
     /// Filled glasses and mixing vessels with liquid inside are an exception on floor-catch / reset: instead of going
     /// back to a side shelf, they are placed upright on an unoccupied spot on the front of the bar counter.
+    ///
+    /// While it's held, the prop passes through everything (it can't knock other props over), and a white ring shows
+    /// on its Default Slot whenever letting go would snap it back there.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class PropRespawn : MonoBehaviour
@@ -54,6 +57,11 @@ namespace MoonlitTails
         DrinkContainer container;
         bool homeNextStep;
         Coroutine pendingSnap;
+        LayerMask excludedWhenFree;
+        Vector3 ringCentre;   // in the bar's space, like home
+        float ringRadius;
+        GameObject ring;      // made the first time it's needed
+        static Mesh ringMesh;
 
         public Vector3 HomePosition => ToWorld(homePosition);
         public Quaternion HomeRotation => ToWorld(homeRotation);
@@ -75,11 +83,17 @@ namespace MoonlitTails
             if (!space) space = transform.parent;
             homePosition = space ? space.InverseTransformPoint(transform.position) : transform.position;
             homeRotation = space ? Quaternion.Inverse(space.rotation) * transform.rotation : transform.rotation;
+            // the prop's own mesh: children such as a pour stream or a liquid may not be in place yet
+            var b = TryGetComponent<Renderer>(out var own) ? own.bounds : GameVisuals.WorldBounds(transform);
+            Vector3 c = new Vector3(b.center.x, b.min.y + 0.003f, b.center.z);   // just above the surface it stands on
+            ringCentre = space ? space.InverseTransformPoint(c) : c;
+            ringRadius = Mathf.Max(b.extents.x, b.extents.z) + 0.03f;   // wide enough to see around the prop above it
         }
 
         void Awake()
         {
             body = GetComponent<Rigidbody>();
+            excludedWhenFree = body.excludeLayers;
             grab = GetComponent<XRBaseInteractable>();
             container = GetComponent<DrinkContainer>();
             if (!space) space = transform.parent;
@@ -104,12 +118,13 @@ namespace MoonlitTails
         void OnGrabbed(SelectEnterEventArgs _)
         {
             if (pendingSnap != null) { StopCoroutine(pendingSnap); pendingSnap = null; }
+            body.excludeLayers = ~0;   // no contacts with anything while in a hand (raycasts and XRI still see it)
         }
 
         void OnReleased(SelectExitEventArgs args)
         {
-            if (args.isCanceled || Attached || snapRadius <= 0f) return;
-            if (Vector3.Distance(transform.position, HomePosition) > snapRadius) return;
+            body.excludeLayers = excludedWhenFree;
+            if (args.isCanceled || !WouldSnapHome) return;
             if (pendingSnap != null) StopCoroutine(pendingSnap);
             pendingSnap = StartCoroutine(SnapToSlotAfterRelease());
         }
@@ -125,6 +140,58 @@ namespace MoonlitTails
             if (!body.isKinematic && body.linearVelocity.sqrMagnitude > 1.5f * 1.5f) yield break;
             if (Vector3.Distance(transform.position, HomePosition) <= snapRadius * 1.5f)
                 SendHome();
+        }
+
+        /// <summary>Letting go right now would snap it back into its Default Slot.</summary>
+        bool WouldSnapHome => !Attached && snapRadius > 0f && Vector3.Distance(transform.position, HomePosition) <= snapRadius;
+
+        /// <summary>Called once per frame by the Drink Game: the white ring on the Default Slot, while held close to it.</summary>
+        public void UpdateHomeRing()
+        {
+            bool show = IsHeld && WouldSnapHome;
+            if (!ring)
+            {
+                if (!show) return;
+                ring = MakeRing();
+            }
+            if (ring.activeSelf != show) ring.SetActive(show);
+        }
+
+        GameObject MakeRing()
+        {
+            var go = new GameObject("Home Ring " + name);
+            go.transform.SetParent(space, false);
+            go.transform.localPosition = ringCentre;
+            go.transform.localScale = Vector3.one * ringRadius;
+            go.AddComponent<MeshFilter>().sharedMesh = RingMesh();
+            var r = go.AddComponent<MeshRenderer>();
+            r.sharedMaterial = GameVisuals.Flat(Color.white);
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            r.receiveShadows = false;
+            return go;
+        }
+
+        /// <summary>A flat ring of radius 1, facing up. One mesh shared by every prop.</summary>
+        static Mesh RingMesh()
+        {
+            if (ringMesh) return ringMesh;
+            const int n = 40;
+            const float inner = 0.82f;
+            var v = new Vector3[n * 2];
+            var tris = new int[n * 6];
+            for (int i = 0; i < n; i++)
+            {
+                float a = i * 2f * Mathf.PI / n;
+                var d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                v[i * 2] = d * inner;
+                v[i * 2 + 1] = d;
+                int j = (i + 1) % n;
+                tris[i * 6 + 0] = i * 2; tris[i * 6 + 1] = j * 2; tris[i * 6 + 2] = i * 2 + 1;
+                tris[i * 6 + 3] = i * 2 + 1; tris[i * 6 + 4] = j * 2; tris[i * 6 + 5] = j * 2 + 1;
+            }
+            ringMesh = new Mesh { name = "Home Ring", vertices = v, triangles = tris };
+            ringMesh.RecalculateNormals();
+            return ringMesh;
         }
 
         /// <summary>Called once per frame by the Drink Game: catches props that somehow escape outside the room.</summary>

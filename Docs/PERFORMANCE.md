@@ -21,7 +21,7 @@ What was slow, what changed (13 Nov 2026), and what's left. The target is 90 fps
 |---|---|---|
 | **Baked lighting.** The 20 point and spot lights are baked into 2 lightmaps (1024 px). Light probes carry the light to props, hands and customers. The moonlight stays realtime. The renderer is plain *Forward* with additional lights off. | Realtime lights: 21 → 1 | about 9–13 ms of GPU time per frame |
 | **One customer at a time** (the new game loop). The others are switched off. | Skinned characters drawn: 3 → 1 | about 1.5–2.5 ms of CPU time |
-| **Static batching** switched on for the 248 fixed pieces, and **labels** show only when looked at. | Batches: 337 → 202. Shader switches (SetPass): 89 → 53 | about 1–1.5 ms of CPU time |
+| **Static batching** switched on for the 248 fixed pieces, and **labels** show only when looked at (now: only when a hand is near, so even fewer). | Batches: 337 → 202. Shader switches (SetPass): 89 → 53 | about 1–1.5 ms of CPU time |
 | **Simple Lit** in place of Lit on the 25 metal, glass and liquid materials. | | about 0.5–1 ms of GPU time |
 
 Looking at the customer, before and after:

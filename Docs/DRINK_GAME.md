@@ -14,7 +14,8 @@ The front counter is laid out in the order you work, left to right, so your hand
 - **mixing** in the middle, on the bar mat: the Stir Cup on its left; the Shake Mixer on its right, with its cap standing in front of it; the bar spoon along the front edge;
 - **garnish** on the front right: the garnish tray;
 - **serve** further forward, in front of the customer: the coaster, the bell and the panel;
-- on your left: the glasses, one of each kind (the spare copies are on the old stand at the far left); on your right: the ingredients, cartons in front of the taller bottles.
+- on your left: the glasses, one of each kind (the spare copies are on the old stand at the far left);
+- on your right: the ingredients, in the order of the crafting guide (see [Ingredients](MENU_AND_CHARACTERS.md#ingredients)). Turn to face them and, left to right, there are four rows: the **base drinks** (Whiskey, Bourbon, Tequila), then the **bitter**, **sweet** and **sour** modifiers. Each row runs from nearest you to furthest in the guide's order, e.g. Tonic Water, Orange Peel, Espresso, Black Tea.
 
 Nothing taller than the Stir Cup (22 cm) stands between you and the customer.
 
@@ -42,11 +43,13 @@ Nothing taller than the Stir Cup (22 cm) stands between you and the customer.
    - A right drink: the customer says the next line of their story, then leaves.
    - A wrong drink: they say what's off, their ticket shows a tip, and they wait for another try.
 
+**Putting things back.** Every prop has a home spot. While you hold it close to that spot, a **white ring** shows there: let go and it snaps into place. Whatever is in your hand passes through everything else, so it can't knock other props over.
+
 To empty anything, tip it out over nothing. The big red **DO NOT PUSH** button on the front counter (far left, past the ice well) puts every prop back where it started, even one in your hand or behind the bar. What's in the glasses and cups stays. **R** on the keyboard does the same.
 
 The rules are on a sign on the back wall right behind you, where the round cocktail logo was, so you can read them from behind the bar. The logo is still in the bar prefab: its three pieces are just switched off in the scene. The chalkboard on the far wall shows the same rules.
 
-Labels float over the bottles and glasses when you're close and looking at them (the Stir Cup and Shake Mixer always show theirs). The buttons are stock XR Interaction Toolkit poke buttons: press them with a fingertip, or with a controller's tip. With the XR Interaction Simulator, poke them with a simulated hand or controller.
+**Labels** show only while your hand is near: about 20 cm from a bottle, glass or the ice scoop, and 40 cm from the Stir Cup and Shake Mixer (you pour into those from above). A message (like "Shaken!") shows anyway while it lasts. Each label has a see-through black backdrop that fits its text, so it's readable against anything. The distance is **Show Near Hand** on the prop's *Ingredient Source* or *Drink Container*; the backdrop's look is in `Resources/Moonlit/FloatingLabel.prefab` and `LabelBackdrop.mat`. The buttons are stock XR Interaction Toolkit poke buttons: press them with a fingertip, or with a controller's tip. With the XR Interaction Simulator, poke them with a simulated hand or controller.
 
 ## Rules
 

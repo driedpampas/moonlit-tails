@@ -171,7 +171,11 @@ namespace MoonlitTails.Gameplay
         void Update()
         {
             if (keyboardReset && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) ResetAllProps();
-            for (int i = 0; i < PropRespawn.All.Count; i++) PropRespawn.All[i].CheckLost();
+            for (int i = 0; i < PropRespawn.All.Count; i++)
+            {
+                PropRespawn.All[i].CheckLost();
+                PropRespawn.All[i].UpdateHomeRing();
+            }
 
             if (!ordersEnabled || states.Count == 0) return;
             switch (Phase)

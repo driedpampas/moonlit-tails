@@ -34,8 +34,8 @@ namespace MoonlitTails.Gameplay
         public ContainerKind kind;
         [Tooltip("For glasses: the variant customers ask for, e.g. Highball. For the vessels: Stir Cup / Shake Mixer.")] public string variant;
         public GlassLength length = GlassLength.Medium;
-        [Tooltip("The label shows when the player's head is closer than this (m). 0 = always.")]
-        [SerializeField] float showWithin = -1f;   // -1 = default: 0.9 m for glasses, always for the vessels
+        [Tooltip("The label shows while a hand is closer than this (m). 0 = always.")]
+        [SerializeField] float showNearHand = -1f;   // -1 = default: 0.2 m for glasses, 0.4 m for the vessels (you pour into them from above)
         [Tooltip("A vessel that has to be closed with its cap (a Container Cap) before it can be shaken.")]
         [SerializeField] bool needsCap;
 
@@ -94,8 +94,7 @@ namespace MoonlitTails.Gameplay
             liquidRoot.localPosition = bounds.center;
 
             Label = FloatingLabel.Create(transform, OpeningWorld.y - transform.position.y + 0.05f, IsGlass ? 0.22f : 0.26f);
-            Label.showWithin = showWithin >= 0f ? showWithin : IsGlass ? 0.9f : 0f;
-            Label.showLookAngle = IsGlass ? 30f : 0f;
+            Label.showNearHand = showNearHand >= 0f ? showNearHand : IsGlass ? 0.2f : 0.4f;
             lastPos = transform.position;
             RefreshNow();
         }
