@@ -118,7 +118,8 @@ namespace MoonlitTails.Gameplay
                 var profile = seat.profile;
                 if (!profile) { profile = CustomerProfile.Fallback(seat.body.name); runtimeProfiles.Add(profile); }
                 var s = new SeatState { Profile = profile, Body = seat.body, TicketSpot = seat.ticketSpot };
-                s.Bubble = FloatingLabel.Create(seat.body, HeadHeight(seat.body) + 0.12f, 0.28f);
+                s.Bubble = FloatingLabel.Create(seat.body, HeadHeight(seat.body) + 0.24f, 0.48f);
+                s.Bubble.ConfigureDialogueBubble(0.48f, 1.05f);
                 if (seat.ticketSpot)
                 {
                     if (!tickets.TryGetValue(seat.ticketSpot, out var ticket))

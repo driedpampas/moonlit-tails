@@ -169,11 +169,20 @@ namespace MoonlitTails.EditorTools
             var away = work + Vector3.up * 1.5f;
             int first = -1;   // the customer served first
             var cap = UnityEngine.Object.FindFirstObjectByType<ContainerCap>();
+            Vector3 startWhiskey = whiskey.transform.position;
+            Vector3 startCup = cup.transform.position;
+            Vector3 startRocks = rocks.transform.position;
+            Vector3 startHighball = highball.transform.position;
 
             return new List<(float, string, Action)>
             {
                 (0f, "set up", () =>
                 {
+                    float dw = Vector3.Distance(startWhiskey, whiskey.GetComponent<PropRespawn>().HomePosition);
+                    float dc = Vector3.Distance(startCup, cup.GetComponent<PropRespawn>().HomePosition);
+                    float dr = Vector3.Distance(startRocks, rocks.GetComponent<PropRespawn>().HomePosition);
+                    Expect(dw < 0.05f && dc < 0.05f && dr < 0.05f,
+                        $"default slots match starting positions (dw={dw:F3}, dc={dc:F3}, dr={dr:F3})");
                     Place(shaker, work);
                     Place(cup, work + right);
                     Place(highball, work - right);
@@ -345,10 +354,43 @@ namespace MoonlitTails.EditorTools
                     Place(whiskey, away);
                     Place(cup, away + right);
                     Expect(Press(game.ResetButtonObject), "the reset button is a button");
-                    bool AtHome(Component c) { var h = c.GetComponent<PropRespawn>(); return h && Vector3.Distance(c.transform.position, h.HomePosition) < 0.001f; }
-                    Expect(AtHome(whiskey) && AtHome(cup) && AtHome(rocks) && AtHome(highball), "pressing it puts the props back where they started");
+                    bool AtStart(Component c, Vector3 start) => Vector3.Distance(c.transform.position, start) < 0.05f;
+                    Expect(AtStart(whiskey, startWhiskey) && AtStart(cup, startCup) && AtStart(rocks, startRocks) && AtStart(highball, startHighball),
+                        $"pressing reset puts empty props back in their actual starting default slots (w={Vector3.Distance(whiskey.transform.position, startWhiskey):F3}, c={Vector3.Distance(cup.transform.position, startCup):F3}, r={Vector3.Distance(rocks.transform.position, startRocks):F3}, h={Vector3.Distance(highball.transform.position, startHighball):F3})");
                 }),
-                (0.2f, "check reset", () => Expect(station.CoasterGlass == null, "a glass sent home leaves the coaster")),
+                (0.2f, "check reset", () =>
+                {
+                    Expect(station.CoasterGlass == null, "a glass sent home leaves the coaster");
+                    // Drop whiskey onto the pit floor (non-kinematic so FloorCatch trigger fires)
+                    var rb = whiskey.GetComponent<Rigidbody>();
+                    rb.isKinematic = false;
+                    whiskey.transform.position = new Vector3(0f, 0.01f, 0.1f);
+                    rb.position = whiskey.transform.position;
+                    Physics.SyncTransforms();
+                }),
+                (0.3f, "floor catch", () =>
+                {
+                    Expect(Vector3.Distance(whiskey.transform.position, startWhiskey) < 0.02f, "floor catch returns dropped prop to its default slot");
+                    // Pour into both shaker and cup to test filled-vessel front-bar exception without collision
+                    Place(shaker, work);
+                    Place(cup, work + right);
+                    TipOver(whiskey, shaker);
+                }),
+                (0.9f, "fill second vessel", () =>
+                {
+                    Place(whiskey, away);
+                    TipOver(cola, cup);
+                }),
+                (0.9f, "reset filled vessels", () =>
+                {
+                    Place(cola, away);
+                    Expect(!shaker.IsEmpty && !cup.IsEmpty, "both mixing vessels hold liquid");
+                    Expect(Press(game.ResetButtonObject), "reset with filled vessels");
+                    Vector3 ps = shaker.transform.position, pc = cup.transform.position;
+                    bool OnFrontBar(Vector3 p) => Mathf.Abs(p.x) < 1.0f && p.z < -0.35f && p.z > -0.95f && p.y > 0.98f && p.y < 1.35f;
+                    Expect(OnFrontBar(ps) && OnFrontBar(pc), $"filled vessels reset onto the front bar counter (shaker={ps}, cup={pc})");
+                    Expect(Vector3.Distance(ps, pc) > 0.12f, $"multiple filled vessels do not collide on the front counter (dist={Vector3.Distance(ps, pc):F3}, shaker={ps}, cup={pc})");
+                }),
             }).ToList();
         }
 

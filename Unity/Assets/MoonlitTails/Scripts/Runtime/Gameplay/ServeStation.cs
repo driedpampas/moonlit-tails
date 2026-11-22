@@ -44,6 +44,17 @@ namespace MoonlitTails.Gameplay
         /// <summary>The glass standing on the coaster, or null.</summary>
         public DrinkContainer CoasterGlass { get; private set; }
 
+        static readonly List<ServeStation> active = new List<ServeStation>();
+
+        /// <summary>True if <paramref name="g"/> is currently snapped onto any coaster.</summary>
+        public static bool IsOnAnyCoaster(DrinkContainer g)
+        {
+            if (!g) return false;
+            for (int i = 0; i < active.Count; i++)
+                if (active[i] && active[i].CoasterGlass == g) return true;
+            return false;
+        }
+
         Transform panel;
         DrinkContainer glass;       // the glass being served (on or near the coaster, not held)
         Rigidbody glassBody;
@@ -56,8 +67,8 @@ namespace MoonlitTails.Gameplay
         const RigidbodyConstraints Pinned =
             RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
 
-        void OnEnable() => HookBell(true);
-        void OnDisable() => HookBell(false);
+        void OnEnable() { if (!active.Contains(this)) active.Add(this); HookBell(true); }
+        void OnDisable() { active.Remove(this); HookBell(false); }
 
         void Start()
         {

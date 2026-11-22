@@ -30,6 +30,9 @@ namespace MoonlitTails.Gameplay
 
         float messageUntil;
         Camera cam;
+        GameObject backdropRoot;
+        Transform backdropFill;
+        Transform backdropBorder;
 
         /// <summary>The camera this label turns to face. Defaults to <see cref="Camera.main"/>; the demo recorder sets its own.</summary>
         public Camera ViewCamera { get => cam; set => cam = value; }
@@ -47,6 +50,56 @@ namespace MoonlitTails.Gameplay
             return label;
         }
 
+        /// <summary>Turns this label into a high-contrast wrapped speech bubble for NPC dialogue.</summary>
+        public void ConfigureDialogueBubble(float fontSize = 0.48f, float maxWidth = 1.05f)
+        {
+            title.text = "";
+            message.fontSize = fontSize;
+            message.fontStyle = FontStyles.Bold;
+            message.textWrappingMode = TextWrappingModes.Normal;
+            message.alignment = TextAlignmentOptions.Center;
+            message.rectTransform.sizeDelta = new Vector2(maxWidth, 0.4f);
+            message.transform.localPosition = Vector3.zero;
+
+            if (!backdropRoot)
+            {
+                backdropRoot = new GameObject("Backdrop");
+                backdropRoot.transform.SetParent(content, false);
+                backdropFill = MakeQuad("Fill", backdropRoot.transform, new Vector3(0, 0, 0.008f), new Color(0.08f, 0.09f, 0.14f, 1f));
+                backdropBorder = MakeQuad("Border", backdropRoot.transform, new Vector3(0, 0, 0.012f), new Color(0.38f, 0.33f, 0.28f, 1f));
+                backdropRoot.SetActive(false);
+            }
+            UpdateBackdrop();
+        }
+
+        static Transform MakeQuad(string name, Transform parent, Vector3 localPos, Color color)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            go.name = name;
+            Destroy(go.GetComponent<Collider>());
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = localPos;
+            var r = go.GetComponent<MeshRenderer>();
+            r.sharedMaterial = GameVisuals.Flat(color);
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            r.receiveShadows = false;
+            return go.transform;
+        }
+
+        void UpdateBackdrop()
+        {
+            if (!backdropRoot) return;
+            bool hasText = !string.IsNullOrEmpty(message.text) && target && target.gameObject.activeInHierarchy;
+            backdropRoot.SetActive(hasText);
+            if (!hasText) return;
+            message.ForceMeshUpdate();
+            Vector2 sz = message.GetRenderedValues(true);
+            float w = Mathf.Clamp(sz.x + 0.12f, 0.28f, message.rectTransform.sizeDelta.x + 0.12f);
+            float h = Mathf.Max(0.11f, sz.y + 0.08f);
+            backdropFill.localScale = new Vector3(w, h, 1f);
+            backdropBorder.localScale = new Vector3(w + 0.018f, h + 0.018f, 1f);
+        }
+
         public void SetTitle(string text) { if (title.text != text) title.text = text; }
 
         /// <summary>A short message under the title, shown for a few seconds.</summary>
@@ -55,6 +108,7 @@ namespace MoonlitTails.Gameplay
             message.text = text;
             message.color = color;
             messageUntil = Time.time + seconds;
+            UpdateBackdrop();
         }
 
         /// <summary>Shows the taste bars with these values, or hides them with null.</summary>
@@ -77,7 +131,16 @@ namespace MoonlitTails.Gameplay
                             && (showLookAngle <= 0f || Vector3.Angle(cam.transform.forward, away) < showLookAngle);
                 if (content.gameObject.activeSelf != show) content.gameObject.SetActive(show);
             }
-            if (messageUntil > 0 && Time.time > messageUntil) { message.text = ""; messageUntil = 0; }
+            if (messageUntil > 0 && Time.time > messageUntil)
+            {
+                message.text = "";
+                messageUntil = 0;
+                UpdateBackdrop();
+            }
+            else if (backdropRoot && backdropRoot.activeSelf && !target.gameObject.activeInHierarchy)
+            {
+                backdropRoot.SetActive(false);
+            }
         }
     }
 
