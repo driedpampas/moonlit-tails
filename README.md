@@ -14,7 +14,7 @@ A cozy VR bartending game for Quest. Mix drinks with your own hands for animal c
 - @stiv69
 - @broko25
 
-## Milestone 1 (Oct 26 – Nov 2, 2026)
+## Week 6 (Oct 26 – Nov 2, 2026)
 - Placeholder environment with interactable assets integrated in Unity
 - Character brainstorming and creation
 
@@ -24,8 +24,8 @@ AI was used for:
 - debugging
 - writing the README
 
-## Milestone 2 (Nov 3 – Nov 8, 2026)
-<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Milestone 2 demo video"></a>
+## Week 7 (Nov 3 – Nov 8, 2026)
+<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Week 7 demo video"></a>
 
 [Watch the demo](https://driedpampas.github.io/moonlit-tails/) (2 min, plays in the browser)
 
@@ -42,15 +42,26 @@ AI was used for:
 - recording the demo video
 - writing the docs
 
-## Milestone 3 (Nov 9 – Nov 23, 2026)
-- Hand-editable scene refactor, `DevTools` isolated from runtime, compact arm's-reach bar with 5 rotating customers, and Quest 2 lighting/perf optimizations
-- Live PCVR playtest fixes: D3D11 VR stereo character shader, working poke buttons, stabilized ear/tail spring physics, animated rigged hand models in controller mode, and readable NPC dialogue bubbles
-- Smoother prop handling: auto-captured Default Slots with snap + indicator ring, held props ignoring clutter, room-wide floor catch, front-bar recovery for filled vessels, hand-near labels, and layer collapse paused for testing
+## Week 9 (Nov 9 – Nov 23, 2026)
+<a href="https://youtu.be/mxYhWDxUZeU"><img src="https://img.youtube.com/vi/mxYhWDxUZeU/hqdefault.jpg" width="480" alt="Week 9 demo video"></a>
+
+[Watch the demo](https://youtu.be/mxYhWDxUZeU) (YouTube)
+
+- The game loop: customers walk in, order, wait until they get the right drink, then leave, and the next one comes in. There are 5 customers now, in a random order, including two new characters (Skunk and Wolf)
+- A smaller bar: everything is within arm's reach, and the front counter is laid out in working order (ice, mixing, garnish, serve). Ingredients are sorted like the drink guide: base drinks, then bitter, sweet and sour
+- The Shake Mixer has a cap that snaps on, and it has to be on before you shake. Tools that did nothing were removed
+- Easier handling: props snap back to their spot (a white ring shows where), what you hold no longer knocks other things over, labels only show when your hand is near and have a dark backdrop, and anything dropped on the floor comes back
+- Quest 2 performance: baked lighting, one customer drawn at a time and lighter materials ([details](Docs/PERFORMANCE.md))
+- Playtest fixes from a PC VR session: the character shader in VR, poke buttons, ear and tail physics, hand models when using controllers, and readable dialogue bubbles
+- The scene is now edited by hand in the Editor, and the testing tools are kept apart in `DevTools`
+- Builds for the Quest (APK) and for PC VR through SteamVR or Link (Windows)
 
 AI was used for:
-- script audit, refactor, and automated smoke tests
-- Windows PCVR shader, physics, UI, and hand-visual fixes
-- prop slot/recovery QoL and conversation logging
+- reviewing the scripts and the refactor
+- the game loop, the bar layout, the shaker cap and the prop handling
+- finding and fixing the performance problems
+- the PC VR fixes
+- the automated tests, the builds and the docs
 
 ## What's here
 | Folder | What |
@@ -60,7 +71,7 @@ AI was used for:
 | `Tests/` | Tests for the drink rules (`dotnet run` in `Tests/DrinkRules.Tests`). |
 | `Art/` | Blender sources. `Art/Bar/` has the bar `.blend`, the scripts that built it, and `split_bar.py`, which exports it as separate pieces. See `Docs/BAR_PIECES.md`. |
 
-The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with three placeholder customers and grabbable, throwable props, and the drink game. Everything in it is placed by hand in the Editor.
+The current scene is `Unity/Assets/MoonlitTails/Scenes/MoonlitBar_VR.unity`. It's the bar with five customers and grabbable, throwable props, and the drink game. Everything in it is placed by hand in the Editor.
 
 ## Getting the project (first time)
 1. Install **Git LFS** once, if you don't have it: https://git-lfs.com, then run `git lfs install`. Models and textures are stored with LFS, so without it they arrive as tiny text files.
