@@ -42,6 +42,16 @@ AI was used for:
 - recording the demo video
 - writing the docs
 
+## Week 3
+- Hand-editable scene refactor, `DevTools` isolated from runtime, compact arm's-reach bar with 5 rotating customers, and Quest 2 lighting/perf optimizations
+- Live PCVR playtest fixes: D3D11 VR stereo character shader, working poke buttons, stabilized ear/tail spring physics, animated rigged hand models in controller mode, and readable NPC dialogue bubbles
+- Smoother prop handling: auto-captured Default Slots with snap + indicator ring, held props ignoring clutter, room-wide floor catch, front-bar recovery for filled vessels, hand-near labels, and layer collapse paused for testing
+
+AI was used for:
+- script audit, refactor, and automated smoke tests
+- Windows PCVR shader, physics, UI, and hand-visual fixes
+- prop slot/recovery QoL and conversation logging
+
 ## What's here
 | Folder | What |
 |---|---|
