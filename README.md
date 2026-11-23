@@ -14,7 +14,7 @@ A cozy VR bartending game for Quest. Mix drinks with your own hands for animal c
 - @stiv69
 - @broko25
 
-## Week 6 (Oct 26 – Nov 2, 2026)
+## Milestone 1 (Oct 26 – Nov 2, 2026)
 - Placeholder environment with interactable assets integrated in Unity
 - Character brainstorming and creation
 
@@ -24,8 +24,8 @@ AI was used for:
 - debugging
 - writing the README
 
-## Week 7 (Nov 3 – Nov 8, 2026)
-<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Week 7 demo video"></a>
+## Milestone 2 (Nov 3 – Nov 8, 2026)
+<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Milestone 2 demo video"></a>
 
 [Watch the demo](https://driedpampas.github.io/moonlit-tails/) (2 min, plays in the browser)
 
@@ -42,8 +42,8 @@ AI was used for:
 - recording the demo video
 - writing the docs
 
-## Week 9 (Nov 9 – Nov 23, 2026)
-<a href="https://youtu.be/mxYhWDxUZeU"><img src="https://img.youtube.com/vi/mxYhWDxUZeU/hqdefault.jpg" width="480" alt="Week 9 demo video"></a>
+## Milestone 3 (Nov 9 – Nov 23, 2026)
+<a href="https://youtu.be/mxYhWDxUZeU"><img src="https://img.youtube.com/vi/mxYhWDxUZeU/hqdefault.jpg" width="480" alt="Milestone 3 demo video"></a>
 
 [Watch the demo](https://youtu.be/mxYhWDxUZeU) (YouTube)
 
