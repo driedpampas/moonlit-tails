@@ -18,3 +18,4 @@ One file per conversation:
 8. [Week 2: README, demo video, video page and the ingredients list](08_2026-11-08_week-2-readme-demo-video-video-page-and-ingredients-list.md) · 2026-11-08
 9. [Character sheets, their drinks and quests](09_2026-11-09_character-sheets-drinks-and-quests.md) · 2026-11-09
 10. [Script audit, hand-editable refactor, PCVR builds & playtest fixes](10_2026-11-09_script-audit-and-the-hand-editable-refactor.md) · 2026-11-09 – 2026-11-23
+11. [Game loop, Quest 2 performance, bar layout, shaker cap and builds](11_2026-11-02_game-loop-quest-2-performance-bar-layout-shaker-cap-and-builds.md) · 2026-11-02 – 2026-11-23 (continues entry 2)
