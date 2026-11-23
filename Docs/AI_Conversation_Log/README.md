@@ -17,5 +17,4 @@ One file per conversation:
 7. [Playtest feedback: coaster snap, reset button and menu board](07_2026-11-07_playtest-feedback-coaster-snap-reset-button-and-menu-board.md) · 2026-11-07
 8. [Week 2: README, demo video, video page and the ingredients list](08_2026-11-08_week-2-readme-demo-video-video-page-and-ingredients-list.md) · 2026-11-08
 9. [Character sheets, their drinks and quests](09_2026-11-09_character-sheets-drinks-and-quests.md) · 2026-11-09
-10. [Script audit and the refactor to a hand-editable scene](10_2026-11-09_script-audit-and-the-hand-editable-refactor.md) · 2026-11-09
-11. [PR #5 review, Windows PCVR builds, shader & playtest fixes](11_2026-11-22_pr-review-pcvr-builds-and-playtest-fixes.md) · 2026-11-22
+10. [Script audit, hand-editable refactor, PCVR builds & playtest fixes](10_2026-11-09_script-audit-and-the-hand-editable-refactor.md) · 2026-11-09 – 2026-11-23
