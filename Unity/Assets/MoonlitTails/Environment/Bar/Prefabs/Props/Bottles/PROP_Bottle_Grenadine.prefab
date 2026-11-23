@@ -68,6 +68,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62af4a64b45924d9eb58d30cc706b3bc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2379051234916575708}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62af4a64b45924d9eb58d30cc706b3bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8466174454394637637}
   m_SourcePrefab: {fileID: 100100000, guid: 62af4a64b45924d9eb58d30cc706b3bc, type: 3}
 --- !u!1 &2696738640280608631 stripped
 GameObject:
@@ -268,3 +271,23 @@ MonoBehaviour:
   space: {fileID: 0}
   homePosition: {x: 0, y: 0, z: 0}
   homeRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &8466174454394637637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2696738640280608631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e9139c744d9cfaf9b7977f1705d86af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.IngredientSource
+  pourAngle: 100
+  rearmAngle: 60
+  pourSeconds: 0.5
+  dumpSeconds: 1.2
+  ingredient: 23
+  labelHeight: 0.04
+  labelSize: 0.22
+  showWithin: 1.2

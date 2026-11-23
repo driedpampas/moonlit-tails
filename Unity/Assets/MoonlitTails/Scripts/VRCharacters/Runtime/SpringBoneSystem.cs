@@ -62,13 +62,20 @@ namespace VRCharacters
         public float referenceRate = 60f;
         [Tooltip("Large frame hitches (teleports, loading) reset the chains instead of exploding.")]
         public float resetDistance = 0.5f;
+        [Range(5f, 90f), Tooltip("Maximum bend angle (degrees) away from the animated pose per bone.")]
+        public float maxAngle = 35f;
 
         Vector3 lastRootPos;
-        bool built;
+        Quaternion lastRootRot;
+        float prevDt;
+        bool built, needsReset;
+        Renderer[] renderers;
+        bool wasVisible = true;
 
         void OnEnable()
         {
             Build();
+            needsReset = true;   // defer tip snap until after the Animator poses the first frame
         }
 
         /// <summary>(Re)collect chain bones. Call after changing chain roots at runtime.</summary>
@@ -103,6 +110,8 @@ namespace VRCharacters
                 }
                 c.nodes = list.ToArray();
             }
+            renderers = GetComponentsInChildren<Renderer>();
+            wasVisible = true;
             built = true;
             ResetSimulation();
         }
@@ -116,11 +125,23 @@ namespace VRCharacters
                 if (c.nodes == null) continue;
                 foreach (var n in c.nodes)
                 {
+                    if (!n.bone) continue;
                     Vector3 tip = n.bone.position + n.bone.rotation * n.localAxis * n.length;
                     n.prevTip = tip; n.currTip = tip;
                 }
             }
             lastRootPos = transform.position;
+            lastRootRot = transform.rotation;
+            prevDt = 0f;
+        }
+
+        /// <summary>True if any camera sees one of the character's renderers. A character with no renderers always counts.</summary>
+        bool Visible()
+        {
+            if (renderers == null || renderers.Length == 0) return true;
+            for (int i = 0; i < renderers.Length; i++)
+                if (renderers[i] && renderers[i].isVisible) return true;
+            return false;
         }
 
         Vector3 Wind(float time)
@@ -139,11 +160,40 @@ namespace VRCharacters
         void LateUpdate()
         {
             if (!built) Build();
-            float dt = Time.deltaTime;
-            if (dt <= 0f) return;
+            float rawDt = Time.deltaTime;
+            if (rawDt <= 1e-5f) return;
 
-            if ((transform.position - lastRootPos).sqrMagnitude > resetDistance * resetDistance) ResetSimulation();
+            // Nobody sees this character: skip the solve (the biggest cost of our scripts), and start from the pose when it's seen again.
+            bool visible = Visible();
+            if (!visible) { wasVisible = false; return; }
+            if (!wasVisible) { wasVisible = true; needsReset = true; }
+
+            if (needsReset
+                || rawDt > 0.1f
+                || (transform.position - lastRootPos).sqrMagnitude > resetDistance * resetDistance
+                || Quaternion.Angle(lastRootRot, transform.rotation) > 45f)
+            {
+                needsReset = false;
+                for (int ci = 0; ci < chains.Count; ci++)
+                {
+                    var nodes = chains[ci].nodes;
+                    if (nodes == null) continue;
+                    for (int i = 0; i < nodes.Length; i++)
+                    {
+                        if (!nodes[i].bone) continue;
+                        nodes[i].poseLocal = nodes[i].bone.localRotation;
+                        nodes[i].writtenLocal = nodes[i].bone.localRotation;
+                    }
+                }
+                ResetSimulation();
+                return;
+            }
             lastRootPos = transform.position;
+            lastRootRot = transform.rotation;
+
+            float dt = Mathf.Min(rawDt, 1f / 30f);
+            float dtRatio = prevDt > 1e-5f ? Mathf.Clamp(dt / prevDt, 0.5f, 1.5f) : 1f;
+            prevDt = dt;
 
             float steps = dt * referenceRate;
             Vector3 wind = Wind(Time.time);
@@ -151,7 +201,7 @@ namespace VRCharacters
             for (int ci = 0; ci < chains.Count; ci++)
             {
                 var c = chains[ci];
-                if (c.nodes == null || c.root == null) continue;
+                if (c.nodes == null) continue;
                 float keep = Mathf.Pow(1f - c.drag, steps);
                 float pull = 1f - Mathf.Pow(1f - c.stiffness, steps);
                 Vector3 accel = (c.gravity + wind * c.windInfluence) * dt * dt;
@@ -160,8 +210,11 @@ namespace VRCharacters
                 for (int i = 0; i < c.nodes.Length; i++)
                 {
                     var n = c.nodes[i];
+                    if (!n.bone) { c.nodes = null; break; }   // a bone was destroyed: drop the chain until Build() runs again
                     if (n.bone.localRotation != n.writtenLocal) n.poseLocal = n.bone.localRotation;
                 }
+
+                if (c.nodes == null) continue;
 
                 // 2) simulate root -> tip
                 for (int i = 0; i < c.nodes.Length; i++)
@@ -172,21 +225,28 @@ namespace VRCharacters
                     Quaternion poseWorld = n.bone.rotation;
                     Vector3 restTip = origin + poseWorld * n.localAxis * n.length;
 
-                    Vector3 next = n.currTip + (n.currTip - n.prevTip) * keep + (restTip - n.currTip) * pull + accel;
+                    Vector3 vel = (n.currTip - n.prevTip) * (keep * dtRatio);
+                    float maxMove = n.length * 0.35f;
+                    if (vel.sqrMagnitude > maxMove * maxMove) vel = vel.normalized * maxMove;
+
+                    Vector3 next = n.currTip + vel + (restTip - n.currTip) * pull + accel;
                     Vector3 dir = next - origin;
                     if (dir.sqrMagnitude < 1e-12f) dir = restTip - origin;
                     next = origin + dir.normalized * n.length;
 
                     for (int k = 0; k < colliders.Count; k++)
                         if (colliders[k] != null && colliders[k].isActiveAndEnabled) colliders[k].Collide(ref next, c.radius);
-                    next = origin + (next - origin).normalized * n.length;
-
-                    n.prevTip = n.currTip;
-                    n.currTip = next;
+                    dir = next - origin;
+                    if (dir.sqrMagnitude < 1e-12f) dir = restTip - origin;
+                    next = origin + dir.normalized * n.length;
 
                     Quaternion aim = Quaternion.FromToRotation(poseWorld * n.localAxis, next - origin) * poseWorld;
+                    aim = Quaternion.RotateTowards(poseWorld, aim, maxAngle);
                     n.bone.rotation = Quaternion.Slerp(poseWorld, aim, c.physicsWeight);
                     n.writtenLocal = n.bone.localRotation;
+
+                    n.prevTip = n.currTip;
+                    n.currTip = origin + n.bone.rotation * n.localAxis * n.length;
                 }
             }
         }

@@ -1,7 +1,7 @@
 # Moonlit Tails: AI conversation log
 
-All conversations with Claude (Claude Code) about the Moonlit Tails game, in chronological order.
-Shown: every user message, Claude's visible replies, and a one-line note for each action Claude took
+All AI conversations (Claude Code and Antigravity) about the Moonlit Tails game, in chronological order.
+Shown: every user message, the assistant's visible replies, and a one-line note for each action taken
 (running a command, editing a file, etc.). Tool output and images are left out to keep it readable;
 the full raw exports are kept separately.
 Names, usernames, email addresses and local paths are replaced with placeholders such as [teammate], [redacted] and [local path].
@@ -17,3 +17,5 @@ One file per conversation:
 7. [Playtest feedback: coaster snap, reset button and menu board](07_2026-11-07_playtest-feedback-coaster-snap-reset-button-and-menu-board.md) · 2026-11-07
 8. [Week 2: README, demo video, video page and the ingredients list](08_2026-11-08_week-2-readme-demo-video-video-page-and-ingredients-list.md) · 2026-11-08
 9. [Character sheets, their drinks and quests](09_2026-11-09_character-sheets-drinks-and-quests.md) · 2026-11-09
+10. [Script audit, hand-editable refactor, PCVR builds & playtest fixes](10_2026-11-09_script-audit-and-the-hand-editable-refactor.md) · 2026-11-09 – 2026-11-23
+11. [Game loop, Quest 2 performance, bar layout, shaker cap and builds](11_2026-11-02_game-loop-quest-2-performance-bar-layout-shaker-cap-and-builds.md) · 2026-11-02 – 2026-11-23 (continues entry 2)

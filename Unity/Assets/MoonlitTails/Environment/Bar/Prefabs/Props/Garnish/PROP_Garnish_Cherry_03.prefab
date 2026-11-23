@@ -68,6 +68,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 34f6f7d867504cffba672efa56109eba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5797519658931112018}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 34f6f7d867504cffba672efa56109eba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7357993748862575729}
   m_SourcePrefab: {fileID: 100100000, guid: 34f6f7d867504cffba672efa56109eba, type: 3}
 --- !u!1 &8062378863544638629 stripped
 GameObject:
@@ -268,3 +271,17 @@ MonoBehaviour:
   space: {fileID: 0}
   homePosition: {x: 0, y: 0, z: 0}
   homeRotation: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &7357993748862575729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062378863544638629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b775426c493d68d2cb55a7acbcfb147a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.Garnish
+  color: Cherry
+  reach: 0.07

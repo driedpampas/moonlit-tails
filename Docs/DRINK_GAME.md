@@ -4,9 +4,22 @@ How drinks are made in Moonlit Tails, the rules as the team agreed them, and whe
 
 ## Playing it
 
-Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so the scene file doesn't need to change.
+Press Play in `MoonlitBar_VR.unity`. The game runs from the `Drink Game` object in the scene.
 
-1. **Read a ticket** on the ticket rail. Each ticket belongs to one customer and shows:
+**Customers come one at a time, in a random order** (never the same one twice in a row). One walks in from the door to the bar and orders. They stay until they get a drink that matches. Then they tell the next line of their story and walk out, and the next customer comes in. A wrong drink never sends them away: they say what's off and keep waiting.
+
+**Everything is within arm's reach.** You stand at the front counter and don't need to step:
+The front counter is laid out in the order you work, left to right, so your hands move in one sweep:
+- **ice** on the front left: the ice well, with the scoop lying on it;
+- **mixing** in the middle, on the bar mat: the Stir Cup on its left; the Shake Mixer on its right, with its cap standing in front of it; the bar spoon along the front edge;
+- **garnish** on the front right: the garnish tray;
+- **serve** further forward, in front of the customer: the coaster, the bell and the panel;
+- on your left: the glasses, one of each kind (the spare copies are on the old stand at the far left);
+- on your right: the ingredients, in the order of the crafting guide (see [Ingredients](MENU_AND_CHARACTERS.md#ingredients)). Turn to face them and, left to right, there are four rows: the **base drinks** (Whiskey, Bourbon, Tequila), then the **bitter**, **sweet** and **sour** modifiers. Each row runs from nearest you to furthest in the guide's order, e.g. Tonic Water, Orange Peel, Espresso, Black Tea.
+
+Nothing taller than the Stir Cup (22 cm) stands between you and the customer.
+
+1. **Read the ticket** on the ticket rail (above the glasses). It's blank until a customer orders, then it shows their name and:
    - the three taste bars to hit;
    - Mixed or Layered;
    - the glass;
@@ -14,7 +27,7 @@ Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so
 2. **Pour ingredients.** Tip a bottle or carton over the **Stir Cup** (the blender jar) or the **Shake Mixer** (the shaker tin). One tip is 1 unit. Tilt it back up to pour again.
 3. **Mix.** With two things in, combine them:
    - if their densities are the same, **stir** by swirling the bar spoon inside;
-   - if they differ, **shake** by holding the cup and shaking it back and forth.
+   - if they differ, **shake** by holding the cup and shaking it back and forth. The Shake Mixer needs its **cap** on first: let go of the cap near its mouth and it snaps on. Grab the cap to take it off again before you pour. While the cap is on, nothing pours in or out.
 
    The wrong method does nothing. The same ingredient can't go in twice.
 4. **Fill the glass.**
@@ -26,15 +39,17 @@ Press Play in `MoonlitBar_VR.unity`. The drink game adds itself to the scene, so
    - Let go of a fruit slice near the rim: it sticks there and gives the drink its **colour**.
 6. **Serve.** Put the glass on the serve coaster. Let go of it close to or just above the coaster and it snaps on, upright and in the middle, and stays there until you pick it up.
    - The panel next to it shows the final taste and has **+ / −** buttons for the end-of-drink adjustment: 1 point for a mixed drink, 2 for a layered one.
-   - Ring the bell (touch or grab it), or press **Serve**.
-   - A right drink: the customer says the next line of their story.
-   - A wrong drink: they say what's off, and their ticket shows a tip.
+   - Ring the bell (press it down with a finger, or pinch it), or press **Serve**.
+   - A right drink: the customer says the next line of their story, then leaves.
+   - A wrong drink: they say what's off, their ticket shows a tip, and they wait for another try.
 
-To empty anything, tip it out over nothing. The big red **DO NOT PUSH** button on the front counter (left corner, next to the glass rack) puts every prop back where it started, even one in your hand or behind the bar. What's in the glasses and cups stays. **R** on the keyboard does the same.
+**Putting things back.** Every prop has a home spot. While you hold it close to that spot, a **white ring** shows there: let go and it snaps into place. Whatever is in your hand passes through everything else, so it can't knock other props over.
 
-The rules are on a sign on the back wall right behind you, where the round cocktail logo was, so you can read them from behind the bar. The logo is only hidden while playing: it's still in the bar prefab. The chalkboard on the far wall shows the same rules.
+To empty anything, tip it out over nothing. The big red **DO NOT PUSH** button on the front counter (far left, past the ice well) puts every prop back where it started, even one in your hand or behind the bar. What's in the glasses and cups stays. **R** on the keyboard does the same.
 
-Labels float over the bottles, cups and glasses when you're close. Buttons work with a fingertip, or with a mouse click when you use the XR Device Simulator.
+The rules are on a sign on the back wall right behind you, where the round cocktail logo was, so you can read them from behind the bar. The logo is still in the bar prefab: its three pieces are just switched off in the scene. The chalkboard on the far wall shows the same rules.
+
+**Labels** show only while your hand is near: about 20 cm from a bottle, glass or the ice scoop, and 40 cm from the Stir Cup and Shake Mixer (you pour into those from above). A message (like "Shaken!") shows anyway while it lasts. Each label has a see-through black backdrop that fits its text, so it's readable against anything. The distance is **Show Near Hand** on the prop's *Ingredient Source* or *Drink Container*; the backdrop's look is in `Resources/Moonlit/FloatingLabel.prefab` and `LabelBackdrop.mat`. The buttons are stock XR Interaction Toolkit poke buttons: press them with a fingertip, or with a controller's tip. With the XR Interaction Simulator, poke them with a simulated hand or controller.
 
 ## Rules
 
@@ -66,8 +81,11 @@ Two choices aren't in the guide yet. Check them with the designers:
 |---|---|
 | `Unity/Assets/MoonlitTails/Scripts/Drinks/` | The rules as plain C# with no Unity dependency: ingredients, mixing, layering, glasses, adjustments, order checking and the order generator. |
 | `Unity/Assets/MoonlitTails/Scripts/Runtime/Gameplay/` | The VR side: pouring, containers, the stir spoon, ice, garnish, the serve station, orders and labels. |
-| `Gameplay/DrinkGame.cs` | **The tables to edit**: which prop is which ingredient, and the glass lengths. |
-| `Gameplay/CustomerScripts.cs` | What each customer says. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
+| `Gameplay/DrinkGame.cs` | The night at the bar: customers coming and going, orders, tickets, serving, and the reset. It's on the `Drink Game` object in the scene, where the customers, their **Walk Path**, the serve panel, the reset button and the chalkboard text are set. The walk path is a list of markers from the door to the bar (`MK_Spawn_L`, `MK_Queue_L1`, `MK_CustomerApproach`, `MK_CustomerSpot_C`): move a marker or add one to change the way in. Walk speed, the bob, and the waits are fields next to it. The rules sign on the back wall is just a prefab in the scene; no script uses it. |
+| `Gameplay/ServeStation.cs` | The serve coaster and its panel (`Prefabs/UI/ServePanel.prefab`): the coaster snap, the taste readout, the adjustment buttons, Serve and the bell. |
+| `Prefabs/UI/` | The serve panel and the rules sign, and their flat-colour materials. The reset button and the chalkboard text are plain objects under `Drink Game` in the scene. |
+| The prop prefabs (`Environment/Bar/Prefabs/Props`) | **What each prop is**: the ingredient on each bottle's *Ingredient Source*, the kind, name and length on each glass's *Drink Container*, the colour on each *Garnish*. |
+| `Data/Customers/` | What each customer says, one *Customer Profile* asset each. **This is placeholder writing** for the old placeholder customers: replace it with the real characters in [Docs/Characters](Characters/). |
 | `Tests/DrinkRules.Tests/` | Rules tests, including the characters' usual drinks: `dotnet run`. |
 
 **Ingredients and props.** The bar has cocktail bottles, so for now each ingredient is assigned to an existing prop:
@@ -90,13 +108,25 @@ Two choices aren't in the guide yet. Check them with the designers:
 | Grapefruit Acid | Melon Liqueur bottle |
 | Sour Mix | Blue Curaçao bottle |
 
-The label over each prop shows the ingredient's name. Swap the models later, or change the table in `DrinkGame.cs`.
+The label over each prop shows the ingredient's name. How the labels, the liquid in a glass, the ice cubes and the pour stream look is set in four small prefabs in `Unity/Assets/MoonlitTails/Resources/Moonlit/` (`FloatingLabel`, `Liquid`, `Ice`, `PourStream`); the game makes copies of them as it needs them. To change what a prop pours, open its prefab and pick another **Ingredient** on its *Ingredient Source*.
+
+**Adding a prop to the game:** open its prefab (it needs a collider, a Rigidbody, an XR Grab Interactable and a Prop Respawn, like the others) and add one component:
+- a bottle or carton: **Ingredient Source**, then pick the ingredient;
+- a glass: **Drink Container**, Kind *Glass*, a Variant name (what customers ask for, e.g. *Highball*) and a Length (Short holds 3 units, Medium 4, Long 5);
+- a fruit slice: **Garnish**, with its colour name (e.g. *Lime*);
+- a cap: **Container Cap**. It snaps onto any Stir Cup or Shake Mixer that has **Needs Cap** ticked on its *Drink Container*. That vessel then can't be shaken without it.
+
+Then run **Tools > Moonlit Tails > Automation > Check Scene** to see it listed.
+
+**Buttons.** Each button is a trigger Box Collider with an *XR Simple Interactable* on the **Poke** interaction layer, an *XR Poke Filter* (Poke Direction = the way the finger moves: *Z* for the panel, *Negative Y* for the reset dome and the bell) and the Starter Assets *XR Poke Follow Affordance*, which moves the child *Visual* in as it's pressed. The serve panel's buttons call the Serve Station through their **Select Entered** event, set in the prefab. The reset button and the bell are subscribed to in code (Drink Game's *Reset Button* field, Serve Station's *Bell* field). The bell is also on the Default layer, so a pinch rings it too. Hands poke on every layer; the controllers' Poke Interactors are set to Default + Poke in the scene.
+
+**One script per job.** A small behaviour that belongs to one thing goes in that thing's script as a method, not in its own component: the coaster snap is part of Serve Station, the taste bars are a field type (`StatBarsView`), and the order book is part of Drink Game. A new component is worth it only when it goes on many different objects (like *Prop Respawn*) or is a different job.
 
 ## Testing
 
 - **Rules:** `cd Tests/DrinkRules.Tests && dotnet run`. If the .NET workload resolver is broken on your machine, run `MSBuildEnableWorkloadResolver=false dotnet run` instead.
-- **Tools > Moonlit Tails > 4. Check Drink Setup:** lists which prop got which role, and warns about anything missing.
-- **Tools > Moonlit Tails > 5. Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button.
+- **Tools > Moonlit Tails > Automation > Check Scene:** lists which prop got which role, warns about anything missing, checks the bar pieces, and checks that the Drink Game object and the serve panel are fully wired.
+- **Tools > Moonlit Tails > Automation > Play Smoke Test:** plays the scene and makes drinks by moving the real props: pours, mixing, stirring, the shaker cap, a mixed and a layered glass, ice, garnish, adjustments, serving, the coaster snap and the reset button. It also checks the customer loop: one walks in and orders, leaves after a right drink, the next comes in, and a wrong drink doesn't send them away. It presses the panel buttons, the bell and the reset button through their XR Interaction Toolkit events.
 - **Headless:** run the smoke test from a terminal. Exit code 0 means it passed.
   ```
   Unity -batchmode -nographics -projectPath Unity -executeMethod MoonlitTails.EditorTools.DrinkPlaySmokeTest.RunBatch -logFile -

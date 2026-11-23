@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ad2b472319a818b8931a861dd5a52f, type: 3}
+  m_Name: Guest
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.CustomerProfile
+  displayName: Guest
+  greetings:
+  - Good evening. I'll have the usual... well, today's usual.
+  - Hello. May I order?
+  story:
+  - I used to come here with someone. They moved to the city by the sea.
+  - They wrote to me today. First letter in a year.
+  - I think I'll write back. Tonight, maybe. With your drink for courage.
+  thanks:
+  - Wonderful, thank you.
+  - Just right.
+  wrong:
+  - Oh... this isn't quite it.
+  - I think something's different from what I asked.
+  storyDone: That's enough remembering for one night.

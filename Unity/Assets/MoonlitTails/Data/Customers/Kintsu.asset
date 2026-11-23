@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1ad2b472319a818b8931a861dd5a52f, type: 3}
+  m_Name: Kintsu
+  m_EditorClassIdentifier: MoonlitTails.Runtime::MoonlitTails.Gameplay.CustomerProfile
+  displayName: Kintsu
+  greetings:
+  - Evening! Could I get something for me?
+  - Hi again. I've been thinking about what I'd like...
+  story:
+  - My grandmother mended broken cups with gold. She said the cracks are the best
+    part.
+  - I dropped her favourite teacup last winter. I still have all the pieces.
+  - I think I'm finally ready to fix it. Gold seams and all.
+  thanks:
+  - Oh, that's perfect.
+  - Exactly what I wanted, thank you!
+  wrong:
+  - Hmm, not quite what I asked for...
+  - That's lovely, but it's not my order.
+  storyDone: Thanks for listening tonight. Same time tomorrow?

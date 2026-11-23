@@ -1,0 +1,28 @@
+{
+    "name": "MoonlitTails.DevTools.Editor",
+    "rootNamespace": "",
+    "references": [
+        "MoonlitTails.Runtime",
+        "MoonlitTails.Drinks",
+        "MoonlitTails.Editor",
+        "MoonlitTails.DevTools",
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.XR.CoreUtils",
+        "Unity.XR.Management",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
