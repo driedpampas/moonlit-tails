@@ -14,7 +14,7 @@ A cozy VR bartending game for Quest. Mix drinks with your own hands for animal c
 - @stiv69
 - @broko25
 
-## Week 1
+## Milestone 1 (Oct 26 – Nov 2, 2026)
 - Placeholder environment with interactable assets integrated in Unity
 - Character brainstorming and creation
 
@@ -24,10 +24,10 @@ AI was used for:
 - debugging
 - writing the README
 
-## Week 2
-<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Week 2 demo video"></a>
+## Milestone 2 (Nov 3 – Nov 8, 2026)
+<a href="https://driedpampas.github.io/moonlit-tails/"><img src="https://driedpampas.github.io/moonlit-tails/poster.jpg" width="480" alt="Milestone 2 demo video"></a>
 
-[Watch the Week 2 demo](https://driedpampas.github.io/moonlit-tails/) (2 min, plays in the browser)
+[Watch the demo](https://driedpampas.github.io/moonlit-tails/) (2 min, plays in the browser)
 
 - Quest build setup, and the XR Interaction Simulator for testing without a headset
 - The drink game: pouring, stirring, shaking, layering, orders and customer reactions ([how it works](Docs/DRINK_GAME.md))
@@ -42,7 +42,7 @@ AI was used for:
 - recording the demo video
 - writing the docs
 
-## Week 3
+## Milestone 3 (Nov 9 – Nov 23, 2026)
 - Hand-editable scene refactor, `DevTools` isolated from runtime, compact arm's-reach bar with 5 rotating customers, and Quest 2 lighting/perf optimizations
 - Live PCVR playtest fixes: D3D11 VR stereo character shader, working poke buttons, stabilized ear/tail spring physics, animated rigged hand models in controller mode, and readable NPC dialogue bubbles
 - Smoother prop handling: auto-captured Default Slots with snap + indicator ring, held props ignoring clutter, room-wide floor catch, front-bar recovery for filled vessels, hand-near labels, and layer collapse paused for testing
